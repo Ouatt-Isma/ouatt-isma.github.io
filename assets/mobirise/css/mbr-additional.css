@@ -1092,10 +1092,10 @@ section.lazy-placeholder:after {
   color: #c1c1c1 !important;
 }
 .cid-qTkA127IK8 {
-  background-image: url("../../../assets/images/background4.jpg");
+  background-color: #232323;
 }
 .cid-s3Mp4dsFp7 {
-  background-image: url("../../../assets/images/background1.jpg");
+  background-color: #073b4c;
 }
 .cid-s3Mp4dsFp7 .icons-media-container {
   display: flex;
@@ -1291,6 +1291,9 @@ section.lazy-placeholder:after {
 }
 .cid-s3MqXLAJLY .nav-tabs .nav-link.active:hover {
   border: 2px solid #149dcc;
+}
+.cid-s3MqXLAJLY H4 {
+  text-align: center;
 }
 .cid-s3MsNm8HFz {
   padding-top: 90px;
