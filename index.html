@@ -1048,238 +1048,126 @@
       </div>
     </section>
 
-    <section class="progress-bars3 cid-s3MzyYFTI9" id="progress-bars3-d">
-      <mbr-parameters>
-        <!-- Block parameters controls (Blue "Gear" panel) -->
-        <input
-          type="range"
-          inline
-          title="Top"
-          name="paddingTop"
-          min="0"
-          max="8"
-          step="1"
-          value="6"
-        />
-        <input
-          type="range"
-          inline
-          title="Bottom"
-          name="paddingBottom"
-          min="0"
-          max="8"
-          step="1"
-          value="6"
-        />
-
-        <input type="checkbox" title="Show Title" name="showTitle" checked />
-        <input
-          type="checkbox"
-          title="Show Subtitle"
-          name="showSubtitle"
-          checked
-        />
-        <input
-          type="color"
-          title="Progress Color"
-          name="progressColor"
-          value="#149dcc"
-        />
-
-        <select title="Progress count" name="progressCount">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3" selected>3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-        </select>
-        <input
-          type="range"
-          inline
-          title="Progress 1"
-          name="progress1"
-          min="0"
-          max="100"
-          step="1"
-          value="100"
-        />
-        <input
-          type="range"
-          inline
-          title="Progress 2"
-          name="progress2"
-          min="0"
-          max="100"
-          step="1"
-          value="80"
-          condition="progressCount>1"
-        />
-        <input
-          type="range"
-          inline
-          title="Progress 3"
-          name="progress3"
-          min="0"
-          max="100"
-          step="1"
-          value="40"
-          condition="progressCount>2"
-        />
-        <input
-          type="range"
-          inline
-          title="Progress 4"
-          name="progress4"
-          min="0"
-          max="100"
-          step="1"
-          value="80"
-          condition="progressCount>3"
-        />
-        <input
-          type="range"
-          inline
-          title="Progress 5"
-          name="progress5"
-          min="0"
-          max="100"
-          step="1"
-          value="90"
-          condition="progressCount>4"
-        />
-        <input
-          type="range"
-          inline
-          title="Progress 6"
-          name="progress6"
-          min="0"
-          max="100"
-          step="1"
-          value="100"
-          condition="progressCount>5"
-        />
-
-        <fieldset type="background" name="bg" parallax>
-          <input
-            type="image"
-            title="Background Image"
-            value="../_images/background1.jpg"
-          />
-          <input
-            type="color"
-            title="Background Color"
-            value="#ffffff"
-            selected
-          />
-          <input
-            type="video"
-            title="Background Video"
-            value="https://www.youtube.com/watch?v=36YgDDJ7XSc"
-          />
-        </fieldset>
-        <input
-          type="checkbox"
-          title="Overlay"
-          name="overlay"
-          condition="bg.type !== 'color'"
-          checked
-        />
-        <input
-          type="color"
-          title="Overlay Color"
-          name="overlayColor"
-          value="#ffffff"
-          condition="overlay && bg.type !== 'color'"
-        />
-        <input
-          type="range"
-          inline
-          title="Opacity"
-          name="overlayOpacity"
-          min="0"
-          max="1"
-          step="0.1"
-          value="0.7"
-          condition="overlay && bg.type !== 'color'"
-        />
+    <section class="progress-bars3" group="Progress" data-bg-video="{{bg.type == 'video' && bg.value.url}}" plugins="as-pie-progress" mbr-class="{'mbr-parallax-background': bg.parallax}">
+ 
+        <mbr-parameters>
+        <!-- Block parameters controls (Blue "Gear" panel) --> 
+            <input type="range" inline title="Top" name="paddingTop" min="0" max="8" step="1" value="6">
+            <input type="range" inline title="Bottom" name="paddingBottom" min="0" max="8" step="1" value="6">
+           
+            <input type="checkbox" title="Show Title" name="showTitle" checked>
+            <input type="checkbox" title="Show Subtitle" name="showSubtitle" checked>
+            <input type="color" title="Progress Color" name="progressColor" value="#149dcc">
+    
+            <select title="Progress count" name="progressCount">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+            </select>
+            <input type="range" inline title="Progress 1" name="progress1" min="0" max="100" step="1" value="100">
+            <input type="range" inline title="Progress 2" name="progress2" min="0" max="100" step="1" value="80" condition="progressCount>1">
+            <input type="range" inline title="Progress 3" name="progress3" min="0" max="100" step="1" value="40" condition="progressCount>2">
+            <input type="range" inline title="Progress 4" name="progress4" min="0" max="100" step="1" value="80" condition="progressCount>3">
+            <input type="range" inline title="Progress 5" name="progress5" min="0" max="100" step="1" value="90" condition="progressCount>4">
+            <input type="range" inline title="Progress 6" name="progress6" min="0" max="100" step="1" value="100" condition="progressCount>5">
+    
+            <fieldset type="background" name="bg" parallax>
+                <input type="image" title="Background Image" value="../_images/background1.jpg">
+                <input type="color" title="Background Color" value="#ffffff" selected>
+                <input type="video" title="Background Video" value="https://www.youtube.com/watch?v=36YgDDJ7XSc">
+            </fieldset>
+            <input type="checkbox" title="Overlay" name="overlay" condition="bg.type !== 'color'" checked>
+            <input type="color" title="Overlay Color" name="overlayColor" value="#ffffff" condition="overlay && bg.type !== 'color'">
+            <input type="range" inline title="Opacity" name="overlayOpacity" min="0" max="1" step="0.1" value="0.7" condition="overlay && bg.type !== 'color'">
         <!-- End block parameters -->
-      </mbr-parameters>
-
-      <div
-        class="mbr-overlay"
-        mbr-if="overlay && bg.type!== 'color'"
-        mbr-style="{'opacity': overlayOpacity, 'background-color': overlayColor}"
-      ></div>
-
-      <div class="container">
-        <h2
-          class="mbr-section-title pb-3 align-center mbr-fonts-style display-2"
-        >
-          Languages
-        </h2>
-
-        <h3 class="mbr-section-subtitle mbr-fonts-style display-5"></h3>
-
-        <div class="media-container-row pt-5 mt-2">
-          <div class="card p-3 align-center">
-            <div class="wrap">
-              <div
-                class="pie_progress progress1"
-                role="progressbar"
-                data-goal="50"
-              >
-                <p class="pie_progress__number mbr-fonts-style display-5">
-                  100%
-                </p>
-              </div>
-            </div>
-            <div class="mbr-crt-title pt-3">
-              <h4 class="card-title py-2 mbr-fonts-style display-5">
-                Francais
-              </h4>
-            </div>
-          </div>
-
-          <div class="card p-3 align-center">
-            <div class="wrap">
-              <div
-                class="pie_progress progress2"
-                role="progressbar"
-                data-goal="60"
-              >
-                <p class="pie_progress__number mbr-fonts-style display-5">
-                  70%
-                </p>
-              </div>
-            </div>
-            <div class="mbr-crt-title pt-3">
-              <h4 class="card-title py-2 mbr-fonts-style display-5">anglais</h4>
-            </div>
-          </div>
-
-          <div class="card p-3 align-center">
-            <div class="wrap">
-              <div
-                class="pie_progress progress3"
-                role="progressbar"
-                data-goal="70"
-              >
-                <p class="pie_progress__number mbr-fonts-style display-5">
-                  40%
-                </p>
-              </div>
-            </div>
-            <div class="mbr-crt-title pt-3">
-              <h4 class="card-title py-2 mbr-fonts-style display-5">
-                Chinois et espagnol
-              </h4>
-            </div>
-          </div>
+        </mbr-parameters> 
+    
+        <div class="mbr-overlay" mbr-if="overlay && bg.type!== 'color'" mbr-style="{'opacity': overlayOpacity, 'background-color': overlayColor}">
         </div>
-      </div>
-    </section>
-
+        
+        <div class="container">
+            <h2 class="mbr-section-title pb-3 align-center mbr-fonts-style" mbr-theme-style="display-2" mbr-if="showTitle" data-app-selector=".mbr-section-title">
+                Languages</h2>
+    
+            <h3 class="mbr-section-subtitle mbr-fonts-style" mbr-theme-style="display-5" mbr-if="showSubtitle" data-app-selector=".mbr-section-subtitle"></h3>
+        
+            <div class="media-container-row pt-5 mt-2">
+                <div class="card p-3 align-center">
+                    <div class="wrap">
+                        <div class="pie_progress progress1" role="progressbar" data-goal="{{progress1}}">
+                            <p class="pie_progress__number mbr-fonts-style" mbr-theme-style="display-5">100%</p>
+                        </div>
+                    </div> 
+                    <div class="mbr-crt-title pt-3">
+                        <h4 class="card-title py-2 mbr-fonts-style" mbr-theme-style="display-5" mbr-if="showTitle">Français</h4>
+                    </div>                 
+                </div>
+    
+                <div class="card p-3 align-center" mbr-if="progressCount>1">
+                    <div class="wrap">
+                        <div class="pie_progress progress2" role="progressbar" data-goal="{{progress2}}">
+                            <p class="pie_progress__number mbr-fonts-style" mbr-theme-style="display-5">60%</p>
+                        </div>
+                    </div> 
+                    <div class="mbr-crt-title pt-3">
+                        <h4 class="card-title py-2 mbr-fonts-style" mbr-theme-style="display-5" mbr-if="showTitle">anglais</h4>
+                    </div>                 
+                </div>
+    
+                <div class="card p-3 align-center" mbr-if="progressCount>2">
+                    <div class="wrap">
+                        <div class="pie_progress progress6" role="progressbar" data-goal="{{progress3}}">
+                            <p class="pie_progress__number mbr-fonts-style" mbr-theme-style="display-5">70%</p>
+                        </div>
+                    </div> 
+                    <div class="mbr-crt-title pt-3">
+                        <h4 class="card-title py-2 mbr-fonts-style" mbr-theme-style="display-5" mbr-if="showTitle">Chinois et espagnol</h4>
+                    </div>                 
+                </div>
+    
+                <div class="card p-3 align-center" mbr-if="progressCount>3">
+                    <div class="wrap">
+                        <div class="pie_progress progress4" role="progressbar" data-goal="{{progress4}}">
+                            <p class="pie_progress__number mbr-fonts-style" mbr-theme-style="display-5"></p>
+                        </div>
+                    </div> 
+                    <div class="mbr-crt-title pt-3">
+                        <h4 class="card-title py-2 mbr-fonts-style" mbr-theme-style="display-5" mbr-if="showTitle">
+                            Safety
+                        </h4>
+                    </div>                 
+                </div>
+    
+                <div class="card p-3 align-center" mbr-if="progressCount>4">
+                    <div class="wrap">
+                        <div class="pie_progress progress5" role="progressbar" data-goal="{{progress5}}">
+                            <p class="pie_progress__number mbr-fonts-style" mbr-theme-style="display-5"></p>
+                        </div>
+                    </div> 
+                    <div class="mbr-crt-title pt-3">
+                        <h4 class="card-title py-2 mbr-fonts-style" mbr-theme-style="display-5" mbr-if="showTitle">
+                            Study
+                        </h4>
+                    </div>                 
+                </div>
+    
+                <div class="card p-3 align-center" mbr-if="progressCount>5">
+                    <div class="wrap">
+                        <div class="pie_progress progress6" role="progressbar" data-goal="{{progress6}}">
+                            <p class="pie_progress__number mbr-fonts-style" mbr-theme-style="display-5"></p>
+                        </div>
+                    </div> 
+                    <div class="mbr-crt-title pt-3">
+                        <h4 class="card-title py-2 mbr-fonts-style" mbr-theme-style="display-5" mbr-if="showTitle">
+                            Français</h4>
+                    </div>                 
+                </div>
+            </div>
+    </div></section>
+    
     <section class="team1 cid-s3MITlQkAu" id="team1-i">
       <div class="container align-center">
         <h2 class="pb-3 mbr-fonts-style mbr-section-title display-2">
