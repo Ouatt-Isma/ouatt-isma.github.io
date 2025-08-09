@@ -187,7 +187,7 @@
       <div class="row tabcont">
         <ul class="nav nav-tabs pt-3 mt-5" role="tablist">
           <li class="nav-item mbr-fonts-style">
-            <a class="nav-link show active display-7" role="tab" data-toggle="tab" href="#tabs3-9_tab0" aria-selected="true">Internships/Roles</a>
+            <a class="nav-link show active display-7" role="tab" data-toggle="tab" href="#tabs3-9_tab0" aria-selected="true">Work Experience</a>
           </li>
           <li class="nav-item mbr-fonts-style">
             <a class="nav-link display-7" role="tab" data-toggle="tab" href="#tabs3-9_tab1">Projects</a>
@@ -326,11 +326,6 @@
           <!-- Other -->
           <div id="tabs3-9_tab3" class="tab-pane mbr-table" role="tabpanel">
             <div class="row tab-content-row">
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbri-responsive mbr-iconfont"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">Part-time Security Engineer — Mithril Security</h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">Confidential computing for AI (Intel SGX).</p>
-              </div>
               <div class="col-xs-12 col-md-6 col-lg-4">
                 <div class="card-img"><span class="mbri-responsive mbr-iconfont"></span></div>
                 <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">Teacher — ISEP (Paris)</h4>
@@ -539,10 +534,10 @@
       </div>
 
       <!-- Books and Chapters -->
-      <div class="mt-4">
+      <!-- <div class="mt-4">
         <h4 class="mbr-fonts-style display-5">Books and Chapters</h4>
         <ul class="mbr-fonts-style display-7" id="bib-booksandchapters"></ul>
-      </div>
+      </div> -->
 
       <!-- Accepted Conference Papers -->
       <div class="mt-4">
@@ -555,12 +550,6 @@
         <h4 class="mbr-fonts-style display-5">Patents</h4>
         <ul class="mbr-fonts-style display-7" id="bib-patent">
           <!-- Manual fallback entry so the section never looks empty -->
-          <li>
-            K. I. Ouattara, S. Papillon, A. F. Feki, K. A. Pantelidou,
-            <em>Distributed machine learning solution for rogue base station detection</em>,
-            <strong>US20240121678A1</strong>, 2024.
-            <a href="https://patents.google.com/patent/US20240121678A1/en" target="_blank" rel="noopener">Link</a>
-          </li>
         </ul>
       </div>
 
@@ -632,7 +621,7 @@
 
 @accepted{ouattara2025quantifying,
   author    = {Koffi Ismael Ouattara and Ioannis Krontiris and Theo Dimitrakos and Frank Kargl},
-  title     = {{Quantifying Calibration Error in Neural Networks through Evidence-Based Theory}},
+  title     = {Quantifying Calibration Error in Neural Networks through Evidence-Based Theory},
   booktitle = {Proceedings of the 28th International Conference on Information Fusion (FUSION)},
   year      = {2025},
   note      = {Accepted at Fusion 2025 ; Rank: B},
@@ -644,7 +633,8 @@
   author       = {Koffi Ismael Ouattara and Ana Petrovska and Ioannis Krontiris and Theo Dimitrakos and Frank Kargl},
   title        = {An Optimized Framework for DSPG Synthesis and Trust Network Analysis with Subjective Logic},
   year         = {2025},
-  note         = {To appear ; Rank: B ; Acceptance Rate: 35\%}
+  booktitle    = {Proceedings of the 9th International Joint Conference on Rules and Reasoning (RuleML+RR 2025)},
+  note         = {To appear; Rank: B ;Acceptance Rate: 35&percnt;}
 }
 
 @inprogress{SNN,
@@ -659,38 +649,94 @@
   author    = {Nikolaos Fotos and Koffi Ismael Ouattara and Dimitrios S. Karas and Ioannis Krontiris and Weizhi Meng and Thanassis Giannetsos},
   booktitle = {Proceedings of the 27th International Conference on Information and Communications Security (ICICS)},
   year      = {2025},
-  note      = {To appear},
   organization = {ICICS},
   url       = {https://www.icics2025.org/},
-  note = {Rank: B, Acceptance rate: 26\%}
+  note = {To appear, Rank: B, Acceptance rate: 26&percnt;}
 }
 
 
     </script>
 
     <!-- Tiny client-side renderer for the categories above -->
-    <script>
+<script>
 (function () {
   const raw = document.getElementById('bibtex-data');
   if (!raw) return;
-
   const text = raw.textContent || raw.innerText || '';
+
+  // ---- Utilities ----
+  function splitTopLevel(body) {
+    // Split body into field assignments at commas NOT inside braces/quotes.
+    const parts = [];
+    let cur = '';
+    let depth = 0;
+    let inQuote = false;
+    for (let i = 0; i < body.length; i++) {
+      const c = body[i];
+      // Handle comments: % to end of line when not in quotes
+      if (c === '%' && !inQuote) {
+        // skip to end of line
+        while (i < body.length && body[i] !== '\n') i++;
+        continue;
+      }
+      if (c === '"' && body[i-1] !== '\\') inQuote = !inQuote;
+      if (!inQuote) {
+        if (c === '{') depth++;
+        else if (c === '}') depth = Math.max(0, depth - 1);
+      }
+      if (c === ',' && depth === 0 && !inQuote) {
+        if (cur.trim()) parts.push(cur.trim());
+        cur = '';
+      } else {
+        cur += c;
+      }
+    }
+    if (cur.trim()) parts.push(cur.trim());
+    return parts;
+  }
+
+  function unbrace(v) {
+    v = v.trim();
+    // remove one outer pair of braces or quotes if they wrap the whole value
+    if ((v.startsWith('{') && v.endsWith('}')) || (v.startsWith('"') && v.endsWith('"'))) {
+      // Ensure braces are balanced before stripping
+      let depth = 0, ok = true;
+      for (let i = 0; i < v.length; i++) {
+        const c = v[i];
+        if (c === '{') depth++;
+        else if (c === '}') depth--;
+        if (depth < 0) { ok = false; break; }
+      }
+      if (ok && depth === 0) v = v.slice(1, -1);
+    }
+    return v.trim();
+  }
+
+  function parseFields(body) {
+    const fields = {};
+    splitTopLevel(body).forEach(token => {
+      const eq = token.indexOf('=');
+      if (eq === -1) return;
+      const k = token.slice(0, eq).trim().toLowerCase();
+      const v = unbrace(token.slice(eq + 1));
+      fields[k] = v.replace(/\s+/g, ' ').trim();
+    });
+    return fields;
+  }
+
+  // ---- Parse entries ----
   const entries = [];
   const re = /@(\w+)\s*\{\s*([^,]+)\s*,([\s\S]*?)\}\s*(?=@|$)/g;
   let m;
-
   while ((m = re.exec(text)) !== null) {
     const type = (m[1] || '').toLowerCase();
     const key = (m[2] || '').trim();
     const body = m[3] || '';
-    const fields = {};
-    body.replace(/(\w+)\s*=\s*(\{|\")([\s\S]*?)\2\s*,?/g, (_, k, _q, v) => {
-      fields[k.toLowerCase()] = (v || '').replace(/\s+/g, ' ').trim();
-    });
+    const fields = parseFields(body);
     entries.push({ type, key, fields });
   }
 
-  // ----- helpers -----
+  // ---- Buckets ----
   const buckets = {
     article: document.getElementById('bib-articles'),
     inproceedings: document.getElementById('bib-inproceedings'),
@@ -700,110 +746,129 @@
     inprogress: document.getElementById('bib-inprogress')
   };
 
-  const grouped = {
-    article: [],
-    inproceedings: [],
-    booksandchapters: [],
-    accepted: [],
-    patent: [],
-    inprogress: []
-  };
-
   function normalizeTarget(e) {
     if (e.type === 'book' || e.type === 'incollection' || e.type === 'inbook') return 'booksandchapters';
-    return grouped.hasOwnProperty(e.type) ? e.type : null;
+    return buckets[e.type] ? e.type : null;
   }
 
-  function cleanAuthors(a) {
-    // Very light cleanup: "A and B and C" -> "A, B, C"
-    return a.replace(/\s+and\s+/gi, ', ');
+  // ---- Formatting helpers ----
+  function initialsFrom(firstNames) {
+    return firstNames
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(w => (w[0] || '').toUpperCase() + '.')
+      .join(' ');
+  }
+  function formatAuthors(authStr) {
+    const parts = authStr.split(/\s+and\s+/i).map(s => s.trim()).filter(Boolean);
+    const formatted = parts.map(p => {
+      if (p.includes(',')) {
+        const [last, first] = p.split(',').map(s => s.trim());
+        return (initialsFrom(first || '') + ' ' + last).trim();
+      } else {
+        const tokens = p.split(/\s+/);
+        const last = tokens.pop();
+        const first = tokens.join(' ');
+        return (initialsFrom(first) + ' ' + (last || '')).trim();
+      }
+    });
+    if (formatted.length <= 2) return formatted.join(' and ');
+    return formatted.slice(0, -1).join(', ') + ', and ' + formatted.slice(-1);
+  }
+  function doiLink(doi) {
+    if (!doi) return '';
+    const cleaned = doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, '').trim();
+    return ` <a href="https://doi.org/${cleaned}" target="_blank" rel="noopener">doi: ${cleaned}</a>`;
+  }
+  function pagesText(p) { return p ? `, pp. ${p.replace(/-/g,'–')}` : ''; }
+  function rankAndYear(note, year) {
+    // let rank = '';
+    // if (note) {
+    //   const r = note.match(/rank\s*:\s*([A-D][\+]?)/i);
+    //   if (r) rank = `Rank: ${r[1].toUpperCase()}`;
+    // }
+    // return (rank ? `${rank}, ` : '') + (year || '');
+    return (note ? `${note}, ` : '') + (year || '');
   }
 
-  function extractBadge(field, regex, labelPrefix) {
-    if (!field) return '';
-    const match = field.match(regex);
-    if (!match) return '';
-    const val = (match[1] || '').replace(/\\%/g, '%').trim();
-    return `<span class="badge badge-secondary" style="margin-left:.35rem;">${labelPrefix} ${val}</span>`;
+  function fmtInproceedings(f) {
+    const authors = f.author ? formatAuthors(f.author) : '';
+    const title = f.title ? `“${f.title}”` : '';
+    const venue = f.booktitle ? `<em>${f.booktitle}</em>` : '';
+    const year = f.year || '';
+    const rankYear = rankAndYear(f.note, year);
+    const doi = doiLink(f.doi);
+    const pages = pagesText(f.pages);
+    return `${authors}, ${title}, in ${venue}${pages}, ${rankYear}.${doi ? ' ' + doi : ''}`;
   }
-
-  function fmt(e) {
+  function fmtArticle(f) {
+    const authors = f.author ? formatAuthors(f.author) : '';
+    const title = f.title ? `“${f.title}”` : '';
+    const journal = f.journal ? `<em>${f.journal}</em>` : (f.note || '');
+    const year = f.year || '';
+    const doi = doiLink(f.doi);
+    return `${authors}, ${title}, ${journal}, ${year}.${doi ? ' ' + doi : ''}`;
+  }
+  function fmtPatent(f) {
+    const authors = f.author ? formatAuthors(f.author) : '';
+    const title = f.title ? `“${f.title}”` : '';
+    const inst = f.institution ? f.institution : '';
+    const num = f.number ? ` <strong>${f.number}</strong>` : '';
+    const year = f.year || '';
+    const link = f.url ? ` <a href="${f.url}" target="_blank" rel="noopener">link</a>` : '';
+    const bits = [authors, title, inst].filter(Boolean).join(', ');
+    return `${bits}${num ? ',' + num : ''}, ${year}.${link}`;
+  }
+  function fmtAccepted(f) { return fmtInproceedings(f); }
+  function fmtInProgress(f) {
+    const authors = f.author ? formatAuthors(f.author) : '';
+    const title = f.title ? `“${f.title}”` : '';
+    const year = f.year || '';
+    return `${authors}, ${title}, Contribution: ${f.abstract}, ${year}.`;
+  }
+  function render(e) {
     const f = e.fields;
-    const parts = [];
-
-    if (f.author) parts.push(cleanAuthors(f.author));
-    if (f.title) parts.push('<em>' + f.title + '</em>');
-
-    // Venue-ish
-    if (e.type === 'article' && f.journal) parts.push(f.journal);
-    if ((e.type === 'inproceedings' || e.type === 'accepted') && f.booktitle) parts.push(f.booktitle);
-    if (!f.booktitle && f.organization) parts.push(f.organization);
-    if (!f.booktitle && !f.organization && f.institution) parts.push(f.institution);
-
-    // Pages
-    if (f.pages) parts.push('pp. ' + f.pages);
-
-    // Month + Year (month may be like "Nov")
-    const when = [f.month, f.year].filter(Boolean).join(' ');
-    if (when) parts.push(when);
-    else if (f.year) parts.push(f.year);
-
-    // Patent number
-    if (f.number && e.type === 'patent') parts.push('<strong>' + f.number + '</strong>');
-
-    // Links
-    if (f.doi) {
-      const doi = f.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, '');
-      parts.push('<a href="https://doi.org/' + doi + '" target="_blank" rel="noopener">doi:' + doi + '</a>');
-    } else if (f.url) {
-      parts.push('<a href="' + f.url + '" target="_blank" rel="noopener">link</a>');
+    switch (e.type) {
+      case 'inproceedings': return fmtInproceedings(f);
+      case 'article': return fmtArticle(f);
+      case 'accepted': return fmtAccepted(f);
+      case 'patent': return fmtPatent(f);
+      case 'inprogress': return fmtInProgress(f);
+      default: return fmtInproceedings(f);
     }
-
-    // Badges (Rank, Acceptance rate) from note
-    const note = f.note || '';
-    const rankBadge = extractBadge(note, /rank\s*:\s*([A-D][\+]?)/i, 'Rank');
-    const accBadge  = extractBadge(note, /acceptance\s*rate\s*:\s*([\d]+\\?%)/i, 'Acceptance');
-
-    const line = parts.join(', ') + (rankBadge || accBadge ? ' ' + rankBadge + accBadge : '');
-    return line;
   }
-
   function getYear(e) {
-    // Try to parse numeric year; fall back to 0
     const y = parseInt(e.fields.year, 10);
     return isNaN(y) ? 0 : y;
   }
 
-  // Group
+  // ---- Group, sort, render ----
+  const grouped = {};
   entries.forEach(e => {
-    const target = normalizeTarget(e);
-    if (!target) return;
-    grouped[target].push(e);
+    const tgt = normalizeTarget(e);
+    if (!tgt) return;
+    (grouped[tgt] = grouped[tgt] || []).push(e);
   });
 
-  // Sort and render
   Object.keys(grouped).forEach(k => {
-    const list = grouped[k];
     const ul = buckets[k];
-    if (!ul || !list.length) return;
-
-    list.sort((a, b) => {
-      const ya = getYear(a), yb = getYear(b);
-      if (yb !== ya) return yb - ya; // desc by year
-      const ta = (a.fields.title || '').toLowerCase();
-      const tb = (b.fields.title || '').toLowerCase();
-      return ta.localeCompare(tb);
-    });
-
-    list.forEach(e => {
-      const li = document.createElement('li');
-      li.className = 'mbr-fonts-style display-7';
-      li.innerHTML = fmt(e);
-      ul.appendChild(li);
-    });
+    if (!ul) return;
+    grouped[k]
+      .sort((a,b) => {
+        const y = getYear(b) - getYear(a);
+        if (y) return y;
+        return (a.fields.title||'').localeCompare(b.fields.title||'');
+      })
+      .forEach(e => {
+        const li = document.createElement('li');
+        li.className = 'mbr-fonts-style display-7';
+        li.innerHTML = render(e);
+        ul.appendChild(li);
+      });
   });
 })();
 </script>
+
 
   </section>
 
