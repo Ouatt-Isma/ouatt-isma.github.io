@@ -670,62 +670,141 @@
 
     <!-- Tiny client-side renderer for the categories above -->
     <script>
-    (function(){
-      const raw = document.getElementById('bibtex-data');
-      if(!raw) return;
+(function () {
+  const raw = document.getElementById('bibtex-data');
+  if (!raw) return;
 
-      const text = raw.textContent || raw.innerText || '';
-      const entries = [];
-      const re = /@(\w+)\s*\{\s*([^,]+)\s*,([\s\S]*?)\}\s*(?=@|$)/g;
-      let m;
-      while ((m = re.exec(text)) !== null) {
-        const type = m[1].toLowerCase();
-        const key = m[2].trim();
-        const body = m[3];
-        const fields = {};
-        body.replace(/(\w+)\s*=\s*(\{|\")([\s\S]*?)\2\s*,?/g, (_, k, _q, v) => {
-          fields[k.toLowerCase()] = v.replace(/\s+/g,' ').trim();
-        });
-        entries.push({ type, key, fields });
-      }
+  const text = raw.textContent || raw.innerText || '';
+  const entries = [];
+  const re = /@(\w+)\s*\{\s*([^,]+)\s*,([\s\S]*?)\}\s*(?=@|$)/g;
+  let m;
 
-      function fmt(e){
-        const f = e.fields;
-        const parts = [];
-        if (f.author) parts.push(f.author);
-        if (f.title) parts.push('<em>' + f.title + '</em>');
-        if (e.type === 'article' && f.journal) parts.push(f.journal);
-        if (e.type === 'inproceedings' && f.booktitle) parts.push(f.booktitle);
-        if (f.year) parts.push(f.year);
-        if (f.number) parts.push('<strong>' + f.number + '</strong>');
-        if (f.doi) parts.push('<a href="https://doi.org/' + f.doi + '" target="_blank" rel="noopener">doi:' + f.doi + '</a>');
-        if (f.url && !f.doi) parts.push('<a href="'+f.url+'" target="_blank" rel="noopener">link</a>');
-        if (f.note && !f.doi && !f.url) parts.push(f.note);
-        return parts.join(', ');
-      }
+  while ((m = re.exec(text)) !== null) {
+    const type = (m[1] || '').toLowerCase();
+    const key = (m[2] || '').trim();
+    const body = m[3] || '';
+    const fields = {};
+    body.replace(/(\w+)\s*=\s*(\{|\")([\s\S]*?)\2\s*,?/g, (_, k, _q, v) => {
+      fields[k.toLowerCase()] = (v || '').replace(/\s+/g, ' ').trim();
+    });
+    entries.push({ type, key, fields });
+  }
 
-      const buckets = {
-        article: document.getElementById('bib-articles'),
-        inproceedings: document.getElementById('bib-inproceedings'),
-        booksandchapters: document.getElementById('bib-booksandchapters'),
-        accepted: document.getElementById('bib-accepted'),
-        patent: document.getElementById('bib-patent'),
-        inprogress: document.getElementById('bib-inprogress')
-      };
+  // ----- helpers -----
+  const buckets = {
+    article: document.getElementById('bib-articles'),
+    inproceedings: document.getElementById('bib-inproceedings'),
+    booksandchapters: document.getElementById('bib-booksandchapters'),
+    accepted: document.getElementById('bib-accepted'),
+    patent: document.getElementById('bib-patent'),
+    inprogress: document.getElementById('bib-inprogress')
+  };
 
-      entries.forEach(e => {
-        let target = buckets[e.type];
-        if (!target && (e.type === 'book' || e.type === 'incollection' || e.type === 'inbook')) {
-          target = buckets['booksandchapters'];
-        }
-        if (!target) return;
-        const li = document.createElement('li');
-        li.className = 'mbr-fonts-style display-7';
-        li.innerHTML = fmt(e);
-        target.appendChild(li);
-      });
-    })();
-    </script>
+  const grouped = {
+    article: [],
+    inproceedings: [],
+    booksandchapters: [],
+    accepted: [],
+    patent: [],
+    inprogress: []
+  };
+
+  function normalizeTarget(e) {
+    if (e.type === 'book' || e.type === 'incollection' || e.type === 'inbook') return 'booksandchapters';
+    return grouped.hasOwnProperty(e.type) ? e.type : null;
+  }
+
+  function cleanAuthors(a) {
+    // Very light cleanup: "A and B and C" -> "A, B, C"
+    return a.replace(/\s+and\s+/gi, ', ');
+  }
+
+  function extractBadge(field, regex, labelPrefix) {
+    if (!field) return '';
+    const match = field.match(regex);
+    if (!match) return '';
+    const val = (match[1] || '').replace(/\\%/g, '%').trim();
+    return `<span class="badge badge-secondary" style="margin-left:.35rem;">${labelPrefix} ${val}</span>`;
+  }
+
+  function fmt(e) {
+    const f = e.fields;
+    const parts = [];
+
+    if (f.author) parts.push(cleanAuthors(f.author));
+    if (f.title) parts.push('<em>' + f.title + '</em>');
+
+    // Venue-ish
+    if (e.type === 'article' && f.journal) parts.push(f.journal);
+    if ((e.type === 'inproceedings' || e.type === 'accepted') && f.booktitle) parts.push(f.booktitle);
+    if (!f.booktitle && f.organization) parts.push(f.organization);
+    if (!f.booktitle && !f.organization && f.institution) parts.push(f.institution);
+
+    // Pages
+    if (f.pages) parts.push('pp. ' + f.pages);
+
+    // Month + Year (month may be like "Nov")
+    const when = [f.month, f.year].filter(Boolean).join(' ');
+    if (when) parts.push(when);
+    else if (f.year) parts.push(f.year);
+
+    // Patent number
+    if (f.number && e.type === 'patent') parts.push('<strong>' + f.number + '</strong>');
+
+    // Links
+    if (f.doi) {
+      const doi = f.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, '');
+      parts.push('<a href="https://doi.org/' + doi + '" target="_blank" rel="noopener">doi:' + doi + '</a>');
+    } else if (f.url) {
+      parts.push('<a href="' + f.url + '" target="_blank" rel="noopener">link</a>');
+    }
+
+    // Badges (Rank, Acceptance rate) from note
+    const note = f.note || '';
+    const rankBadge = extractBadge(note, /rank\s*:\s*([A-D][\+]?)/i, 'Rank');
+    const accBadge  = extractBadge(note, /acceptance\s*rate\s*:\s*([\d]+\\?%)/i, 'Acceptance');
+
+    const line = parts.join(', ') + (rankBadge || accBadge ? ' ' + rankBadge + accBadge : '');
+    return line;
+  }
+
+  function getYear(e) {
+    // Try to parse numeric year; fall back to 0
+    const y = parseInt(e.fields.year, 10);
+    return isNaN(y) ? 0 : y;
+  }
+
+  // Group
+  entries.forEach(e => {
+    const target = normalizeTarget(e);
+    if (!target) return;
+    grouped[target].push(e);
+  });
+
+  // Sort and render
+  Object.keys(grouped).forEach(k => {
+    const list = grouped[k];
+    const ul = buckets[k];
+    if (!ul || !list.length) return;
+
+    list.sort((a, b) => {
+      const ya = getYear(a), yb = getYear(b);
+      if (yb !== ya) return yb - ya; // desc by year
+      const ta = (a.fields.title || '').toLowerCase();
+      const tb = (b.fields.title || '').toLowerCase();
+      return ta.localeCompare(tb);
+    });
+
+    list.forEach(e => {
+      const li = document.createElement('li');
+      li.className = 'mbr-fonts-style display-7';
+      li.innerHTML = fmt(e);
+      ul.appendChild(li);
+    });
+  });
+})();
+</script>
+
   </section>
 
   <!-- CONTACT -->
