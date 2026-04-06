@@ -1,1052 +1,1186 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <!-- Site made with Mobirise Website Builder v4.12.4, https://mobirise.com -->
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="generator" content="Mobirise v4.12.4, mobirise.com">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-  <link rel="shortcut icon" href="assets/images/logo2.png" type="image/x-icon">
-  <meta name="description" content="Koffi Ismael Ouattara — Ph.D. candidate in AI Security. Trust assessment, Subjective Logic, ML & Cybersecurity.">
-  <title>Home</title>
-  <link rel="stylesheet" href="assets/web/assets/mobirise-icons/mobirise-icons.css">
-  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-grid.min.css">
-  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-reboot.min.css">
-  <link rel="stylesheet" href="assets/socicon/css/styles.css">
-  <link rel="stylesheet" href="assets/dropdown/css/style.css">
-  <link rel="stylesheet" href="assets/as-pie-progress/css/progress.min.css">
-  <link rel="stylesheet" href="assets/tether/tether.min.css">
-  <link rel="stylesheet" href="assets/theme/css/style.css">
-  <link rel="preload" as="style" href="assets/mobirise/css/mbr-additional.css"><link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Koffi Ismael Ouattara — AI Researcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d12;
+    --surface: #111620;
+    --surface2: #161c28;
+    --border: #1e2636;
+    --accent: #e8633a;
+    --accent2: #f09a5c;
+    --text: #dce3ef;
+    --muted: #6b7a96;
+    --faint: #2a3348;
+    --mono: 'DM Mono', monospace;
+    --serif: 'DM Serif Display', serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  [data-theme="light"] {
+    --bg: #f5f3ef;
+    --surface: #edeae4;
+    --surface2: #e4e0d8;
+    --border: #d0ccc3;
+    --accent: #c94f24;
+    --accent2: #e07a3a;
+    --text: #1a1a1a;
+    --muted: #6b6560;
+    --faint: #ccc8c0;
+  }
+
+  /* ── THEME TOGGLE ── */
+  #theme-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    width: 34px;
+    height: 34px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    flex-shrink: 0;
+  }
+
+  #theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  #theme-toggle svg {
+    transition: transform 0.4s ease;
+  }
+
+  #theme-toggle:hover svg {
+    transform: rotate(20deg);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 48px;
+    background: rgba(10, 13, 18, 0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.3s, border-color 0.3s;
+  }
+
+  [data-theme="light"] nav {
+    background: rgba(245, 243, 239, 0.88);
+  }
+
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cv {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent) !important;
+    border: 1px solid var(--accent);
+    padding: 6px 14px;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .nav-cv:hover {
+    background: var(--accent);
+    color: var(--bg) !important;
+  }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 120px 48px 80px;
+    gap: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(232,99,58,0.12) 0%, transparent 70%);
+    top: 50%; right: -100px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.1s forwards;
+  }
+
+  .hero-tag::before {
+    content: '';
+    width: 32px; height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(42px, 5vw, 72px);
+    line-height: 1.05;
+    font-weight: 400;
+    color: var(--text);
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.2s forwards;
+  }
+
+  h1 em {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 20px;
+    max-width: 500px;
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.35s forwards;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 28px;
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.45s forwards;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 5px 10px;
+    border: 1px solid var(--faint);
+    border-radius: 2px;
+    color: var(--muted);
+    background: var(--surface);
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 14px;
+    margin-top: 36px;
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.55s forwards;
+  }
+
+  .btn-primary {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 12px 24px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.2s;
+    display: inline-block;
+  }
+
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .btn-secondary {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 12px 24px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+    display: inline-block;
+  }
+
+  .btn-secondary:hover { border-color: var(--text); }
+
+  /* Hero right: stat cards */
+  .hero-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.6s forwards;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .stat-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+
+  .stat-card:hover::before { transform: scaleX(1); }
+
+  .stat-num {
+    font-family: var(--serif);
+    font-size: 42px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 100px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 48px;
+  }
+
+  /* ── ABOUT ── */
+  #about .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+  }
+
+  .about-text p {
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .about-text p strong {
+    color: var(--text);
+  }
+
+  .skills-group {
+    margin-bottom: 24px;
+  }
+
+  .skills-group-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .skill-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--faint);
+    color: var(--text);
+    border-radius: 2px;
+  }
+
+  /* ── EXPERIENCE ── */
+  #experience { background: none; }
+  #experience > div { max-width: 900px; margin: 0 auto;}
+
+  .exp-item {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 32px;
+    padding: 32px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .exp-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--faint);
+  }
+
+  .exp-item:hover::before {
+    background: var(--accent);
+    transition: background 0.3s;
+  }
+
+  .exp-meta {
+    padding-top: 4px;
+    padding-left: 16px;
+  }
+
+  .exp-year {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+
+  .exp-org {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .exp-role {
+    font-family: var(--serif);
+    font-size: 20px;
+    color: var(--text);
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+
+  .exp-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .exp-bullets {
+    margin-top: 10px;
+    list-style: none;
+  }
+
+  .exp-bullets li {
+    font-size: 13px;
+    color: var(--muted);
+    padding: 3px 0 3px 16px;
+    position: relative;
+  }
+
+  .exp-bullets li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 11px;
+  }
+
+  /* ── PUBLICATIONS ── */
+  #publications {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    max-width: 100%;
+    padding: 100px 48px;
+  }
+
+  #publications > .inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .pub-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+
+  .filter-btn.active,
+  .filter-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(232,99,58,0.06);
+  }
+
+  .pub-list { display: flex; flex-direction: column; gap: 2px; }
+
+  .pub-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 22px 24px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 20px;
+    align-items: start;
+    transition: border-color 0.25s, background 0.25s;
+    cursor: default;
+  }
+
+  .pub-item:hover {
+    border-color: var(--faint);
+    background: var(--surface2);
+  }
+
+  .pub-idx {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    width: 28px;
+    padding-top: 2px;
+  }
+
+  .pub-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+
+  .pub-authors {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .pub-venue {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .pub-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-end;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  .badge-rank { background: rgba(232,99,58,0.12); color: var(--accent); border: 1px solid rgba(232,99,58,0.3); }
+  .badge-review { background: rgba(107,122,150,0.12); color: var(--muted); border: 1px solid var(--border); }
+  .badge-patent { background: rgba(240,154,92,0.12); color: var(--accent2); border: 1px solid rgba(240,154,92,0.3); }
+  .badge-submitted { background: rgba(107,122,150,0.08); color: var(--muted); border: 1px solid var(--border); }
+
+  /* ── EDUCATION ── */
+  .edu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .edu-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px 24px;
+    position: relative;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .edu-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+  }
+
+  .edu-card::after {
+    content: attr(data-year);
+    position: absolute;
+    top: 20px; right: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .edu-degree {
+    font-family: var(--serif);
+    font-size: 17px;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .edu-inst {
+    font-size: 13px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .edu-field {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ── CONTACT ── */
+  #contact {
+    text-align: center;
+    padding: 100px 48px;
+  }
+
+  .contact-links {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+
+  .contact-link {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+
+  .contact-link:hover {
+    color: var(--text);
+    border-color: var(--text);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer p {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    #hero { grid-template-columns: 1fr; padding: 100px 24px 60px; }
+    .hero-stats { display: none; }
+    section { padding: 60px 24px; }
+    #publications { padding: 60px 24px; }
+    #about .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    .exp-item { grid-template-columns: 1fr; gap: 8px; }
+    .edu-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
 </head>
 <body>
-  <section class="menu cid-qTkzRZLJNu" once="menu" id="menu1-0">
-    <nav class="navbar navbar-expand beta-menu navbar-dropdown align-items-center navbar-fixed-top navbar-toggleable-sm">
-      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <div class="hamburger"><span></span><span></span><span></span><span></span></div>
-      </button>
-      <div class="menu-logo">
-        <div class="navbar-brand">
-          <span class="navbar-logo">
-            <a href="#"><img src="assets/images/logo2.png" alt="Logo" style="height: 3.8rem;"></a>
-          </span>
-          <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4" href="#"></a></span>
-        </div>
-      </div>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav nav-dropdown" data-app-modern-menu="true">
-          <li class="nav-item">
-            <a class="nav-link link text-white display-4" href="#header12-3">
-              <span class="mbri-home mbr-iconfont mbr-iconfont-btn"></span>
-              Menu</a>
-          </li>
-        </ul>
-        <div class="navbar-buttons mbr-section-btn"><a class="btn btn-sm btn-primary display-4" href="#form1-b">Contact me</a></div>
-      </div>
-    </nav>
-  </section>
 
-  <!-- WHO AM I -->
-  <section class="cid-qTkA127IK8 mbr-fullscreen" id="header2-1">
-    <div class="container align-center">
-      <div class="row justify-content-md-center">
-        <div class="mbr-white col-md-10">
-          <h1 class="mbr-section-title mbr-bold pb-3 mbr-fonts-style display-1">Who am I?</h1>
-          <p class="mbr-text pb-3 mbr-fonts-style display-5">
-            I’m <strong>Koffi Ismael Ouattara</strong>, a Ph.D. candidate in <strong>AI Security</strong> at Ulm University in collaboration with <strong>Huawei Munich</strong>.
-            My passion for <strong>mathematics</strong> and <strong>computer science</strong> drives my work on making AI systems more trustworthy, interpretable, and secure.<br><br>
-            I am working on <strong>dynamic and interpretable Trust Propagation </strong> in neural networks using <strong>Subjective Logic</strong>, machine learning, and cybersecurity principles. I’ve worked with
-            <strong>Nokia Bell Labs</strong> and <strong>Mithril Security</strong>, contributed to multiple <strong>EU Horizon projects</strong>, and co-authored peer-reviewed publications and a patent.<br><br>
-            For me, math is the language, computer science is the toolkit, and AI security is the mission.
-          </p>
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">K·I·O</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#publications">Research</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="Ouattara_CV_Publications.pdf" download class="nav-cv">↓ CV + Pubs</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Toggle theme" title="Toggle light/dark mode">
+    <!-- Moon icon (shown in dark mode) -->
+    <svg id="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <!-- Sun icon (shown in light mode) -->
+    <svg id="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/>
+      <line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- HERO -->
+<div id="hero">
+  <div class="hero-bg-glow"></div>
+  <div class="hero-left">
+    <div class="hero-tag">AI Researcher</div>
+    <h1>Koffi Ismael<br><em>Ouattara</em></h1>
+    <p class="hero-sub">
+      PhD candidate at Ulm University &amp; Huawei (Paris/Munich). Building the theoretical and practical foundations for trustworthy, interpretable machine learning through Subjective Logic and neuro-symbolic methods.
+    </p>
+    <div class="hero-tags">
+      <span class="tag">Trustworthy AI</span>
+      <span class="tag">Uncertainty Quantification</span>
+      <span class="tag">Neuro-Symbolic AI</span>
+      <span class="tag">Adversarial ML</span>
+      <span class="tag">Privacy-Preserving AI</span>
+    </div>
+    <div class="hero-ctas">
+      <a href="#publications" class="btn-primary">View Research</a>
+      <a href="Ouattara_CV_Publications.pdf" download class="btn-secondary">Download CV + Pubs</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-card">
+      <div class="stat-num">8</div>
+      <div class="stat-label">Publications</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">1</div>
+      <div class="stat-label">US Patent</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">3</div>
+      <div class="stat-label">EU Horizon<br>Projects</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">A/B</div>
+      <div class="stat-label">Venue Rankings</div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">About</div>
+  <h2>Building machines that<br><em style="font-family:var(--serif);font-style:italic;color:var(--accent)">know what they don't know</em></h2>
+  <div class="about-grid fade-in">
+    <div class="about-text">
+      <p>
+        I am a researcher in <strong>Trustworthy AI and Machine Learning Security</strong>, currently pursuing a PhD at Ulm University in collaboration with Huawei Research (Paris &amp; Munich). My work sits at the intersection of formal reasoning, probabilistic uncertainty, and real-world ML deployments.
+      </p>
+      <p>
+        My core research integrates <strong>Subjective Logic</strong> and <strong>Bayesian Deep Learning</strong> into neural networks — enabling models to reason explicitly about their own uncertainty, propagate trust through multi-agent systems, and remain interpretable under adversarial conditions.
+      </p>
+      <p>
+        Beyond academia, I have worked at <strong>Huawei, Nokia Bell Labs, Mithril Security</strong>, and <strong>INRIA</strong> — building production-grade ML systems and defenses against real-world attacks. I contribute to EU HORIZON projects CONNECT, CASTOR, and DUCA.
+      </p>
+    </div>
+    <div class="about-skills">
+      <div class="skills-group">
+        <div class="skills-group-label">Research Areas</div>
+        <div class="skill-chips">
+          <span class="chip">Trustworthy AI</span>
+          <span class="chip">Uncertainty Quantification</span>
+          <span class="chip">Bayesian Deep Learning</span>
+          <span class="chip">Neuro-Symbolic AI</span>
+          <span class="chip">Trust Propagation</span>
+          <span class="chip">Adversarial ML</span>
+          <span class="chip">Privacy-Preserving AI</span>
+          <span class="chip">Reinforcement Learning</span>
+        </div>
+      </div>
+      <div class="skills-group">
+        <div class="skills-group-label">Programming</div>
+        <div class="skill-chips">
+          <span class="chip">Python</span>
+          <span class="chip">C++</span>
+          <span class="chip">Rust</span>
+          <span class="chip">Go</span>
+          <span class="chip">Java</span>
+          <span class="chip">R</span>
+          <span class="chip">x86-64 Asm</span>
+        </div>
+      </div>
+      <div class="skills-group">
+        <div class="skills-group-label">ML / Tools</div>
+        <div class="skill-chips">
+          <span class="chip">PyTorch</span>
+          <span class="chip">TensorFlow</span>
+          <span class="chip">Transformers</span>
+          <span class="chip">Docker</span>
+          <span class="chip">LaTeX</span>
+        </div>
+      </div>
+      <div class="skills-group">
+        <div class="skills-group-label">Security</div>
+        <div class="skill-chips">
+          <span class="chip">IDS/IPS</span>
+          <span class="chip">TCP/IP</span>
+          <span class="chip">Adversarial Robustness</span>
+          <span class="chip">Membership Inference</span>
         </div>
       </div>
     </div>
-    <div class="mbr-arrow hidden-sm-down" aria-hidden="true">
-      <a href="#next"><i class="mbri-down mbr-iconfont"></i></a>
-    </div>
-  </section>
+  </div>
+</section>
 
-  <!-- WHAT TO KNOW -->
-  <section class="header12 cid-s3Mp4dsFp7 mbr-fullscreen" id="header12-3">
-    <div class="container">
-      <div class="media-container">
-        <div class="col-md-12 align-center">
-          <h1 class="mbr-section-title pb-3 mbr-white mbr-bold mbr-fonts-style display-1">What do you want to know about me?</h1>
-          <div class="icons-media-container mbr-white">
-            <div class="card col-12 col-md-6 col-lg-3">
-              <div class="icon-block"><a href="#timeline1-6"><span class="mbr-iconfont mbri-briefcase"></span></a></div>
-              <h5 class="mbr-fonts-style display-5">Education</h5>
-            </div>
-            <div class="card col-12 col-md-6 col-lg-3">
-              <div class="icon-block"><a href="#tabs3-9"><span class="mbr-iconfont mbri-user"></span></a></div>
-              <h5 class="mbr-fonts-style display-5">Work experience</h5>
-            </div>
-            <div class="card col-12 col-md-6 col-lg-3">
-              <div class="icon-block"><a href="#clients-a"><span class="mbr-iconfont mbri-features"></span></a></div>
-              <h5 class="mbr-fonts-style display-5">Skills</h5>
-            </div>
-          </div>
-        </div>
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div>
+    <div class="section-label">Experience</div>
+    <h2>Where I've worked</h2>
+
+    <div class="exp-item fade-in">
+      <div class="exp-meta">
+        <div class="exp-year">2023 – 2026</div>
+        <div class="exp-org">Paris / Munich</div>
       </div>
-    </div>
-    <div class="mbr-arrow hidden-sm-down" aria-hidden="true">
-      <a href="#next"><i class="mbri-down mbr-iconfont"></i></a>
-    </div>
-  </section>
-
-  <!-- EDUCATION -->
-  <section class="timeline1 cid-s3MqUsZzwz" id="timeline1-6">
-    <div class="container align-center">
-      <h2 class="mbr-section-title pb-3 mbr-fonts-style display-2">Education</h2>
-      <div class="container timelines-container" mbri-timelines="">
-        <!-- PhD -->
-        <div class="row timeline-element reverse separline">
-          <div class="timeline-date-panel col-xs-12 col-md-6 align-left">
-            <div class="time-line-date-content">
-              <p class="mbr-timeline-date mbr-fonts-style display-5">2023 – Present</p>
-            </div>
-          </div>
-          <span class="iconBackground"></span>
-          <div class="col-xs-12 col-md-6 align-right">
-            <div class="timeline-text-content">
-              <h4 class="mbr-timeline-title pb-3 mbr-fonts-style display-5">Ulm University — Ph.D. Candidate</h4>
-              <p class="mbr-timeline-text mbr-fonts-style display-7">
-                Specialization: V2X Networks, Machine Learning & Trust. Research Topic: Trust Assessment in AI Systems.
-                Affiliation: Huawei Technologies (Munich). Supervisors: Prof. Frank Kargl, Prof. Theo Dimitrakos.
-              </p>
-            </div>
-          </div>
-        </div>
-        <!-- Telecom Paris -->
-        <div class="row timeline-element separline">
-          <div class="timeline-date-panel col-xs-12 col-md-6 align-right">
-            <div class="time-line-date-content">
-              <p class="mbr-timeline-date mbr-fonts-style display-5">2021 – 2023</p>
-            </div>
-          </div>
-          <span class="iconBackground"></span>
-          <div class="col-xs-12 col-md-6 align-left">
-            <div class="timeline-text-content">
-              <h4 class="mbr-timeline-title pb-3 mbr-fonts-style display-5">Télécom Paris — Engineering & Master’s (IP Paris)</h4>
-              <p class="mbr-timeline-text mbr-fonts-style display-7">
-                Specialization: Cybersecurity, Machine Learning & Mobile Networks (Machine Learning, Communication & Security).
-              </p>
-            </div>
-          </div>
-        </div>
-        <!-- Polytechnique -->
-        <div class="row timeline-element reverse">
-          <div class="timeline-date-panel col-xs-12 col-md-6 align-left">
-            <div class="time-line-date-content">
-              <p class="mbr-timeline-date mbr-fonts-style display-5">2018 – 2022</p>
-            </div>
-          </div>
-          <span class="iconBackground"></span>
-          <div class="col-xs-12 col-md-6 align-right">
-            <div class="timeline-text-content">
-              <h4 class="mbr-timeline-title pb-3 mbr-fonts-style display-5">École Polytechnique — Engineering/Master’s</h4>
-              <p class="mbr-timeline-text mbr-fonts-style display-7">
-                Specialization: Cybersecurity & Machine Learning. Notable courses: Cryptography, Network Security, Deep Learning,
-                Applied Mathematics, Markov Chains.
-              </p>
-            </div>
-          </div>
-        </div>
-        <!-- INP-HB -->
-        <div class="row timeline-element">
-          <div class="timeline-date-panel col-xs-12 col-md-6 align-right">
-            <div class="time-line-date-content">
-              <p class="mbr-timeline-date mbr-fonts-style display-5">2016 – 2018</p>
-            </div>
-          </div>
-          <span class="iconBackground"></span>
-          <div class="col-xs-12 col-md-6 align-left">
-            <div class="timeline-text-content">
-              <h4 class="mbr-timeline-title pb-3 mbr-fonts-style display-5">INP-HB — Preparatory Classes (MPSI)</h4>
-              <p class="mbr-timeline-text mbr-fonts-style display-7">
-                Intensive program for entry into Grandes Écoles (France).
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- WORK EXPERIENCE & PROJECTS (TABS) -->
-  <section class="tabs3 cid-s3MqXLAJLY" id="tabs3-9">
-    <div class="container">
-      <h2 class="mbr-section-title align-center pb-3 mbr-fonts-style display-2">Work experience</h2>
-      <h3 class="mbr-section-subtitle display-5 align-center mbr-light mbr-fonts-style">
-        Research + industry experience in AI Security, ML, and cybersecurity.
-      </h3>
-    </div>
-    <div class="container-fluid">
-      <div class="row tabcont">
-        <ul class="nav nav-tabs pt-3 mt-5" role="tablist">
-          <li class="nav-item mbr-fonts-style">
-            <a class="nav-link show active display-7" role="tab" data-toggle="tab" href="#tabs3-9_tab0" aria-selected="true">Work Experience</a>
-          </li>
-          <li class="nav-item mbr-fonts-style">
-            <a class="nav-link display-7" role="tab" data-toggle="tab" href="#tabs3-9_tab1">Projects</a>
-          </li>
-          <li class="nav-item mbr-fonts-style">
-            <a class="nav-link display-7" role="tab" data-toggle="tab" href="#tabs3-9_tab2">Software</a>
-          </li>
-          <li class="nav-item mbr-fonts-style">
-            <a class="nav-link display-7" role="tab" data-toggle="tab" href="#tabs3-9_tab3">Teaching Experiments</a>
-          </li>
+      <div>
+        <div class="exp-role">Researcher &amp; PhD Student, AI Security</div>
+        <div class="exp-desc" style="color:var(--accent);font-size:13px;margin-bottom:10px;">Huawei Technologies &amp; Ulm University</div>
+        <ul class="exp-bullets">
+          <li>Developed a novel trust propagation framework for neural networks using Subjective Logic, enabling interpretable uncertainty and reliability assessment across full AI pipelines.</li>
+          <li>Designed PaTAS (Parallel Trust Assessment System) — a scalable framework integrating data quality, model behavior, and inference context for dynamic trust scoring.</li>
+          <li>Developed Subjective Neural Networks: a Bayesian neural architecture for joint modeling of prediction, uncertainty, and trust at the parameter level.</li>
+          <li>Proposed neuro-symbolic approaches for policy enforcement in AI agents, bridging logical constraints and neural learning.</li>
+          <li>Contributed to EU HORIZON projects CONNECT, CASTOR, and DUCA designing trust architectures for secure and privacy-preserving AI in edge and mobility systems.</li>
         </ul>
       </div>
     </div>
 
-    <div class="container">
-      <div class="row px-1">
-        <div class="tab-content">
-          <!-- Internships/Roles -->
-          <div id="tabs3-9_tab0" class="tab-pane in active mbr-table" role="tabpanel">
-            <div class="row tab-content-row">
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbri-extension mbr-iconfont"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">
-                  Ph.D. Student — Huawei Technologies (2023–Present)
-                </h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">
-                  Dynamic & interpretable trust propagation in neural networks using Subjective Logic. Built the Parallel Trust Assessment System (PTAS).
-                </p>
-              </div>
-
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbri-extension mbr-iconfont"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">
-                  ML/Security Engineer — Mithril Security (Apr 2022–Mar 2023)
-                </h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">
-                  Developed defenses against model extraction & membership inference attacks on deep learning models.
-                </p>
-              </div>
-
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbri-extension mbr-iconfont"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">
-                  Research Intern — Nokia Bell Labs (Mar–Sep 2022)
-                </h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">
-                  ML-based anomaly/attack detection for 5G using knowledge graph convolutional networks (led to a patent proposal).
-                </p>
-              </div>
-
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbri-extension mbr-iconfont"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">
-                  Interim Teacher — ISEP (Apr 2022)
-                </h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">
-                  Delivered labs on Intrusion Detection Systems (Snort).
-                </p>
-              </div>
-
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbri-extension mbr-iconfont"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">
-                  Research Intern — INRIA (Apr–Aug 2021)
-                </h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">
-                  Designed a meta-model of cryptographic architectures for compliance verification with best practices.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Projects (EU + Huawei) -->
-          <div id="tabs3-9_tab1" class="tab-pane mbr-table" role="tabpanel">
-            <div class="row tab-content-row">
-
-              <!-- EU HORIZON — CONNECT -->
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbr-iconfont mbri-folder"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">CONNECT (EU HORIZON)</h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">
-                  Privacy-preserving <strong>federated trust</strong> infrastructure for connected mobility &amp; edge computing.<br>
-                  Role: designed &amp; implemented the <strong>Trust Assessment Framework (TAF)</strong> using <strong>Subjective Logic</strong> for dynamic, distributed reasoning.
-                </p>
-              </div>
-
-              <!-- EU HORIZON — CASTOR -->
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbr-iconfont mbri-folder"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">CASTOR (EU HORIZON)</h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">
-                  Continuous assessment of <strong>security, trustworthiness &amp; resilience</strong> of software.<br>
-                  Role: developed <strong>global/local trust</strong> models for secure service routing with evidence modeling.
-                </p>
-              </div>
-
-              <!-- EU HORIZON — DUCA -->
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbr-iconfont mbri-folder"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">DUCA (EU HORIZON)</h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">
-                  Digital user-centric architecture for privacy-preserving services.<br>
-                  Role: built a <strong>dual-dimensional trust model</strong> combining <strong>PTAS</strong> with <strong>Homomorphic Encryption</strong> to reason about trust in AI models.
-                </p>
-              </div>
-
-              <!-- Huawei Internal — STRUNEE / TLEE -->
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbr-iconfont mbri-folder"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">STRUNEE (Huawei Internal) — TLEE</h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">
-                  <strong>Trust Level Evaluation Engine (TLEE)</strong> for evaluating complex trust expressions over DAGs with operators
-                  such as consensus, deduction, and discounting for distributed AI trust computation.
-                </p>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- Webmastering -->
-          <div id="tabs3-9_tab2" class="tab-pane mbr-table" role="tabpanel">
-            <div class="row tab-content-row">
-             
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                 <a href="https://playinvest-hd.com/" target="_blank">
-                <div class="card-img"><span class="mbri-bootstrap mbr-iconfont"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5"> PlayInvest-HD </h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">PlayInvest is a free, gamified platform that helps users learn and practice investing with virtual portfolios, quizzes, and educational resources to build financial skills without real-world risk.</p> </a>
-              </div>
-              
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbri-bootstrap mbr-iconfont"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">FAOS Platform (Xprojets)</h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">Business accelerator platform built with WordPress.</p>
-              </div>
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbri-bootstrap mbr-iconfont"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">PaniniX</h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">Simple online ordering platform for food purchases.</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Other -->
-          <div id="tabs3-9_tab3" class="tab-pane mbr-table" role="tabpanel">
-            <div class="row tab-content-row">
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbri-responsive mbr-iconfont"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">Oral Examiner — EPF (Cachan)</h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">Oral examiner (kholleur) for undergraduate and preparatory-level students, conducting weekly oral examinations to assess understanding, problem-solving skills, and conceptual clarity.</p>
-              </div>
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbri-responsive mbr-iconfont"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">Teacher — ISEP (Paris)</h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">Intrusion Detection labs (Snort).</p>
-              </div>
-              <div class="col-xs-12 col-md-6 col-lg-4">
-                <div class="card-img"><span class="mbri-responsive mbr-iconfont"></span></div>
-                <h4 class="mbr-element-title align-center mbr-fonts-style pb-2 display-5">Assistant Teacher — Lycée Janson de Sailly</h4>
-                <p class="mbr-section-text align-center mbr-fonts-style display-7">Classes préparatoires support.</p>
-              </div>
-            </div>
-          </div>
-        </div><!-- /tab-content -->
+    <div class="exp-item fade-in">
+      <div class="exp-meta">
+        <div class="exp-year">2022 – 2023</div>
+        <div class="exp-org">Paris, France</div>
       </div>
-    </div>
-  </section>
-
-  <!-- SKILLS -->
-  <section class="clients cid-s3MsNm8HFz" data-interval="false" id="clients-a">
-    <div class="container mb-5">
-      <div class="media-container-row">
-        <div class="col-12 align-center">
-          <h2 class="mbr-section-title pb-3 mbr-fonts-style display-2">Computer science skills</h2>
-          <h3 class="mbr-section-subtitle mbr-light mbr-fonts-style display-5">
-            Machine Learning • AI Security • Cybersecurity • Data Analysis &amp; Statistics
-            <br><br>Programming languages
-          </h3>
-        </div>
-      </div>
-    </div>
-    <div class="container">
-      <div class="carousel slide" role="listbox" data-pause="true" data-keyboard="false" data-ride="carousel" data-interval="5000">
-        <div class="carousel-inner" data-visible="5">
-          <div class="carousel-item ">
-            <div class="media-container-row"><div class="col-md-12"><div class="wrap-img ">
-              <img src="assets/images/download-225x225.png" class="img-responsive clients-img" alt="C logo"></div></div></div>
-          </div>
-          <div class="carousel-item ">
-            <div class="media-container-row"><div class="col-md-12"><div class="wrap-img ">
-              <img src="assets/images/icons8-programmation-en-c-480-240x240.png" class="img-responsive clients-img" alt="C++ logo"></div></div></div>
-          </div>
-          <div class="carousel-item ">
-            <div class="media-container-row"><div class="col-md-12"><div class="wrap-img ">
-              <img src="assets/images/icons8-c-500-500x500.png" class="img-responsive clients-img" alt="C icon"></div></div></div>
-          </div>
-          <div class="carousel-item ">
-            <div class="media-container-row"><div class="col-md-12"><div class="wrap-img ">
-              <img src="assets/images/icons8-python-480-480x480.png" class="img-responsive clients-img" alt="Python logo"></div></div></div>
-          </div>
-          <div class="carousel-item ">
-            <div class="media-container-row"><div class="col-md-12"><div class="wrap-img ">
-              <img src="assets/images/icons8-logo-java-coffee-cup-480-480x480.png" class="img-responsive clients-img" alt="Java logo"></div></div></div>
-          </div>
-        </div>
-        <div class="carousel-controls">
-          <a class="carousel-control carousel-control-prev" role="button" data-slide="prev">
-            <span aria-hidden="true" class="mbri-left mbr-iconfont"></span>
-            <span class="sr-only">Previous</span>
-          </a>
-          <a class="carousel-control carousel-control-next" role="button" data-slide="next">
-            <span aria-hidden="true" class="mbri-right mbr-iconfont"></span>
-            <span class="sr-only">Next</span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- WEBMASTERING -->
-  <section class="clients cid-s3MCujouX4" data-interval="false" id="clients-f">
-    <div class="container mb-5">
-      <div class="media-container-row">
-        <div class="col-12 align-center">
-          <h2 class="mbr-section-title pb-3 mbr-fonts-style display-2">Webmastering and data management</h2>
-          <h3 class="mbr-section-subtitle mbr-light mbr-fonts-style display-5">I have hands-on experience with front-end basics and site building.</h3>
-        </div>
-      </div>
-    </div>
-
-    <div class="container">
-      <div class="carousel slide" role="listbox" data-pause="true" data-keyboard="false" data-ride="carousel" data-interval="5000">
-        <div class="carousel-inner" data-visible="5">
-          <div class="carousel-item ">
-            <div class="media-container-row"><div class="col-md-12"><div class="wrap-img ">
-              <img src="assets/images/icons8-html-5-512-240x240.png" class="img-responsive clients-img" alt="HTML5"></div></div></div>
-          </div>
-          <div class="carousel-item ">
-            <div class="media-container-row"><div class="col-md-12"><div class="wrap-img ">
-              <img src="assets/images/css-208x208.png" class="img-responsive clients-img" alt="CSS3"></div></div></div>
-          </div>
-          <div class="carousel-item ">
-            <div class="media-container-row"><div class="col-md-12"><div class="wrap-img ">
-              <img src="assets/images/icons8-javascript-512-512x512.png" class="img-responsive clients-img" alt="JavaScript"></div></div></div>
-          </div>
-          <div class="carousel-item ">
-            <div class="media-container-row"><div class="col-md-12"><div class="wrap-img ">
-              <img src="assets/images/icons8-jquery-500-500x500.png" class="img-responsive clients-img" alt="jQuery"></div></div></div>
-          </div>
-          <div class="carousel-item ">
-            <div class="media-container-row"><div class="col-md-12"><div class="wrap-img ">
-              <img src="assets/images/icons8-php-512-512x512.png" class="img-responsive clients-img" alt="PHP"></div></div></div>
-          </div>
-        </div>
-        <div class="carousel-controls">
-          <a class="carousel-control carousel-control-prev" role="button" data-slide="prev">
-            <span aria-hidden="true" class="mbri-left mbr-iconfont"></span>
-            <span class="sr-only">Previous</span>
-          </a>
-          <a class="carousel-control carousel-control-next" role="button" data-slide="next">
-            <span aria-hidden="true" class="mbri-right mbr-iconfont"></span>
-            <span class="sr-only">Next</span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- OTHER SKILLS -->
-  <section class="tabs2 cid-s3MyddC7FY" id="tabs2-c">
-    <div class="container">
-      <h2 class="mbr-section-title align-center pb-5 mbr-fonts-style display-2">
-        Yes, I really love programming.<br>But it's not the only thing I do.
-      </h2>
-      <div class="media-container-row">
-        <div class="col-12 col-md-8">
-          <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item"><a class="nav-link mbr-fonts-style show active display-7" role="tab" data-toggle="tab" href="#tabs2-c_tab0" aria-selected="true">Maintenance</a></li>
-            <li class="nav-item"><a class="nav-link mbr-fonts-style display-7" role="tab" data-toggle="tab" href="#tabs2-c_tab1">Software</a></li>
-            <li class="nav-item"><a class="nav-link mbr-fonts-style display-7" role="tab" data-toggle="tab" href="#tabs2-c_tab2">Languages</a></li>
-          </ul>
-          <div class="tab-content">
-            <div id="tabs2-c_tab0" class="tab-pane in active" role="tabpanel">
-              <div class="row"><div class="col-md-12">
-                <p class="mbr-text py-5 mbr-fonts-style display-7">General computer maintenance and troubleshooting.</p>
-              </div></div>
-            </div>
-            <div id="tabs2-c_tab1" class="tab-pane" role="tabpanel">
-              <div class="row"><div class="col-md-12">
-                <p class="mbr-text py-5 mbr-fonts-style display-7">Basic video editing (Filmora, Adobe tools).</p>
-              </div></div>
-            </div>
-            <div id="tabs2-c_tab2" class="tab-pane" role="tabpanel">
-              <div class="row"><div class="col-md-12">
-                <p class="mbr-text py-5 mbr-fonts-style display-7">French (native), English (advanced), Chinese &amp; Spanish (beginner).</p>
-              </div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- LANGUAGES BARS -->
-  <section class="progress-bars3 cid-s3MzyYFTI9" id="progress-bars3-d">
-    <div class="container">
-      <h2 class="mbr-section-title pb-3 align-center mbr-fonts-style display-2">Languages</h2>
-      <div class="media-container-row pt-5 mt-2">
-        <div class="card p-3 align-center">
-          <div class="wrap">
-            <div class="pie_progress progress1" role="progressbar" data-goal="100">
-              <p class="pie_progress__number mbr-fonts-style display-5">100%</p>
-            </div>
-          </div>
-          <div class="mbr-crt-title pt-3"><h4 class="card-title py-2 mbr-fonts-style display-5">French</h4></div>
-        </div>
-
-        <div class="card p-3 align-center">
-          <div class="wrap">
-            <div class="pie_progress progress2" role="progressbar" data-goal="90">
-              <p class="pie_progress__number mbr-fonts-style display-5">90%</p>
-            </div>
-          </div>
-          <div class="mbr-crt-title pt-3"><h4 class="card-title py-2 mbr-fonts-style display-5">English</h4></div>
-        </div>
-
-        <div class="card p-3 align-center">
-          <div class="wrap">
-            <div class="pie_progress progress6" role="progressbar" data-goal="40">
-              <p class="pie_progress__number mbr-fonts-style display-5">40%</p>
-            </div>
-          </div>
-          <div class="mbr-crt-title pt-3"><h4 class="card-title py-2 mbr-fonts-style display-5">Mandarin &amp; Spanish</h4></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PUBLICATIONS & PATENTS -->
-  <section class="cid-publications" id="publications">
-    <div class="container">
-      <h2 class="mbr-section-title align-center pb-3 mbr-fonts-style display-2">Publications &amp; Patents</h2>
-      <h3 class="mbr-section-subtitle align-center mbr-light mbr-fonts-style display-5">
-        Selected work on trust assessment, trustworthy AI, and secure machine learning.
-      </h3>
-
-      <!-- Journal Articles -->
-      <div class="mt-4">
-        <h4 class="mbr-fonts-style display-5">Journal Articles</h4>
-        <ul class="mbr-fonts-style display-7" id="bib-articles"></ul>
-      </div>
-
-      <!-- Conference Proceedings -->
-      <div class="mt-4">
-        <h4 class="mbr-fonts-style display-5">Conference Proceedings</h4>
-        <ul class="mbr-fonts-style display-7" id="bib-inproceedings"></ul>
-      </div>
-
-      <!-- Books and Chapters -->
-      <!-- <div class="mt-4">
-        <h4 class="mbr-fonts-style display-5">Books and Chapters</h4>
-        <ul class="mbr-fonts-style display-7" id="bib-booksandchapters"></ul>
-      </div> -->
-
-      <!-- Accepted Conference Papers -->
-      <div class="mt-4">
-        <h4 class="mbr-fonts-style display-5">Accepted Conference Papers</h4>
-        <ul class="mbr-fonts-style display-7" id="bib-accepted"></ul>
-      </div>
-
-      <!-- Patents -->
-      <div class="mt-4">
-        <h4 class="mbr-fonts-style display-5">Patents</h4>
-        <ul class="mbr-fonts-style display-7" id="bib-patent">
-          <!-- Manual fallback entry so the section never looks empty -->
+      <div>
+        <div class="exp-role">ML / Security Engineer</div>
+        <div class="exp-desc" style="color:var(--accent);font-size:13px;margin-bottom:10px;">Mithril Security</div>
+        <ul class="exp-bullets">
+          <li>Developed defenses against model extraction and membership inference attacks in deployed ML systems.</li>
+          <li>Worked on privacy-preserving inference techniques for sensitive data processing.</li>
         </ul>
       </div>
+    </div>
 
-      <!-- Work in Progress -->
-      <div class="mt-4">
-        <h4 class="mbr-fonts-style display-5">Conference Papers Under Review</h4>
-        <ul class="mbr-fonts-style display-7" id="bib-inprogress"></ul>
+    <div class="exp-item fade-in">
+      <div class="exp-meta">
+        <div class="exp-year">2022</div>
+        <div class="exp-org">Nozay, France</div>
+      </div>
+      <div>
+        <div class="exp-role">Research Intern</div>
+        <div class="exp-desc" style="color:var(--accent);font-size:13px;margin-bottom:10px;">Nokia Bell Labs (Alcatel-Lucent Int.)</div>
+        <ul class="exp-bullets">
+          <li>Designed ML-based anomaly detection for 5G networks using graph-based deep learning models.</li>
+          <li>Co-invented a patented system for rogue base-station detection — Patent US20240121678A1.</li>
+        </ul>
       </div>
     </div>
 
-    <!-- ======== Paste/extend your .bib entries below (between the script tags) ======== -->
-    <script type="application/x-bibtex" id="bibtex-data">
-@INPROCEEDINGS{10474891,
-  author={Kriaa, Siwar and Feki, Afef and Papillon, Serge and Chene, Thomas and Ouattara, Ismael},
-  booktitle={2023 IEEE Virtual Conference on Communications (VCC)}, 
-  title={Detecting Fake Base Stations Using Knowledge Graphs and ML-Based Techniques}, 
-  year={2023},
-  volume={},
-  number={},
-  pages={37-42},
-  abstract={Radio Access Networks (RAN) can be subject to different types of attacks across the mobile networks generations (3G, 4G, 5G, etc.). We propose two complementary ways to detect threats in RAN using existing reported radio measurements. The first one uses knowledge graphs and the second one is based on machine learning. Both methods have been experimented with a simulation framework and results showcase their efficiency to detect fake base station attacks.},
-  keywords={Base stations;5G mobile communication;3G mobile communication;Knowledge graphs;Machine learning;Computer crime;Radio access networks;Cybersecurity;Knowledge Graphs;Machine learning;Neural Networks;5G RAN},
-  doi={10.1109/VCC60689.2023.10474891},
-  ISSN={},
-  month={Nov}
-}
+    <div class="exp-item fade-in">
+      <div class="exp-meta">
+        <div class="exp-year">2021</div>
+        <div class="exp-org">Rennes, France</div>
+      </div>
+      <div>
+        <div class="exp-role">Research Intern</div>
+        <div class="exp-desc" style="color:var(--accent);font-size:13px;margin-bottom:10px;">INRIA</div>
+        <ul class="exp-bullets">
+          <li>Designed a meta-model of cryptographic architectures to verify compliance with best practices.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
 
-@INPROCEEDINGS{10706345,
-  author={Ouattara, Koffi Ismael and Petrovska, Ana and Hermann, Artur and Trkulja, Nataša and Dimitrakos, Theo and Kargl, Frank},
-  booktitle={2024 27th International Conference on Information Fusion (FUSION)}, 
-  title={On Subjective Logic Trust Discount for Referral Paths}, 
-  year={2024},
-  volume={},
-  number={},
-  %pages={1-8},
-  abstract={Subjective Logic (SL) enriches probabilistic logic by incorporating uncertainty and subjective belief ownership, enabling the expression of uncertainty about subjective beliefs. Unlike traditional probabilistic logics, SL 1) accommodates situations where different agents express beliefs about the same proposition, integrating the subjective nature and ownership of beliefs; and 2) addresses existing limitations in Dempster-Shafer Theory of evidence (DST), particularly in modelling trust transitivity. In modern computer systems, trust assessment extends beyond direct relationships to complex networks, necessitating the consideration of referral and direct trust relationships. This paper introduces a novel trust discount operator for referral edges in complex networks, addressing challenges in discounting trust across two and multiple referral edges. Through our empirical analysis, we demonstrate the effectiveness of the proposed operator and establish a relationship between path length and trustworthiness.},
-  keywords={Uncertainty;Data security;Computational modeling;Complex networks;Cyber-physical systems;Probabilistic logic;Vehicle dynamics;Trust management;subjective logic;trust discount;referral paths;multiple agents},
-  doi={10.23919/FUSION59988.2024.10706345},
-  ISSN={},
-  % month={July},
-  note = {Rank: B}
-}
+<!-- PUBLICATIONS -->
+<div id="publications">
+  <div class="inner">
+    <div class="section-label">Research</div>
+    <h2 style="margin-bottom:32px">Publications &amp; Patents</h2>
+    <div class="pub-filters">
+      <button class="filter-btn active" onclick="filterPubs('all', this)">All</button>
+      <button class="filter-btn" onclick="filterPubs('conference', this)">Conference</button>
+      <button class="filter-btn" onclick="filterPubs('journal', this)">Journal</button>
+      <button class="filter-btn" onclick="filterPubs('patent', this)">Patent</button>
+      <button class="filter-btn" onclick="filterPubs('submitted', this)">Submitted</button>
+    </div>
 
-@INPROCEEDINGS{10.1007/978-981-95-3543-9_14,
-author={Fotos, Nikolaos
-and Ouattara, Koffi Ismael
-and Karas, Dimitrios S.
-and Krontiris, Ioannis
-and Meng, Weizhi
-and Giannetsos, Thanassis},
-editor={Han, Jinguang
-and Xiang, Yang
-and Cheng, Guang
-and Susilo, Willy
-and Chen, Liquan},
-title={Actions Speak Louder Than Words: Evidence-Based Trust Level Evaluation in Multi-agent Systems},
-booktitle={Information and Communications Security },
-year={2026},
-doi={10.1007/978-981-95-3543-9_14},
-note = {Rank: B, Acceptance rate: 26&percnt;}
+    <div class="pub-list" id="pubList">
 
-}
+      <div class="pub-item" data-type="journal">
+        <div class="pub-idx">J1</div>
+        <div>
+          <div class="pub-title">Patas: A Framework for Parallel Trust Assessment in Neural Networks</div>
+          <div class="pub-authors">K. I. Ouattara et al.</div>
+          <div class="pub-venue">Knowledge Based Systems Journal · 2025</div>
+        </div>
+        <div class="pub-badges">
+          <span class="badge badge-review">Under Review</span>
+        </div>
+      </div>
 
-@inproceedings{10.1007/978-3-032-08887-1_4,
-author = {Ouattara, Koffi Ismael and Petrovska, Ana and Krontiris, Ioannis and Dimitrakos, Theo and Kargl, Frank},
-title = {An Optimized Framework for&nbsp;DSPG Synthesis and&nbsp;Trust Network Analysis with&nbsp;Subjective Logic},
-year = {2025},
-isbn = {978-3-032-08886-4},
-publisher = {Springer-Verlag},
-address = {Berlin, Heidelberg},
-url = {https://doi.org/10.1007/978-3-032-08887-1_4},
-doi = {10.1007/978-3-032-08887-1_4},
-abstract = {Subjective Logic-based trust reasoning requires the network to be a Directed Series-Parallel Graph (DSPG). However, most real-world trust graphs do not meet this condition, and existing transformation methods often remove uncertain edges, causing unnecessary information loss. In this paper, we propose a new DSPG synthesis framework that prioritizes structural integrity and information preservation. At its core is the concept of Parallel Non-intersecting Path Subnetworks (PNPS), which refines existing definitions and enables clearer identification of DSPG violations. We also introduce optimized synthesis criteria that admit more edges while maintaining DSPG compliance. In addition to the theoretical contributions from the framework, we also propose an algorithm for DSPG synthesis that ensures correctness, avoids edge removal, and enhances trust inference. Our experiments demonstrate reduced uncertainty in derived opinions and more reliable decision-making in trust-based systems.},
-booktitle = {Rules and Reasoning: 9th International Joint Conference, RuleML+RR 2025, Istanbul, Turkey, September 22–24, 2025, Proceedings},
-pages = {54–71},
-numpages = {18},
-note         = {To appear; Rank: B ;Acceptance Rate: 35&percnt;}
-}
+      <div class="pub-item" data-type="conference">
+        <div class="pub-idx">C1</div>
+        <div>
+          <div class="pub-title">Assessing AI Training Dataset Trustworthiness — A Use Case on Bias</div>
+          <div class="pub-authors">K. I. Ouattara, I. Krontiris, T. Dimitrakos, F. Kargl</div>
+          <div class="pub-venue">BIAS 2025 Workshop @ ECML PKDD 2025</div>
+        </div>
+        <div class="pub-badges">
+          <span class="badge badge-rank">Rank A</span>
+        </div>
+      </div>
 
-@patent{ouattara2024roguebs,
-  author       = {Koffi Ismael Ouattara and Serge Papillon and Afef Feki and Koffi  Anna Pantelidou},
-  title        = {Distributed Machine Learning Solution for Rogue Base Station Detection},
-  number       = {US20240121678A1},
-  year         = {2024},
-  institution  = {Nokia Technologies Oy},
-  url          = {https://patents.google.com/patent/US20240121678A1/en},
-  type         = {Patent},
-  note         = {Filed Patent}
-}
+      <div class="pub-item" data-type="conference">
+        <div class="pub-idx">C2</div>
+        <div>
+          <div class="pub-title">Actions Speak Louder Than Words: Evidence-Based Trust Level Evaluation in Multi-Agent Systems</div>
+          <div class="pub-authors">N. Fotos, K. I. Ouattara, D. S. Karas, I. Krontiris, W. Meng, T. Giannetsos</div>
+          <div class="pub-venue">ICICS 2025 · 27th Int. Conf. on Information and Communications Security</div>
+        </div>
+        <div class="pub-badges">
+          <span class="badge badge-rank">Rank B</span>
+          <span class="badge badge-review">Accept. 26%</span>
+        </div>
+      </div>
 
-@article{ouattara2024ptasreview,
-  author    = {Koffi Ismael Ouattara and Ioannis Krontiris and Theo Dimitrakos and Frank Kargl},
-  title     = {PTAS: Framework for Trust Assessment System for Neural Networks},
-  journal   = {Submitted to IEEE Transactions on Neural Networks and Learning Systems},
-  note      = {Under review},
-  author={Koffi Ismael Ouattara and Ioannis Krontiris and Theo Dimitrakos and Dennis Eisermann and Houda Labiod and Frank Kargl},
-  year={2025},
-  eprint={2511.20586},
-  archivePrefix={arXiv},
-  primaryClass={cs.AI},
-  url={https://arxiv.org/abs/2511.20586}, 
-}
+      <div class="pub-item" data-type="conference">
+        <div class="pub-idx">C3</div>
+        <div>
+          <div class="pub-title">Quantifying Calibration Error in Neural Networks through Evidence-Based Theory</div>
+          <div class="pub-authors">K. I. Ouattara, I. Krontiris, T. Dimitrakos, F. Kargl</div>
+          <div class="pub-venue">FUSION 2025 · 28th Int. Conf. on Information Fusion</div>
+        </div>
+        <div class="pub-badges">
+          <span class="badge badge-rank">Rank B</span>
+        </div>
+      </div>
 
-@accepted{dataai,
-  author = {Ouattara, Koffi Ismael and Krontiris, Ioannis and Dimitrakos, Theo and Kargl, Frank},
-  title = {Assessing AI Training Dataset Trustworthiness - A Use Case on Bias},
-  note = {Accepted at BIAS 2025 Workshop, ECML PKDD 2025; Rank: A}
-}
+      <div class="pub-item" data-type="conference">
+        <div class="pub-idx">C4</div>
+        <div>
+          <div class="pub-title">An Optimized Framework for DSPG Synthesis and Trust Network Analysis with Subjective Logic</div>
+          <div class="pub-authors">K. I. Ouattara, A. Petrovska, I. Krontiris, T. Dimitrakos, F. Kargl</div>
+          <div class="pub-venue">RuleML+RR 2025</div>
+        </div>
+        <div class="pub-badges">
+          <span class="badge badge-rank">Rank B</span>
+          <span class="badge badge-review">Accept. 35%</span>
+        </div>
+      </div>
 
-@INPROCEEDINGS{11124121,
-  author={Ouattara, Koffi Ismael and Krontiris, Ioannis and Dimitrakos, Theo and Kargl, Frank},
-  booktitle={2025 28th International Conference on Information Fusion (FUSION)}, 
-  title={Quantifying Calibration Error in Neural Networks Through Evidence-Based Theory}, 
-  year={2025},
-  volume={},
-  number={},
-  pages={1-8},
-  keywords={Uncertainty;Autonomous systems;Neural networks;Redundancy;Medical services;Real-time systems;Calibration;Reliability;Logic;Artificial intelligence;Neural Network Trustworthiness;Subjective Logic;Confidence Calibration;Expected Calibration Error (ECE);Belief Fusion},
-  doi={10.23919/FUSION65864.2025.11124121}
-}
+      <div class="pub-item" data-type="conference">
+        <div class="pub-idx">C5</div>
+        <div>
+          <div class="pub-title">On Subjective Logic Trust Discount for Referral Paths</div>
+          <div class="pub-authors">K. I. Ouattara, A. Petrovska, A. Hermann, N. Trkulja, T. Dimitrakos, F. Kargl</div>
+          <div class="pub-venue">FUSION 2024 · 27th Int. Conf. on Information Fusion · DOI: 10.23919/FUSION59988.2024.10706345</div>
+        </div>
+        <div class="pub-badges">
+          <span class="badge badge-rank">Rank B</span>
+        </div>
+      </div>
 
+      <div class="pub-item" data-type="conference">
+        <div class="pub-idx">C6</div>
+        <div>
+          <div class="pub-title">Detecting Fake Base Stations Using Knowledge Graphs and ML-Based Techniques</div>
+          <div class="pub-authors">S. Kriaa, A. Feki, S. Papillon, T. Chene, I. Ouattara</div>
+          <div class="pub-venue">IEEE Virtual Conference on Communications (VCC) · Nov. 2023 · DOI: 10.1109/VCC60689.2023.10474891</div>
+        </div>
+        <div class="pub-badges"></div>
+      </div>
 
-@INPROCEEDINGS{ouattara2025quantifying,
-  title     = {Quantifying Dataset Trustworthiness from Labeling Bias Using Subjective Logic},
-  author    = {Ouattara, Koffi Ismael and Krontiris, Ioannis and Dimitrakos, Theo and Kargl, Frank},
-  booktitle = {Proceedings of TRUST-AI 2025 - The European Workshop on Trustworthy AI
-co-located with the 28th European Conference on Artificial Intelligence (ECAI 2025)
-},
-  series    = {CEUR Workshop Proceedings},
-  volume    = {4132},
-  year      = {2025},
-  publisher = {CEUR-WS.org},
-  url       = {https://ceur-ws.org/Vol-4132/},
-  urn       = {urn:nbn:de:0074-4132-0}
-}
+      <div class="pub-item" data-type="patent">
+        <div class="pub-idx">P1</div>
+        <div>
+          <div class="pub-title">Distributed Machine Learning Solution for Rogue Base Station Detection</div>
+          <div class="pub-authors">K. I. Ouattara, S. Papillon, A. Feki, K. A. Pantelidou</div>
+          <div class="pub-venue">US Patent US20240121678A1 · Filed 2024</div>
+        </div>
+        <div class="pub-badges">
+          <span class="badge badge-patent">Patent</span>
+        </div>
+      </div>
 
+      <div class="pub-item" data-type="submitted">
+        <div class="pub-idx">S1</div>
+        <div>
+          <div class="pub-title">Subjective Neural Network</div>
+          <div class="pub-authors">K. I. Ouattara</div>
+          <div class="pub-venue">Submitted to UAI 2026 · Neural network framework integrating Subjective Logic for structured uncertainty modeling with SBNN and Dirichlet Process mappings.</div>
+        </div>
+        <div class="pub-badges">
+          <span class="badge badge-submitted">Submitted</span>
+        </div>
+      </div>
 
+    </div>
+  </div>
+</div>
 
-@inprogress{SNN,
-  author    = {Koffi Ismael Ouattara},
-  title     = {Subjective Neural Networks: Trust-Aware Bayesian Inference with Subjective Logic},
-  year      = {2025},
-  abstract  = {This work introduces Subjective Neural Networks (SNNs), a neural learning framework that integrates Subjective Logic with Bayesian inference to enable structured and interpretable uncertainty modeling. The approach formalizes uncertainty as subjective trust opinions, explicitly separating belief from ignorance. A Subjective Binary Neural Network (SBNN) is proposed, where binary weights are governed by binomial opinions, alongside a novel mapping of continuous subjective opinions to Dirichlet processes for nonparametric belief representation. The resulting framework supports trust-aware, calibrated, and interpretable inference across both discrete and continuous domains, bridging Bayesian deep learning and subjective uncertainty reasoning.}
-}
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-label">Education</div>
+  <h2>Academic background</h2>
+  <div class="edu-grid fade-in">
+    <div class="edu-card" data-year="2023–2026">
+      <div class="edu-degree">PhD in AI Security</div>
+      <div class="edu-inst">Ulm University</div>
+      <div class="edu-field">V2X Networks, Trust in Machine Learning · Germany</div>
+    </div>
+    <div class="edu-card" data-year="2021–2023">
+      <div class="edu-degree">Engineer &amp; Master's<br>Cybersecurity, ML</div>
+      <div class="edu-inst">Telecom Paris — Institut Polytechnique de Paris</div>
+      <div class="edu-field">Cybersecurity, Machine Learning, Mobile Networks · France</div>
+    </div>
+    <div class="edu-card" data-year="2018–2022">
+      <div class="edu-degree">Engineer / Master's<br>Cybersecurity &amp; ML</div>
+      <div class="edu-inst">École Polytechnique</div>
+      <div class="edu-field">Cybersecurity &amp; Machine Learning · France</div>
+    </div>
+  </div>
+</section>
 
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label" style="justify-content:center">Contact</div>
+  <h2>Get in touch</h2>
+  <p style="color:var(--muted);max-width:480px;margin:0 auto;font-size:15px;">
+    Open to collaborations, research discussions, and speaking engagements in trustworthy AI, uncertainty quantification, and ML security.
+  </p>
+  <div class="contact-links">
+    <a href="/cdn-cgi/l/email-protection#1f706a7e6b6b7e6d7e766c727e7a732e2626265f78727e7673317c7072" class="contact-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+      <span class="__cf_email__" data-cfemail="a6c9d3c7d2d2c7d4c7cfd5cbc7c3ca979f9f9fe6c1cbc7cfca88c5c9cb">[email&#160;protected]</span>
+    </a>
+    <a href="https://github.com/Ouatt-Isma" target="_blank" class="contact-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      github.com/Ouatt-Isma
+    </a>
+    <a href="https://ouatt-isma.github.io" target="_blank" class="contact-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 1 0 20A14.5 14.5 0 0 1 12 2"/><path d="M2 12h20"/></svg>
+      ouatt-isma.github.io
+    </a>
+    <a href="https://www.linkedin.com/in/koffi-ismael-ouattara-96291817a/" target="_blank" class="contact-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 1 0 20A14.5 14.5 0 0 1 12 2"/><path d="M2 12h20"/></svg>
+      linkedin
+    </a>
+    <a href="Ouattara_CV_Publications.pdf" download class="contact-link" style="border-color:var(--accent);color:var(--accent);">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download CV + Publications
+    </a>
+  </div>
+</section>
 
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Koffi Ismael Ouattara</p>
+  <p>Ulm University &amp; Huawei Research</p>
+</footer>
 
-
-    </script>
-
-    <!-- Tiny client-side renderer for the categories above -->
-<script>
-(function () {
-  const raw = document.getElementById('bibtex-data');
-  if (!raw) return;
-  const text = raw.textContent || raw.innerText || '';
-
-  // ---- Utilities ----
-  function splitTopLevel(body) {
-    // Split body into field assignments at commas NOT inside braces/quotes.
-    const parts = [];
-    let cur = '';
-    let depth = 0;
-    let inQuote = false;
-    for (let i = 0; i < body.length; i++) {
-      const c = body[i];
-      // Handle comments: % to end of line when not in quotes
-      if (c === '%' && !inQuote) {
-        // skip to end of line
-        while (i < body.length && body[i] !== '\n') i++;
-        continue;
-      }
-      if (c === '"' && body[i-1] !== '\\') inQuote = !inQuote;
-      if (!inQuote) {
-        if (c === '{') depth++;
-        else if (c === '}') depth = Math.max(0, depth - 1);
-      }
-      if (c === ',' && depth === 0 && !inQuote) {
-        if (cur.trim()) parts.push(cur.trim());
-        cur = '';
-      } else {
-        cur += c;
-      }
-    }
-    if (cur.trim()) parts.push(cur.trim());
-    return parts;
-  }
-
-  function unbrace(v) {
-    v = v.trim();
-    // remove one outer pair of braces or quotes if they wrap the whole value
-    if ((v.startsWith('{') && v.endsWith('}')) || (v.startsWith('"') && v.endsWith('"'))) {
-      // Ensure braces are balanced before stripping
-      let depth = 0, ok = true;
-      for (let i = 0; i < v.length; i++) {
-        const c = v[i];
-        if (c === '{') depth++;
-        else if (c === '}') depth--;
-        if (depth < 0) { ok = false; break; }
-      }
-      if (ok && depth === 0) v = v.slice(1, -1);
-    }
-    return v.trim();
-  }
-
-  function parseFields(body) {
-    const fields = {};
-    splitTopLevel(body).forEach(token => {
-      const eq = token.indexOf('=');
-      if (eq === -1) return;
-      const k = token.slice(0, eq).trim().toLowerCase();
-      const v = unbrace(token.slice(eq + 1));
-      fields[k] = v.replace(/\s+/g, ' ').trim();
-    });
-    return fields;
-  }
-
-  // ---- Parse entries ----
-  const entries = [];
-  const re = /@(\w+)\s*\{\s*([^,]+)\s*,([\s\S]*?)\}\s*(?=@|$)/g;
-  let m;
-  while ((m = re.exec(text)) !== null) {
-    const type = (m[1] || '').toLowerCase();
-    const key = (m[2] || '').trim();
-    const body = m[3] || '';
-    const fields = parseFields(body);
-    entries.push({ type, key, fields });
-  }
-
-  // ---- Buckets ----
-  const buckets = {
-    article: document.getElementById('bib-articles'),
-    inproceedings: document.getElementById('bib-inproceedings'),
-    booksandchapters: document.getElementById('bib-booksandchapters'),
-    accepted: document.getElementById('bib-accepted'),
-    patent: document.getElementById('bib-patent'),
-    inprogress: document.getElementById('bib-inprogress')
-  };
-
-  function normalizeTarget(e) {
-    if (e.type === 'book' || e.type === 'incollection' || e.type === 'inbook') return 'booksandchapters';
-    return buckets[e.type] ? e.type : null;
-  }
-
-  // ---- Formatting helpers ----
-  function initialsFrom(firstNames) {
-    return firstNames
-      .split(/\s+/)
-      .filter(Boolean)
-      .map(w => (w[0] || '').toUpperCase() + '.')
-      .join(' ');
-  }
-  function formatAuthors(authStr) {
-    const parts = authStr.split(/\s+and\s+/i).map(s => s.trim()).filter(Boolean);
-    const formatted = parts.map(p => {
-      if (p.includes(',')) {
-        const [last, first] = p.split(',').map(s => s.trim());
-        return (initialsFrom(first || '') + ' ' + last).trim();
-      } else {
-        const tokens = p.split(/\s+/);
-        const last = tokens.pop();
-        const first = tokens.join(' ');
-        return (initialsFrom(first) + ' ' + (last || '')).trim();
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Scroll fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
       }
     });
-    if (formatted.length <= 2) return formatted.join(' and ');
-    return formatted.slice(0, -1).join(', ') + ', and ' + formatted.slice(-1);
-  }
-  function doiLink(doi,url) {
-    if (!doi ) return '';
-    const cleaned = doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, '').trim();
-    return ` <a href="https://doi.org/${cleaned}" target="_blank" rel="noopener">doi: ${cleaned}</a>`;
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Publication filter
+  function filterPubs(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(    b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.pub-item').forEach(item => {
+      item.style.display = (type === 'all' || item.dataset.type === type) ? 'grid' : 'none';
+    });
   }
 
-  function urlLink(doi,url) {
-    if (!url ) return '';
-      return ` <a href="${url}" target="_blank" rel="noopener">doi: ${cleaned}</a>`;
-    } 
-    
-  function pagesText(p) { return p ? `, pp. ${p.replace(/-/g,'–')}` : ''; }
-  function rankAndYear(note, year) {
-    // let rank = '';
-    // if (note) {
-    //   const r = note.match(/rank\s*:\s*([A-D][\+]?)/i);
-    //   if (r) rank = `Rank: ${r[1].toUpperCase()}`;
-    // }
-    // return (rank ? `${rank}, ` : '') + (year || '');
-    return (note ? `${note}, ` : '') + (year || '');
+  // Theme toggle
+  const toggle = document.getElementById('theme-toggle');
+  const moon = document.getElementById('icon-moon');
+  const sun = document.getElementById('icon-sun');
+  const html = document.documentElement;
+
+  // Persist preference
+  const saved = localStorage.getItem('theme');
+  if (saved === 'light') {
+    html.setAttribute('data-theme', 'light');
+    moon.style.display = 'none';
+    sun.style.display = 'block';
   }
 
-  function fmtInproceedings(f) {
-    const authors = f.author ? formatAuthors(f.author) : '';
-    const title = f.title ? `“${f.title}”` : '';
-    const venue = f.booktitle ? `<em>${f.booktitle}</em>` : '';
-    const year = f.year || '';
-    const rankYear = rankAndYear(f.note, year);
-    const doi = doiLink(f.doi);
-    const pages = pagesText(f.pages);
-    return `${authors}, ${title}, in ${venue}${pages}, ${rankYear}.${doi ? ' ' + doi : ''}`;
-  }
-  function fmtArticle(f) {
-    const authors = f.author ? formatAuthors(f.author) : '';
-    const title = f.title ? `“${f.title}”` : '';
-    const journal = f.journal ? `<em>${f.journal}</em>` : (f.note || '');
-    const year = f.year || '';
-    const doi = doiLink(f.doi);
-    const url = urlLink(f.url);
-    return `${authors}, ${title}, ${journal}, ${year}.${doi ? ' ' + doi : ''}, ${url ? ' ' + url : ''}`;
-  }
-  function fmtPatent(f) {
-    const authors = f.author ? formatAuthors(f.author) : '';
-    const title = f.title ? `“${f.title}”` : '';
-    const inst = f.institution ? f.institution : '';
-    const num = f.number ? ` <strong>${f.number}</strong>` : '';
-    const year = f.year || '';
-    const link = f.url ? ` <a href="${f.url}" target="_blank" rel="noopener">link</a>` : '';
-    const bits = [authors, title, inst].filter(Boolean).join(', ');
-    return `${bits}${num ? ',' + num : ''}, ${year}.${link}`;
-  }
-  function fmtAccepted(f) { return fmtInproceedings(f); }
-  function fmtInProgress(f) {
-    const authors = f.author ? formatAuthors(f.author) : '';
-    const title = f.title ? `“${f.title}”` : '';
-    const year = f.year || '';
-    return `${authors}, ${title}, Contribution: ${f.abstract}, ${year}.`;
-  }
-  function render(e) {
-    const f = e.fields;
-    switch (e.type) {
-      case 'inproceedings': return fmtInproceedings(f);
-      case 'article': return fmtArticle(f);
-      case 'accepted': return fmtAccepted(f);
-      case 'patent': return fmtPatent(f);
-      case 'inprogress': return fmtInProgress(f);
-      default: return fmtInproceedings(f);
+  toggle.addEventListener('click', () => {
+    const isLight = html.getAttribute('data-theme') === 'light';
+    if (isLight) {
+      html.removeAttribute('data-theme');
+      moon.style.display = 'block';
+      sun.style.display = 'none';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      html.setAttribute('data-theme', 'light');
+      moon.style.display = 'none';
+      sun.style.display = 'block';
+      localStorage.setItem('theme', 'light');
     }
-  }
-  function getYear(e) {
-    const y = parseInt(e.fields.year, 10);
-    return isNaN(y) ? 0 : y;
-  }
-
-  // ---- Group, sort, render ----
-  const grouped = {};
-  entries.forEach(e => {
-    const tgt = normalizeTarget(e);
-    if (!tgt) return;
-    (grouped[tgt] = grouped[tgt] || []).push(e);
   });
-
-  Object.keys(grouped).forEach(k => {
-    const ul = buckets[k];
-    if (!ul) return;
-    grouped[k]
-      .sort((a,b) => {
-        const y = getYear(b) - getYear(a);
-        if (y) return y;
-        return (a.fields.title||'').localeCompare(b.fields.title||'');
-      })
-      .forEach(e => {
-        const li = document.createElement('li');
-        li.className = 'mbr-fonts-style display-7';
-        li.innerHTML = render(e);
-        ul.appendChild(li);
-      });
-  });
-})();
 </script>
-
-
-  </section>
-
-  <!-- CONTACT -->
-  <section class="mbr-section form1 cid-s3MvvrYa7n" id="form1-b">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="title col-12 col-lg-8">
-          <h2 class="mbr-section-title align-center pb-3 mbr-fonts-style display-2">Contact me</h2>
-          <br>
-          Download my résumé:
-          <a href="files/cv_en.pdf" target="_blank">Full version</a> |
-          <a href="files/cv_1.pdf" target="_blank">1-page version</a>
-        </div>
-      </div>
-    </div>
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="media-container-column col-lg-8" data-form-type="formoid">
-          <form action="send_form.php" method="POST" class="mbr-form form-with-styler" data-form-title="Mobirise Form">
-            <input type="hidden" name="email" data-form-email="true" value="">
-            <div class="row">
-              <div hidden data-form-alert class="alert alert-success col-12">Thanks for filling out the form!</div>
-              <div hidden data-form-alert-danger class="alert alert-danger col-12"></div>
-            </div>
-            <div class="dragArea row">
-              <div class="col-md-4 form-group" data-for="name">
-                <label for="name-form1-b" class="form-control-label mbr-fonts-style display-7">Name</label>
-                <input type="text" name="name" data-form-field="Name" required class="form-control display-7" id="name-form1-b">
-              </div>
-              <div class="col-md-4 form-group" data-for="email">
-                <label for="email-form1-b" class="form-control-label mbr-fonts-style display-7">Email</label>
-                <input type="email" name="email" data-form-field="Email" required class="form-control display-7" id="email-form1-b">
-              </div>
-              <div data-for="phone" class="col-md-4 form-group">
-                <label for="phone-form1-b" class="form-control-label mbr-fonts-style display-7">Phone</label>
-                <input type="tel" name="phone" data-form-field="Phone" class="form-control display-7" id="phone-form1-b">
-              </div>
-              <div data-for="message" class="col-md-12 form-group">
-                <label for="message-form1-b" class="form-control-label mbr-fonts-style display-7">Message</label>
-                <textarea name="message" data-form-field="Message" class="form-control display-7" id="message-form1-b"></textarea>
-              </div>
-              <div class="col-md-12 input-group-btn align-center">
-                <button type="submit" class="btn btn-primary btn-form display-4">SEND FORM</button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <section class="cid-qTkAaeaxX5" id="footer1-2">
-    <div class="container">
-      <div class="media-container-row content text-white">
-        <div class="col-12 col-md-3">
-          <div class="media-wrap"><a href=""><img src="assets/images/logo2.png" alt="Logo"></a></div>
-        </div>
-        <div class="col-12 col-md-3 mbr-fonts-style display-7">
-          <h5 class="pb-3">Address</h5>
-          <p class="mbr-text">Paris Area, France</p>
-        </div>
-        <div class="col-12 col-md-3 mbr-fonts-style display-7">
-          <h5 class="pb-3">Contacts</h5>
-          <p class="mbr-text">
-            Email: <a class="text-white" href="mailto:ouattaraismael1999@gmail.com">ouattaraismael1999@gmail.com</a><br>
-            Phone: +33 (0) 7 69 29 22 19
-          </p>
-        </div>
-      </div>
-      <div class="footer-lower">
-        <div class="media-container-row"><div class="col-sm-12"><hr></div></div>
-        <div class="media-container-row mbr-white">
-          <div class="col-sm-6 copyright">
-            <p class="mbr-text mbr-fonts-style display-7">© Copyright — All Rights Reserved</p>
-          </div>
-          <div class="col-md-6">
-            <div class="social-list align-right">
-              <div class="soc-item">
-                <a href="https://www.linkedin.com/in/koffi-ismael-ouattara-96291817a/" target="_blank">
-                  <span class="socicon-linkedin socicon mbr-iconfont mbr-iconfont-social"></span>
-                </a>
-              </div>
-              <div class="soc-item">
-                <a href="https://github.com/Ouatt-Isma" target="_blank">
-                  <span class="socicon-github socicon mbr-iconfont mbr-iconfont-social"></span>
-                </a>
-              </div>
-              <div class="soc-item">
-                <a href="https://ouatt-isma.github.io/" target="_blank">
-                  <span class="socicon socicon-mobirise mbr-iconfont mbr-iconfont-social"></span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <script src="assets/web/assets/jquery/jquery.min.js"></script>
-  <script src="assets/popper/popper.min.js"></script>
-  <script src="assets/bootstrap/js/bootstrap.min.js"></script>
-  <script src="assets/smoothscroll/smooth-scroll.js"></script>
-  <script src="assets/dropdown/js/nav-dropdown.js"></script>
-  <script src="assets/dropdown/js/navbar-dropdown.js"></script>
-  <script src="assets/touchswipe/jquery.touch-swipe.min.js"></script>
-  <script src="assets/vimeoplayer/jquery.mb.vimeo_player.js"></script>
-  <script src="assets/mbr-tabs/mbr-tabs.js"></script>
-  <script src="assets/bootstrapcarouselswipe/bootstrap-carousel-swipe.js"></script>
-  <script src="assets/mbr-clients-slider/mbr-clients-slider.js"></script>
-  <script src="assets/as-pie-progress/jquery-as-pie-progress.min.js"></script>
-  <script src="assets/tether/tether.min.js"></script>
-  <script src="assets/theme/js/script.js"></script>
-  <script src="assets/formoid/formoid.min.js"></script>
 </body>
 </html>
