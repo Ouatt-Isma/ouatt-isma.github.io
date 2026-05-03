@@ -720,6 +720,127 @@
     transform: translateY(0);
   }
 
+  /* ── PROJECTS ── */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .project-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+
+  .project-card:hover::before { transform: scaleX(1); }
+
+  .project-name {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .project-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    flex: 1;
+  }
+
+  .project-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 4px;
+  }
+
+  .project-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.07em;
+    padding: 3px 8px;
+    background: var(--surface2);
+    border: 1px solid var(--faint);
+    color: var(--muted);
+    border-radius: 2px;
+  }
+
+  .project-link {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+  }
+
+  .project-link:hover { text-decoration: underline; }
+
+  .other-projects {
+    border-top: 1px solid var(--border);
+    padding-top: 40px;
+  }
+
+  .other-projects-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .other-projects-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    list-style: none;
+  }
+
+  .other-projects-list li {
+    font-size: 13px;
+    color: var(--muted);
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--faint);
+    line-height: 1.6;
+    transition: border-color 0.2s;
+  }
+
+  .other-projects-list li:hover {
+    border-left-color: var(--accent);
+  }
+
   /* ── MOBILE ── */
   @media (max-width: 900px) {
     nav { padding: 16px 24px; }
@@ -731,6 +852,8 @@
     #about .about-grid { grid-template-columns: 1fr; gap: 40px; }
     .exp-item { grid-template-columns: 1fr; gap: 8px; }
     .edu-grid { grid-template-columns: 1fr; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .other-projects-list { grid-template-columns: 1fr; }
     footer { flex-direction: column; gap: 12px; text-align: center; }
   }
 </style>
@@ -743,6 +866,7 @@
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
     <li><a href="#publications">Research</a></li>
     <li><a href="#education">Education</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -941,6 +1065,107 @@
         </ul>
       </div>
     </div>
+    <div class="exp-item fade-in">
+      <div class="exp-meta">
+        <div class="exp-year">Apr 2022</div>
+        <div class="exp-org">Paris, France</div>
+      </div>
+      <div>
+        <div class="exp-role">Interim Teacher — IDS &amp; SNORT</div>
+        <div class="exp-desc" style="color:var(--accent);font-size:13px;margin-bottom:10px;">ISEP</div>
+        <ul class="exp-bullets">
+          <li>Taught Intrusion Detection Systems course and led hands-on SNORT lab sessions for engineering students.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exp-item fade-in">
+      <div class="exp-meta">
+        <div class="exp-year">2021 – 2022</div>
+        <div class="exp-org">Paris, France</div>
+      </div>
+      <div>
+        <div class="exp-role">Teaching Assistant &amp; Oral Examiner</div>
+        <div class="exp-desc" style="color:var(--accent);font-size:13px;margin-bottom:10px;">Lycée Janson de Sailly &amp; EPF Engineering School</div>
+        <ul class="exp-bullets">
+          <li>Oral examiner (colle) for Classes Préparatoires students — mathematics and computer science.</li>
+          <li>Homework support and course comprehension assistance for preparatory-class students.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-label">Projects</div>
+  <h2>Built &amp; shipped</h2>
+
+  <div class="projects-grid fade-in">
+
+    <div class="project-card">
+      <div class="project-name">FAOS.FR</div>
+      <div class="project-desc">
+        Business accelerator agency platform. Full-stack development of the FAOS platform including custom themes, plugins, and integrations tailored for SME growth.
+      </div>
+      <div class="project-stack">
+        <span class="project-tag">WordPress</span>
+        <span class="project-tag">PHP</span>
+        <span class="project-tag">MySQL</span>
+      </div>
+      <a href="https://faos.fr" target="_blank" rel="noopener" class="project-link">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        faos.fr
+      </a>
+    </div>
+
+    <div class="project-card">
+      <div class="project-name">AMON.AI</div>
+      <div class="project-desc">
+        RAG-powered information retrieval system for BTP (Building &amp; Construction) projects. Enables teams to instantly query large project documentation corpora using natural language.
+      </div>
+      <div class="project-stack">
+        <span class="project-tag">RAG</span>
+        <span class="project-tag">LLM</span>
+        <span class="project-tag">Vector DB</span>
+        <span class="project-tag">Python</span>
+      </div>
+      <a href="http://amon.ai" target="_blank" rel="noopener" class="project-link">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        amon.ai
+      </a>
+    </div>
+
+    <div class="project-card">
+      <div class="project-name">PLAYINVEST-HD.COM</div>
+      <div class="project-desc">
+        Financial intelligence platform delivering real-time investment insights. Full-stack application with server-side rendering, REST API backend, and relational data storage.
+      </div>
+      <div class="project-stack">
+        <span class="project-tag">Nuxt.js</span>
+        <span class="project-tag">FastAPI</span>
+        <span class="project-tag">PostgreSQL</span>
+        <span class="project-tag">Python</span>
+      </div>
+      <a href="https://playinvest-hd.com" target="_blank" rel="noopener" class="project-link">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        playinvest-hd.com
+      </a>
+    </div>
+
+  </div>
+
+  <div class="other-projects fade-in">
+    <div class="other-projects-label">Other work</div>
+    <ul class="other-projects-list">
+      <li>Dynamic pricing &amp; recommendation engine on sales platforms to reduce food waste.</li>
+      <li>Predicting Uber driver activation likelihood from signup data (binary classification).</li>
+      <li>Predicting tweet retweet counts from content and metadata features.</li>
+      <li>CTF challenges on Root Me platform — network, web, reverse, crypto (pseudo: <strong style="color:var(--text)">Xma99</strong>).</li>
+      <li>Implemented Snort rules to build a firewall securing a local network.</li>
+      <li>Wrote a YARA rule to detect a specific malware sample.</li>
+      <li>Built a mini C compiler from scratch using Java (lexer → parser → codegen).</li>
+    </ul>
   </div>
 </section>
 
