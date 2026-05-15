@@ -1,0 +1,2555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PaTAS Simulator — Parallel Trust Assessment System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3ede0;
+    --paper-2: #ebe3d2;
+    --ink: #1a1814;
+    --ink-2: #4b463c;
+    --ink-3: #837c6c;
+    --rule: #1a1814;
+    --belief: #0cc20c;
+    --belief-soft: #f8c9a8;
+    --disbelief: #d11b1b;
+    --disbelief-soft: #b9c8b8;
+    --uncertainty: #a08b5d;
+    --uncertainty-soft: #e6d9b8;
+    --highlight: #fef3c7;
+    --error: #991b1b;
+    --ok: #14532d;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  body {
+    background-image:
+      radial-gradient(rgba(26, 24, 20, 0.04) 1px, transparent 1px);
+    background-size: 4px 4px;
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* ─────── Masthead ─────── */
+  header.masthead {
+    border-top: 6px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 18px 0 14px;
+    margin-bottom: 28px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+    gap: 24px;
+  }
+  .masthead .left,
+  .masthead .right {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .masthead .right { text-align: right; }
+  .masthead h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 42px;
+    line-height: 1;
+    margin: 0;
+    letter-spacing: -0.02em;
+    text-align: center;
+  }
+  .masthead h1 .small {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 18px;
+    display: block;
+    color: var(--ink-2);
+    margin-top: 6px;
+    letter-spacing: 0;
+  }
+
+  /* ─────── Stage IV: Param Update specific ─────── */
+  .batch-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .batch-row {
+    display: grid;
+    grid-template-columns: 36px 1fr 24px;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 8px;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+  }
+  .batch-row .idx {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+  }
+  .batch-row .bar-mini {
+    height: 16px;
+    display: flex;
+    border: 1px solid var(--ink);
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .batch-row .bar-mini .seg-b { background: var(--belief); }
+  .batch-row .bar-mini .seg-d { background: var(--disbelief); }
+  .batch-row .bar-mini .seg-u { background: var(--uncertainty); }
+  .batch-row button.x {
+    background: transparent;
+    border: 1px solid var(--ink-3);
+    color: var(--ink-3);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 2px 6px;
+    cursor: pointer;
+  }
+  .batch-row button.x:hover { background: var(--error); color: var(--paper); border-color: var(--error); }
+
+  .batch-sliders {
+    display: none;
+    background: var(--paper-2);
+    border: 1px solid var(--ink);
+    border-top: none;
+    padding: 8px 12px;
+    margin-top: -1px;
+    margin-bottom: 8px;
+  }
+  .batch-sliders.show {
+    display: block;
+  }
+  .batch-sliders .slider-row {
+    display: grid;
+    grid-template-columns: 20px 1fr 40px;
+    gap: 8px;
+    align-items: center;
+    margin: 4px 0;
+  }
+  .batch-sliders .slider-row label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .batch-sliders .slider-row label.b { color: var(--belief); }
+  .batch-sliders .slider-row label.d { color: var(--disbelief); }
+  .batch-sliders .slider-row label.u { color: var(--uncertainty); }
+  .batch-sliders .slider-row input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    outline: none;
+  }
+  .batch-sliders .slider-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--ink);
+    border: 2px solid var(--paper);
+    border-radius: 0;
+    cursor: pointer;
+  }
+  .batch-sliders .slider-row input[type="range"]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: var(--ink);
+    border: 2px solid var(--paper);
+    border-radius: 0;
+    cursor: pointer;
+  }
+  .batch-sliders .slider-row .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-align: right;
+    color: var(--ink-2);
+  }
+
+  .grad-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .grad-cell {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 4px 6px;
+    text-align: center;
+  }
+  .grad-cell input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-align: center;
+    outline: none;
+    padding: 0;
+  }
+  .grad-cell .glbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+  }
+  .grad-cell.weak { background: #d9e8d5; }
+  .grad-cell.strong { background: #f4cfb3; }
+
+  .step-controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--ink-3);
+  }
+  .step-pill {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    margin-left: auto;
+  }
+
+  .algo-step {
+    margin: 14px 0;
+    padding: 12px 14px;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    border-left: 4px solid var(--ink-3);
+    opacity: 0.45;
+    transition: all 0.25s ease;
+    position: relative;
+  }
+  .algo-step.active {
+    opacity: 1;
+    border-left-color: var(--belief);
+    box-shadow: 0 0 0 1px var(--belief);
+  }
+  .algo-step.done {
+    opacity: 0.95;
+    border-left-color: var(--ok);
+  }
+  .algo-step .step-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+  .algo-step .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .algo-step .step-title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .algo-step .step-body {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  .algo-step .step-body .formula {
+    background: var(--highlight);
+    padding: 2px 6px;
+    margin: 6px 0;
+    display: inline-block;
+  }
+  .algo-step .step-body .res {
+    display: inline-block;
+    padding: 2px 6px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 0;
+  }
+  .algo-step .step-body .small-line {
+    color: var(--ink-2);
+    font-size: 11px;
+    margin: 2px 0;
+  }
+
+  .epsilon-control {
+    display: grid;
+    grid-template-columns: 60px 1fr 60px;
+    gap: 8px;
+    align-items: center;
+  }
+  .epsilon-control label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .epsilon-control .val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-align: right;
+    color: var(--ink-2);
+  }
+
+  /* compact opinion editor (mini, used in stage IV) */
+  .mini-opinion {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 8px 10px;
+    margin-bottom: 8px;
+  }
+  .mini-opinion .mhead {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+  }
+  .mini-opinion .mhead .mname {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .mini-opinion .mhead .mval {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--ink-2);
+  }
+  .mini-opinion .triple-bar {
+    height: 16px;
+  }
+  .mini-opinion .opinion-sliders {
+    grid-template-columns: 16px 1fr 36px;
+    gap: 4px 6px;
+    margin-top: 4px;
+  }
+  .mini-opinion .opinion-sliders label { font-size: 10px; }
+  .mini-opinion .opinion-sliders .num { font-size: 10px; }
+
+  .neuron-pick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .neuron-pick button {
+    background: transparent;
+    border: 1px solid var(--ink);
+    padding: 4px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+  .neuron-pick button.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  /* SVG highlight for active param update */
+  circle.trust-node.update-target {
+    fill: var(--highlight);
+    stroke: var(--belief);
+    stroke-width: 2.5;
+  }
+  line.edge.update-edge {
+    stroke: var(--belief);
+    stroke-width: 2.5;
+  }
+  line.edge.weak-grad {
+    stroke: #4a7c40;
+    stroke-width: 2;
+  }
+  line.edge.strong-grad {
+    stroke: #b8421f;
+    stroke-width: 2;
+    stroke-dasharray: 5 3;
+  }
+
+  /* ─────── Stage tabs ─────── */
+  .stages {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 24px;
+  }
+  .stage-tab {
+    background: transparent;
+    border: 1px solid var(--ink);
+    border-bottom: none;
+    padding: 10px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--ink);
+    margin-right: -1px;
+    transition: background 0.15s;
+  }
+  .stage-tab.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .stage-tab:hover:not(.active) {
+    background: var(--paper-2);
+  }
+
+  /* ─────── Layout ─────── */
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 360px) 1fr;
+    gap: 28px;
+  }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─────── Panels ─────── */
+  .panel {
+    background: var(--paper-2);
+    border: 1px solid var(--ink);
+    padding: 18px 18px 22px;
+    margin-bottom: 20px;
+  }
+  .panel-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 18px;
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--ink-3);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .panel-title .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    font-weight: 400;
+  }
+
+  /* ─────── Opinion editors ─────── */
+  .opinion {
+    margin-bottom: 12px;
+  }
+  .opinion-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .opinion-label .name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+  .opinion-label .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-2);
+  }
+  .triple-bar {
+    display: flex;
+    height: 24px;
+    border: 1px solid var(--ink);
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+  }
+  .bar-seg {
+    height: 100%;
+    transition: width 0.18s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .bar-seg.belief { background: var(--belief); }
+  .bar-seg.disbelief { background: var(--disbelief); }
+  .bar-seg.uncertainty { background: var(--uncertainty); }
+  .bar-seg.belief.zero,
+  .bar-seg.disbelief.zero,
+  .bar-seg.uncertainty.zero { width: 0 !important; }
+
+  .opinion-sliders {
+    display: grid;
+    grid-template-columns: 24px 1fr 44px;
+    gap: 6px 8px;
+    margin-top: 6px;
+    align-items: center;
+  }
+  .opinion-sliders label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .opinion-sliders label.b { color: var(--belief); }
+  .opinion-sliders label.d { color: var(--disbelief); }
+  .opinion-sliders label.u { color: var(--uncertainty); }
+  .opinion-sliders input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    outline: none;
+  }
+  .opinion-sliders input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--ink);
+    border: 2px solid var(--paper);
+    border-radius: 0;
+    cursor: pointer;
+  }
+  .opinion-sliders input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--ink);
+    border: 2px solid var(--paper);
+    border-radius: 0;
+    cursor: pointer;
+  }
+  .opinion-sliders .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-align: right;
+    color: var(--ink-2);
+  }
+
+  /* ─────── Buttons / selects ─────── */
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  button.act, select.act {
+    background: transparent;
+    border: 1px solid var(--ink);
+    padding: 6px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--ink);
+    transition: all 0.15s;
+  }
+  button.act:hover { background: var(--ink); color: var(--paper); }
+  button.act.primary { background: var(--ink); color: var(--paper); }
+  button.act.primary:hover { background: var(--belief); border-color: var(--belief); }
+  select.act { padding: 6px 26px 6px 10px; appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%); background-position: calc(100% - 12px) 11px, calc(100% - 7px) 11px; background-size: 5px 5px; background-repeat: no-repeat; }
+
+  /* ─────── Network canvas ─────── */
+  .network-card {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .network-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--ink);
+  }
+  .net-title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-2);
+    margin: 0 0 4px;
+  }
+  .net-eq {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 18px;
+  }
+  .net-eq .em {
+    background: var(--highlight);
+    padding: 0 4px;
+  }
+
+  svg.network {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ─────── Trace / log ─────── */
+  .trace {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    margin-top: 18px;
+    padding: 16px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .trace-title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-2);
+    margin: 0 0 10px;
+    font-family: 'Fraunces', serif;
+  }
+  .trace-line {
+    margin: 4px 0;
+  }
+  .trace-line .lbl {
+    color: var(--ink-2);
+  }
+  .trace-line .op {
+    color: var(--belief);
+    font-weight: 700;
+    padding: 0 2px;
+  }
+  .trace-line .val { color: var(--ink); }
+  .trace-line .arrow {
+    display: inline-block;
+    margin: 0 6px;
+    color: var(--ink-3);
+  }
+  .trace-line.section {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--ink-3);
+    text-transform: uppercase;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+  .trace-line.section:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+
+  /* ─────── Output card ─────── */
+  .output-final {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 22px 24px;
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: center;
+  }
+  .output-final .label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--paper-2);
+  }
+  .output-final .val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    text-align: right;
+  }
+  .output-final .components {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .output-final .components > div {
+    border: 1px solid var(--paper-2);
+    padding: 8px 10px;
+  }
+  .output-final .components .k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--paper-2);
+  }
+  .output-final .components .v {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .output-final .components .belief-bg .v { color: var(--belief-soft); }
+  .output-final .components .disbelief-bg .v { color: var(--disbelief-soft); }
+  .output-final .components .uncertainty-bg .v { color: var(--uncertainty-soft); }
+
+  /* ─────── Diagnostics ─────── */
+  .checks {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .check {
+    padding: 5px 10px;
+    border: 1px solid var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .check.pass { background: var(--ok); color: var(--paper); border-color: var(--ok); }
+  .check.fail { background: var(--error); color: var(--paper); border-color: var(--error); }
+
+  /* ─────── Footnote ─────── */
+  .footnote {
+    margin-top: 32px;
+    padding-top: 14px;
+    border-top: 1px solid var(--ink);
+    font-family: 'Fraunces', serif;
+    font-size: 12.5px;
+    font-style: italic;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+
+  /* ─────── Edge labels ─────── */
+  .edge-lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    fill: var(--ink-2);
+  }
+  .node-lbl {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 14px;
+    fill: var(--ink);
+  }
+  .layer-lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    fill: var(--ink-3);
+  }
+  circle.neuron {
+    fill: var(--paper-2);
+    stroke: var(--ink);
+    stroke-width: 1.6;
+  }
+  circle.trust-node {
+    fill: var(--paper);
+    stroke: var(--ink);
+    stroke-width: 1.6;
+    stroke-dasharray: 0;
+  }
+  circle.trust-node.ipta-active {
+    fill: var(--highlight);
+    stroke: var(--belief);
+    stroke-width: 2;
+  }
+  line.edge { stroke: var(--ink); stroke-width: 1.4; }
+  line.edge.trust { stroke: var(--belief); stroke-width: 1.4; }
+  line.edge.trust.dimmed { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 3 3; }
+  .mini-bar {
+    stroke: var(--ink);
+    stroke-width: 0.7;
+  }
+
+  /* ─────── Stage-specific show/hide ─────── */
+  .stage-content { display: none; }
+  .stage-content.active { display: block; }
+
+  /* small helpers */
+  .row-flex { display: flex; gap: 12px; align-items: center; }
+  .hint {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink-3);
+    margin: 8px 0 0;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="masthead">
+    <div class="left">Vol. I &middot; No. 1<br>Trust Propagation</div>
+    <h1>
+      The PaTAS Simulator
+      <span class="small">— Parallel Trust Assessment, propagated through neural networks via Subjective Logic —</span>
+    </h1>
+    <div class="right">Ouattara et al.<br>Running Example</div>
+  </header>
+
+  <div class="stages">
+    <button class="stage-tab active" data-stage="perceptron">I. Perceptron — Apartment Rent</button>
+    <button class="stage-tab" data-stage="network">II. Trust Nodes Network &amp; IPTA</button>
+    <button class="stage-tab" data-stage="paramupdate">III. Parameter-Trust Update</button>
+    <button class="stage-tab" data-stage="theorems">IV. Theorem Checks</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- STAGE I: PERCEPTRON                           -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="stage-content active" id="stage-perceptron">
+    <div class="grid">
+
+      <!-- LEFT: Controls -->
+      <div>
+
+        <div class="panel">
+          <div class="panel-title">Input Trust <span class="tag">T<sub>x</sub></span></div>
+          <div class="opinion" data-key="Ts">
+            <div class="opinion-label">
+              <span class="name">T<sub>s</sub> — size feature</span>
+              <span class="value mono"></span>
+            </div>
+            <div class="triple-bar">
+              <div class="bar-seg belief"></div>
+              <div class="bar-seg disbelief"></div>
+              <div class="bar-seg uncertainty"></div>
+            </div>
+            <div class="opinion-sliders">
+              <label class="b">b</label><input type="range" min="0" max="1" step="0.01" data-comp="b"><span class="num"></span>
+              <label class="d">d</label><input type="range" min="0" max="1" step="0.01" data-comp="d"><span class="num"></span>
+              <label class="u">u</label><input type="range" min="0" max="1" step="0.01" data-comp="u"><span class="num"></span>
+            </div>
+          </div>
+          <div class="opinion" data-key="Tnr">
+            <div class="opinion-label">
+              <span class="name">T<sub>nr</sub> — # rooms feature</span>
+              <span class="value mono"></span>
+            </div>
+            <div class="triple-bar">
+              <div class="bar-seg belief"></div>
+              <div class="bar-seg disbelief"></div>
+              <div class="bar-seg uncertainty"></div>
+            </div>
+            <div class="opinion-sliders">
+              <label class="b">b</label><input type="range" min="0" max="1" step="0.01" data-comp="b"><span class="num"></span>
+              <label class="d">d</label><input type="range" min="0" max="1" step="0.01" data-comp="d"><span class="num"></span>
+              <label class="u">u</label><input type="range" min="0" max="1" step="0.01" data-comp="u"><span class="num"></span>
+            </div>
+          </div>
+          <p class="hint">Adjust input trust opinions; b + d + u is renormalized as you drag.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Parameter Trust <span class="tag">T<sub>θ</sub></span></div>
+          <div class="opinion" data-key="Ttheta1">
+            <div class="opinion-label">
+              <span class="name">T<sub>θ₁</sub> — weight on s (=10)</span>
+              <span class="value mono"></span>
+            </div>
+            <div class="triple-bar">
+              <div class="bar-seg belief"></div>
+              <div class="bar-seg disbelief"></div>
+              <div class="bar-seg uncertainty"></div>
+            </div>
+            <div class="opinion-sliders">
+              <label class="b">b</label><input type="range" min="0" max="1" step="0.01" data-comp="b"><span class="num"></span>
+              <label class="d">d</label><input type="range" min="0" max="1" step="0.01" data-comp="d"><span class="num"></span>
+              <label class="u">u</label><input type="range" min="0" max="1" step="0.01" data-comp="u"><span class="num"></span>
+            </div>
+          </div>
+          <div class="opinion" data-key="Ttheta2">
+            <div class="opinion-label">
+              <span class="name">T<sub>θ₂</sub> — weight on n<sub>r</sub> (=100)</span>
+              <span class="value mono"></span>
+            </div>
+            <div class="triple-bar">
+              <div class="bar-seg belief"></div>
+              <div class="bar-seg disbelief"></div>
+              <div class="bar-seg uncertainty"></div>
+            </div>
+            <div class="opinion-sliders">
+              <label class="b">b</label><input type="range" min="0" max="1" step="0.01" data-comp="b"><span class="num"></span>
+              <label class="d">d</label><input type="range" min="0" max="1" step="0.01" data-comp="d"><span class="num"></span>
+              <label class="u">u</label><input type="range" min="0" max="1" step="0.01" data-comp="u"><span class="num"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Fusion Operator <span class="tag">⊕</span></div>
+          <select class="act" id="fusion-op">
+            <option value="cc">Consensus & Compromise ⊕<sub>cc</sub></option>
+            <option value="cumulative">Cumulative Fusion ⊕<sub>cum</sub></option>
+            <option value="averaging">Averaging Fusion ⊕<sub>avg</sub></option>
+            
+          </select>
+          <!-- <p class="hint">In the apartment example, s and n<sub>r</sub> are independent evidence sources → cumulative fusion is the natural choice.</p> -->
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Preset Scenarios</div>
+          <div class="btn-row">
+            <button class="act" data-preset="fullTrusted">Fully Trusted</button>
+            <button class="act" data-preset="fullUncertain">Fully Uncertain</button>
+            <button class="act" data-preset="fullDistrusted">Fully Distrusted</button>
+            <button class="act" data-preset="mixed">Partial (.25,.25,.5)</button>
+            <button class="act" data-preset="mild">Mild (.25,0,.75)</button>
+            <button class="act" data-preset="adv">Adversarial Patch</button>
+            <button class="act" data-preset="trustedInUncertainParam">Trusted Input / Uncertain θ</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Visualization -->
+      <div>
+        <div class="network-card">
+          <p class="net-title">Apartment-rent perceptron with parallel Trust Nodes Network</p>
+          <p class="net-eq">y′ = <span class="em">θ₁</span> · s + <span class="em">θ₂</span> · n<sub>r</sub> &nbsp;&nbsp;|&nbsp;&nbsp; T<sub>y′</sub> = (T<sub>θ₁</sub> ⊗ T<sub>s</sub>) ⊕ (T<sub>θ₂</sub> ⊗ T<sub>nr</sub>)</p>
+          <svg viewBox="0 0 720 480" class="network" id="svg-perceptron">
+            <!-- Layer labels -->
+            <text x="20" y="40" class="layer-lbl">Neural Network</text>
+            <text x="20" y="270" class="layer-lbl">Trust Nodes Network (parallel)</text>
+
+            <!-- NN edges -->
+            <line class="edge" x1="180" y1="80" x2="500" y2="150"/>
+            <line class="edge" x1="180" y1="180" x2="500" y2="150"/>
+            <text class="edge-lbl" x="320" y="100">θ₁ = 10</text>
+            <text class="edge-lbl" x="320" y="180">θ₂ = 100</text>
+
+            <!-- NN nodes -->
+            <text x="130" y="85" class="node-lbl" text-anchor="middle">s &rarr;</text>
+            <circle class="neuron" cx="180" cy="80" r="22"/>
+            <text x="180" y="85" class="node-lbl" text-anchor="middle">N₁</text>
+
+            <text x="130" y="185" class="node-lbl" text-anchor="middle">n<tspan dy="5" font-size="100%">r</tspan> &rarr;</text>
+            <circle class="neuron" cx="180" cy="180" r="22"/>
+            <text x="180" y="185" class="node-lbl" text-anchor="middle">N₂</text>
+
+            <circle class="neuron" cx="500" cy="150" r="26"/>
+            <text x="500" y="155" class="node-lbl" text-anchor="middle">N₃</text>
+            <text x="530" y="155" class="node-lbl"> &rarr; y′</text>
+
+            <!-- divider -->
+            <line x1="20" y1="240" x2="700" y2="240" stroke="var(--ink)" stroke-width="2"/>
+            <text x="360" y="233" text-anchor="middle" class="layer-lbl" style="background:var(--paper); padding:0 8px;">⇣ Trust propagation in parallel ⇣</text>
+
+            <!-- TNN: Input trust labels (from user or context) -->
+            <text x="130" y="330" class="node-lbl" text-anchor="middle" style="font-size:11px; fill:var(--ink-2);">T<tspan dy="5" font-size="100%">s</tspan> &rarr; </text>
+            <text x="130" y="430" class="node-lbl" text-anchor="middle" style="font-size:11px; fill:var(--ink-2);">T<tspan dy="5" font-size="100%">nr</tspan> &rarr; </text>
+           
+
+            <!-- TNN edges (with discount labels) -->
+            <line class="edge trust" x1="180" y1="330" x2="500" y2="400" id="edge1"/>
+            <line class="edge trust" x1="180" y1="430" x2="500" y2="400" id="edge2"/>
+            <text class="edge-lbl" x="280" y="345" id="lbl-disc1">T<tspan dy="5" font-size="100%">θ₁</tspan> ⊗ T<tspan dy="5" font-size="100%">s</tspan></text>
+            <text class="edge-lbl" x="280" y="430" id="lbl-disc2">T<tspan dy="5" font-size="100%">θ₂</tspan> ⊗ T<tspan dy="5" font-size="100%">nr</tspan></text>
+   
+
+            <!-- TN nodes with trust bars -->
+            <g id="tn-s">
+              <circle class="trust-node" cx="180" cy="330" r="22"/>
+              <text x="180" y="335" class="node-lbl" text-anchor="middle">TN <tspan dy="5" font-size="100%"> s </tspan></text>
+              <g class="tn-bar" transform="translate(154, 360)"></g>
+            </g>
+            <g id="tn-nr">
+              <circle class="trust-node" cx="180" cy="430" r="22"/>
+              <text x="180" y="435" class="node-lbl" text-anchor="middle">TN <tspan dy="5" font-size="100%">n<tspan dy="5" font-size="100%">r</tspan></tspan></text>
+              <g class="tn-bar" transform="translate(154, 460)"></g>
+            </g>
+            <g id="tn-out">
+              <circle class="trust-node" cx="500" cy="400" r="28"/>
+              <text x="500" y="405" class="node-lbl" text-anchor="middle">TN₃</text>
+              <g class="tn-bar" transform="translate(471, 435)"></g>
+            </g>
+
+            <!-- Fusion symbol at output -->
+            <text x="500" y="425" text-anchor="middle" font-family="JetBrains Mono" font-size="20" font-weight="700" fill="var(--belief)" id="fusion-sym">⊕</text>
+            <text x="530" y="405" class="node-lbl"> &rarr; T<tspan dy="5" font-size="100%">y′</tspan></text>
+          </svg>
+        </div>
+
+        <div class="trace" id="trace-perceptron">
+          <p class="trace-title">Step-by-step trace</p>
+          <div id="trace-body-perceptron"></div>
+        </div>
+
+        <div class="output-final">
+          <div class="label">Final output trust T<sub>y′</sub></div>
+          <div class="val" id="ty-prime-vec">—</div>
+          <div class="components">
+            <div class="belief-bg"><div class="k">Trust (belief)</div><div class="v" id="ty-b">—</div></div>
+            <div class="disbelief-bg"><div class="k">Distrust</div><div class="v" id="ty-d">—</div></div>
+            <div class="uncertainty-bg"><div class="k">Uncertainty</div><div class="v" id="ty-u">—</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- STAGE II: TRUST NODES NETWORK + IPTA           -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="stage-content" id="stage-network">
+    <div class="grid">
+
+      <div>
+        <div class="panel">
+          <div class="panel-title">Network Inputs <span class="tag">x ∈ ℝ²</span></div>
+          <div class="opinion" data-key="net_x1">
+            <div class="opinion-label">
+              <span class="name">T<sub>x₁</sub></span><span class="value mono"></span>
+            </div>
+            <div class="triple-bar">
+              <div class="bar-seg belief"></div><div class="bar-seg disbelief"></div><div class="bar-seg uncertainty"></div>
+            </div>
+            <div class="opinion-sliders">
+              <label class="b">b</label><input type="range" min="0" max="1" step="0.01" data-comp="b"><span class="num"></span>
+              <label class="d">d</label><input type="range" min="0" max="1" step="0.01" data-comp="d"><span class="num"></span>
+              <label class="u">u</label><input type="range" min="0" max="1" step="0.01" data-comp="u"><span class="num"></span>
+            </div>
+          </div>
+          <div class="opinion" data-key="net_x2">
+            <div class="opinion-label">
+              <span class="name">T<sub>x₂</sub></span><span class="value mono"></span>
+            </div>
+            <div class="triple-bar">
+              <div class="bar-seg belief"></div><div class="bar-seg disbelief"></div><div class="bar-seg uncertainty"></div>
+            </div>
+            <div class="opinion-sliders">
+              <label class="b">b</label><input type="range" min="0" max="1" step="0.01" data-comp="b"><span class="num"></span>
+              <label class="d">d</label><input type="range" min="0" max="1" step="0.01" data-comp="d"><span class="num"></span>
+              <label class="u">u</label><input type="range" min="0" max="1" step="0.01" data-comp="u"><span class="num"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Parameter Trust Profile <span class="tag">T<sub>θ</sub></span></div>
+          <p class="hint">All edges share one of these trust profiles; the architecture is 2 → 3 → 2.</p>
+          <div class="btn-row">
+            <button class="act primary" data-paramprofile="trusted">Trusted (1,0,0)</button>
+            <button class="act" data-paramprofile="uncertain">Uncertain (0,0,1)</button>
+            <button class="act" data-paramprofile="partial">Partial (.7,0,.3)</button>
+            <button class="act" data-paramprofile="poisoned">Poisoned (.3,.4,.3)</button>
+          </div>
+          <p class="hint" id="param-profile-readout"></p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">IPTA Activation Mask <span class="tag">ReLU</span></div>
+          <p class="hint">Pick which hidden neurons are activated for this specific inference. PaTAS' GenIPTA prunes the Trust Nodes Network to just the activated path.</p>
+          <div class="btn-row">
+            <label style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;">
+              <input type="checkbox" data-hidden="h1" checked> h₁
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;">
+              <input type="checkbox" data-hidden="h2" checked> h₂
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;">
+              <input type="checkbox" data-hidden="h3"> h₃
+            </label>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Output Aggregation <span class="tag">⊕</span></div>
+          <select class="act" id="agg-op">
+            <option value="cc">Consensus & Compromise</option>
+            <option value="cumulative">Cumulative</option>
+            <option value="averaging">Averaging</option>
+          </select>
+          <p class="hint">Aggregates the two output-neuron trust opinions into a single consolidated network trust.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="network-card">
+          <p class="net-title">Trust Feedforward through a 2 → 3 → 2 network</p>
+          <p class="net-eq">T<sub>z<sup>(l)</sup><sub>i</sub></sub> = ⋁<sub>j</sub> ( T<sub>x<sup>(l-1)</sup><sub>j</sub></sub> ⊗ T<sub>θ<sup>(l)</sup><sub>ij</sub></sub> ) &nbsp;,&nbsp; T<sub>x<sup>(l+1)</sup></sub> = T<sub>f</sub>(T<sub>z<sup>(l)</sup></sub>)</p>
+          <svg viewBox="0 0 720 420" class="network" id="svg-network"></svg>
+        </div>
+
+        <div class="trace" id="trace-network">
+          <p class="trace-title">Trust Feedforward &amp; IPTA trace</p>
+          <div id="trace-body-network"></div>
+        </div>
+
+        <div class="output-final">
+          <div class="label">Aggregated T<sub>y</sub></div>
+          <div class="val" id="net-ty-vec">—</div>
+          <div class="components">
+            <div class="belief-bg"><div class="k">Trust</div><div class="v" id="net-ty-b">—</div></div>
+            <div class="disbelief-bg"><div class="k">Distrust</div><div class="v" id="net-ty-d">—</div></div>
+            <div class="uncertainty-bg"><div class="k">Uncertainty</div><div class="v" id="net-ty-u">—</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- STAGE IV: PARAMETER-TRUST UPDATE              -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="stage-content" id="stage-paramupdate">
+
+    <div style="background: var(--paper-2); border: 1px solid var(--ink); padding: 18px 22px; margin-bottom: 24px;">
+      <p style="font-family:'Fraunces',serif; font-style:italic; font-size:15px; margin:0 0 6px; color:var(--ink);">
+        Algorithm 1 — <span style="font-weight:600">ParameterTrustUpdate(g, T<sub>y</sub>, ϵ)</span>
+      </p>
+      <p style="font-family:'Inter',sans-serif; font-size:13px; color:var(--ink-2); margin:0;">
+        Walks one mini-batch through the six steps that revise the trust of a single parameter
+        T<sub>θ<sub>i,j</sub></sub> given gradient evidence, label trust, input-feature trust, and learning-rate trust.
+        Pick a neuron, edit the gradients, then step through.
+      </p>
+    </div>
+
+    <div class="grid">
+
+      <!-- LEFT: Controls -->
+      <div>
+
+        <div class="panel">
+          <div class="panel-title">Batch Label Trust <span class="tag">{T<sub>y</sub>}</span></div>
+          <div class="batch-list" id="batch-list"></div>
+          <div class="btn-row">
+            <button class="act" id="add-batch-row">+ Add Sample</button>
+            <button class="act" data-batchpreset="clean">All Clean</button>
+            <button class="act" data-batchpreset="poison">⅓ Poisoned</button>
+            <button class="act" data-batchpreset="uncertain">All Uncertain</button>
+          </div>
+          <p class="hint">Click any bar to expand sliders and edit (b, d, u) directly. <code>T<sub>y_batch</sub> = ⋁<sub>y∈y_batch</sub> T<sub>y</sub></code> (Line 4).</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Target Neuron &amp; Gradients <span class="tag">N(i)</span></div>
+          <div class="neuron-pick" id="neuron-pick">
+            <button data-neuron="h1" class="active">h₁ (2 edges)</button>
+            <button data-neuron="h2">h₂ (2 edges)</button>
+            <button data-neuron="h3">h₃ (2 edges)</button>
+            <button data-neuron="y1">y₁ (3 edges)</button>
+            <button data-neuron="y2">y₂ (3 edges)</button>
+          </div>
+          <p class="hint" style="margin-top:8px;">Edit gradients g<sub>i,j</sub> per incoming edge:</p>
+          <div class="grad-grid" id="grad-grid"></div>
+          <div class="epsilon-control" style="margin-top:12px;">
+            <label>ϵ</label>
+            <input type="range" min="0.001" max="0.5" step="0.001" id="eps-slider" value="0.05">
+            <span class="val" id="eps-val">0.05</span>
+          </div>
+          <p class="hint">|g<sub>i,j</sub>| &lt; ϵ → weak (positive evidence r); ≥ ϵ → strong (negative evidence s).</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Auxiliary Trust <span class="tag">T<sub>lr</sub>, T<sub>x</sub></span></div>
+          <div class="mini-opinion" data-key="pu_Tlr">
+            <div class="mhead"><span class="mname">T<sub>lr</sub> — learning rate</span><span class="mval"></span></div>
+            <div class="triple-bar">
+              <div class="bar-seg belief"></div><div class="bar-seg disbelief"></div><div class="bar-seg uncertainty"></div>
+            </div>
+            <div class="opinion-sliders">
+              <label class="b">b</label><input type="range" min="0" max="1" step="0.01" data-comp="b"><span class="num"></span>
+              <label class="d">d</label><input type="range" min="0" max="1" step="0.01" data-comp="d"><span class="num"></span>
+              <label class="u">u</label><input type="range" min="0" max="1" step="0.01" data-comp="u"><span class="num"></span>
+            </div>
+          </div>
+          <div class="mini-opinion" data-key="pu_Tx">
+            <div class="mhead"><span class="mname">T<sub>x<sub>j</sub></sub> — input feature</span><span class="mval"></span></div>
+            <div class="triple-bar">
+              <div class="bar-seg belief"></div><div class="bar-seg disbelief"></div><div class="bar-seg uncertainty"></div>
+            </div>
+            <div class="opinion-sliders">
+              <label class="b">b</label><input type="range" min="0" max="1" step="0.01" data-comp="b"><span class="num"></span>
+              <label class="d">d</label><input type="range" min="0" max="1" step="0.01" data-comp="d"><span class="num"></span>
+              <label class="u">u</label><input type="range" min="0" max="1" step="0.01" data-comp="u"><span class="num"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Initial T<sub>θ<sub>i,j</sub></sub> (before update) <span class="tag">prior</span></div>
+          <div class="mini-opinion" data-key="pu_Ttheta">
+            <div class="mhead"><span class="mname">current parameter trust</span><span class="mval"></span></div>
+            <div class="triple-bar">
+              <div class="bar-seg belief"></div><div class="bar-seg disbelief"></div><div class="bar-seg uncertainty"></div>
+            </div>
+            <div class="opinion-sliders">
+              <label class="b">b</label><input type="range" min="0" max="1" step="0.01" data-comp="b"><span class="num"></span>
+              <label class="d">d</label><input type="range" min="0" max="1" step="0.01" data-comp="d"><span class="num"></span>
+              <label class="u">u</label><input type="range" min="0" max="1" step="0.01" data-comp="u"><span class="num"></span>
+            </div>
+          </div>
+          <div class="step-controls">
+            <button class="act primary" id="step-back">◂ Back</button>
+            <button class="act primary" id="step-next">Step ▸</button>
+            <button class="act" id="step-runall">Run All</button>
+            <button class="act" id="step-reset">Reset</button>
+            <span class="step-pill" id="step-pill">Step 0 / 6</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Visualization + Trace -->
+      <div>
+
+        <div class="network-card">
+          <p class="net-title">Network view: target parameter and its evidence</p>
+          <p class="net-eq">
+            T<sub>θ<sub>i,j</sub></sub> ← <span class="em">Update</span>(<span class="em">Revise</span>(T<sub>θ<sub>i,j</sub></sub>, T<sub>n<sub>i</sub>‖Y</sub>), T<sub>lr</sub>, T<sub>x<sub>j</sub></sub>, T<sub>y<sub>batch</sub></sub>)
+          </p>
+          <svg viewBox="0 0 720 380" class="network" id="svg-paramupdate"></svg>
+        </div>
+
+        <div id="algo-trace" style="margin-top: 20px;">
+          <!-- Step 1 -->
+          <div class="algo-step" data-step="1">
+            <div class="step-head">
+              <span class="step-num">Line 3–4 · Step 1</span>
+              <span class="step-title">Aggregate label trust over the mini-batch</span>
+            </div>
+            <div class="step-body">
+              <div>Cumulative fusion of all <code>T<sub>y</sub></code> in the batch:</div>
+              <div class="formula">T<sub>y<sub>batch</sub></sub> = ⋁<sub>y∈y<sub>batch</sub></sub> T<sub>y</sub></div>
+              <div>Result: <span class="res" id="r-step1">—</span></div>
+              <div class="small-line" id="r-step1-detail">—</div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="algo-step" data-step="2">
+            <div class="step-head">
+              <span class="step-num">Line 8 · Step 2</span>
+              <span class="step-title">Gather gradients for the target neuron</span>
+            </div>
+            <div class="step-body">
+              <div class="formula">g<sub>i</sub><sup>(l)</sup> = { g<sub>i,j</sub><sup>(l)</sup> | j ∈ N(i) }</div>
+              <div>Gradients for <span id="r-step2-target">—</span>: <span class="res" id="r-step2">—</span></div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="algo-step" data-step="3">
+            <div class="step-head">
+              <span class="step-num">Line 10 · Step 3</span>
+              <span class="step-title">NodeTrust — quantify gradient evidence</span>
+            </div>
+            <div class="step-body">
+              <div>Count weak/strong gradients via ϵ, then apply Baseline-Prior Quantification (W = 2):</div>
+              <div class="formula">b = r/(W+r+s), &nbsp; d = s/(W+r+s), &nbsp; u = W/(W+r+s)</div>
+              <div class="small-line" id="r-step3-counts">—</div>
+              <div>Result: <span class="res" id="r-step3">—</span> &nbsp;<i>(T<sub>n<sub>i</sub>|y<sub>batch</sub></sub>)</i></div>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="algo-step" data-step="4">
+            <div class="step-head">
+              <span class="step-num">Line 12 · Step 4</span>
+              <span class="step-title">DeduceTrust — combine conditionals over T<sub>y<sub>batch</sub></sub></span>
+            </div>
+            <div class="step-body">
+              <div>T<sub>n<sub>i</sub>|ȳ<sub>batch</sub></sub> is set vacuous (0, 0, 1). Then apply the deduction operator ⊚:</div>
+              <div class="formula">T<sub>n<sub>i</sub>‖Y<sub>batch</sub></sub> = T<sub>y<sub>batch</sub></sub> ⊚ ( T<sub>n<sub>i</sub>|y<sub>batch</sub></sub>, T<sub>n<sub>i</sub>|ȳ<sub>batch</sub></sub> )</div>
+              <div>Result: <span class="res" id="r-step4">—</span></div>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="algo-step" data-step="5">
+            <div class="step-head">
+              <span class="step-num">Line 14–15 · Step 5</span>
+              <span class="step-title">Revise — fuse deduced neuron trust into T<sub>θ</sub></span>
+            </div>
+            <div class="step-body">
+              <div class="formula">T<sub>θ<sub>i,j</sub></sub> ← T<sub>θ<sub>i,j</sub></sub> ⊖ T<sub>n<sub>i</sub>‖Y<sub>batch</sub></sub>&nbsp;&nbsp;(⊖ = cumulative fusion)</div>
+              <div>Before: <span class="res" id="r-step5-before">—</span></div>
+              <div>After: &nbsp;&nbsp;<span class="res" id="r-step5-after">—</span></div>
+            </div>
+          </div>
+
+          <!-- Step 6 -->
+          <div class="algo-step" data-step="6">
+            <div class="step-head">
+              <span class="step-num">Line 16–17 · Step 6</span>
+              <span class="step-title">Update — multiply by (T<sub>x<sub>j</sub></sub> ⊘ T<sub>y<sub>batch</sub></sub>)</span>
+            </div>
+            <div class="step-body">
+              <div>Conservative division ⊘ takes min belief, max disbelief:</div>
+              <div class="formula">(b, d, u) = (min(b₁,b₂), max(d₁,d₂), 1−(b+d))</div>
+              <div class="small-line">T<sub>x<sub>j</sub></sub> ⊘ T<sub>y<sub>batch</sub></sub> = <span id="r-step6-aux">—</span></div>
+              <div class="formula" style="margin-top:6px;">T<sub>θ<sub>i,j</sub></sub> ← T<sub>θ<sub>i,j</sub></sub> ⊙ (T<sub>x<sub>j</sub></sub> ⊘ T<sub>y<sub>batch</sub></sub>)</div>
+              <div>Final: <span class="res" id="r-step6-final">—</span></div>
+              <div class="small-line" id="r-step6-interpret">—</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="output-final">
+          <div class="label">Net change: ΔT<sub>θ<sub>i,j</sub></sub></div>
+          <div class="val" id="pu-delta">—</div>
+          <div class="components">
+            <div class="belief-bg"><div class="k">Δ trust</div><div class="v" id="pu-db">—</div></div>
+            <div class="disbelief-bg"><div class="k">Δ distrust</div><div class="v" id="pu-dd">—</div></div>
+            <div class="uncertainty-bg"><div class="k">Δ uncertainty</div><div class="v" id="pu-du">—</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- STAGE III: THEOREM CHECKS                     -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="stage-content" id="stage-theorems">
+    <div class="panel">
+      <div class="panel-title">Theorem 2 — Vacuous input ⇒ Vacuous output</div>
+      <p style="font-family:'Fraunces',serif; font-style:italic; color:var(--ink-2);">
+        If T<sub>x</sub> = (0, 0, 1), then for any parameter trust profile T<sub>θ</sub>, the PaTAS feedforward yields T<sub>y′</sub> = (0, 0, 1).
+        The simulator empirically verifies this below. Re-roll random parameter trust to see it hold.
+      </p>
+      <div class="btn-row">
+        <button class="act primary" id="run-thm2">Run Theorem 2 Check</button>
+      </div>
+      <div id="thm2-out" class="trace" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Theorem 3 — Symmetric inputs ⇒ Symmetric outputs</div>
+      <p style="font-family:'Fraunces',serif; font-style:italic; color:var(--ink-2);">
+        Given T<sub>x</sub> = (b, d, u) and its symmetric counterpart T<sub>x̄</sub> = (d, b, u), the outputs satisfy
+        b<sub>y</sub> = d<sub>ȳ</sub>, d<sub>y</sub> = b<sub>ȳ</sub>, u<sub>y</sub> = u<sub>ȳ</sub>.
+        Also: full trust ⇒ d<sub>y</sub> = 0, full distrust ⇒ b<sub>y</sub> = 0.
+      </p>
+      <div class="btn-row">
+        <button class="act primary" id="run-thm3">Run Theorem 3 Check</button>
+      </div>
+      <div id="thm3-out" class="trace" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Convergence Sanity (Trust mass under repeated Averaging fusion)</div>
+      <p style="font-family:'Fraunces',serif; font-style:italic; color:var(--ink-2);">
+        Cumulative fusion of n independent identical opinions concentrates trust by reducing uncertainty. This mirrors what
+        PaTAS does across a batch when label-trust evidence accumulates. Try varying n and the per-source opinion.
+      </p>
+      <div class="opinion-sliders" style="grid-template-columns: 80px 1fr 60px; max-width:380px;">
+        <label class="b">batch n</label>
+        <input type="range" min="1" max="50" step="1" id="convN" value="10">
+        <span class="num" id="convN-val">10</span>
+      </div>
+      <div id="conv-out" class="trace" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+  <div class="footnote">
+    Implementation notes: Trust discounting uses ω<sub>θ</sub> ⊗ ω<sub>x</sub> = (P·b<sub>x</sub>, P·d<sub>x</sub>, 1 − P(b<sub>x</sub>+d<sub>x</sub>)) with P = b<sub>θ</sub> + a·u<sub>θ</sub>.
+    Cumulative fusion follows Jøsang's standard formulation; for the u=0 boundary an ε-stabilization is applied. The Parameter-Trust
+    Update implements Algorithm 1 of the paper directly: Baseline-Prior Quantification (W=2) maps gradient counts to a binomial
+    opinion, deduction ⊚ uses the binomial projection, revision ⊖ is realized as cumulative fusion (per Theorem 4 of the paper),
+    and the auxiliary Update step composes binomial multiplication ⊙ with conservative division ⊘. T<sub>lr</sub> enters via a
+    final trust-discounting step that modulates the parameter trust by learning-rate reliability. Base rate a = 0.5 throughout.
+    All numbers are recomputed live as inputs change.
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   PaTAS Simulator — Subjective Logic kernel
+   ════════════════════════════════════════════════════════════ */
+const EPS = 1e-9;
+
+function normalize(op) {
+  // Ensure b + d + u = 1, all in [0,1]
+  let { b, d, u } = op;
+  b = Math.max(0, Math.min(1, b));
+  d = Math.max(0, Math.min(1, d));
+  u = Math.max(0, Math.min(1, u));
+  const s = b + d + u;
+  if (s === 0) return { b: 0, d: 0, u: 1, a: op.a ?? 0.5 };
+  return { b: b/s, d: d/s, u: u/s, a: op.a ?? 0.5 };
+}
+
+function P(omega) { return omega.b + omega.a * omega.u; }
+
+/** Trust discount: ω_A ⊗ ω_X = (P·b_X, P·d_X, 1 − P(b_X+d_X), a_X) */
+function discount(omegaA, omegaX) {
+  const p = P(omegaA);
+  const b = p * omegaX.b;
+  const d = p * omegaX.d;
+  return { b, d, u: 1 - p * (omegaX.b + omegaX.d), a: omegaX.a };
+}
+
+/** Cumulative fusion (Jøsang) */
+function fuseCumulative(o1, o2) {
+  const u1 = o1.u, u2 = o2.u;
+  // Edge case: both fully certain (u1 = u2 = 0). Average belief masses.
+  if (u1 < EPS && u2 < EPS) {
+    return { b: (o1.b + o2.b) / 2, d: (o1.d + o2.d) / 2, u: 0, a: (o1.a + o2.a)/2 };
+  }
+  const k = u1 + u2 - u1 * u2;
+  const b = (o1.b * u2 + o2.b * u1) / k;
+  const d = (o1.d * u2 + o2.d * u1) / k;
+  const u = (u1 * u2) / k;
+  let a;
+  const denomA = u1 + u2 - 2 * u1 * u2;
+  if (Math.abs(denomA) < EPS) a = (o1.a + o2.a) / 2;
+  else a = (o1.a * u2 + o2.a * u1 - (o1.a + o2.a) * u1 * u2) / denomA;
+  return { b, d, u, a };
+}
+
+/** Averaging fusion */
+function fuseAveraging(o1, o2) {
+  const u1 = o1.u, u2 = o2.u;
+  if (u1 < EPS && u2 < EPS) {
+    return { b: (o1.b + o2.b) / 2, d: (o1.d + o2.d) / 2, u: 0, a: (o1.a + o2.a)/2 };
+  }
+  const denom = u1 + u2;
+  return {
+    b: (o1.b * u2 + o2.b * u1) / denom,
+    d: (o1.d * u2 + o2.d * u1) / denom,
+    u: (2 * u1 * u2) / denom,
+    a: (o1.a + o2.a) / 2
+  };
+}
+
+
+
+/**
+ * Consensus & Compromise Fusion (CCF)
+ * Binomial opinions only
+ *
+ * Opinion format:
+ * {
+ *   b: belief,
+ *   d: disbelief,
+ *   u: uncertainty,
+ *   a: base rate
+ * }
+ */
+function fuseCC(o1, o2)  {
+  // ========== PHASE 1: CONSENSUS ==========
+  // Find minimum common belief on each outcome
+  const b_cons = Math.min(o1.b, o2.b);
+  const d_cons = Math.min(o1.d, o2.d);
+  const b_cons_total = b_cons + d_cons;
+  
+  // ========== PHASE 2: COMPROMISE ==========
+  // Compute residuals (beliefs beyond consensus)
+  const b_res1 = o1.b - b_cons;
+  const d_res1 = o1.d - d_cons;
+  const b_res2 = o2.b - b_cons;
+  const d_res2 = o2.d - d_cons;
+  
+  // Weight residuals by other's uncertainty
+  // (high uncertainty means more weight to compromise)
+  const b_comp = b_res1 * o2.u + b_res2 * o1.u;
+  const d_comp = d_res1 * o2.u + d_res2 * o1.u;
+  const b_comp_total = b_comp + d_comp;
+  
+  // Preliminary uncertainty (overlap)
+  const u_pre = o1.u * o2.u;
+  
+  // ========== PHASE 3: NORMALIZATION ==========
+  // Compute normalization factor
+  let eta = 1.0;
+  if (Math.abs(b_comp_total) > EPS) {
+    eta = (1 - b_cons_total - u_pre) / b_comp_total;
+  }
+  
+  // Apply normalization to compromise beliefs and uncertainty
+  const b_final = b_cons + eta * b_comp;
+  const d_final = d_cons + eta * d_comp;
+  const u_final = u_pre + eta * b_comp_total;
+  
+  // Average base rates
+  const a_final = (o1.a + o2.a) / 2;
+  
+  // Normalize to ensure sum = 1 (should be by construction)
+  const sum = b_final + d_final + u_final;
+  
+  return {
+    b: b_final / sum,
+    d: d_final / sum,
+    u: u_final / sum,
+    a: a_final
+  };
+}
+function fuseList(list, op) {
+
+  const fusionMap = {
+    cumulative: fuseCumulative,
+    averaging: fuseAveraging,
+    cc: fuseCC
+  };
+
+  const fuseFn = fusionMap[op];
+
+  if (!fuseFn) {
+    throw new Error(`Unknown fusion operator: ${op}`);
+  }
+
+  return list.reduce((acc, x) => fuseFn(acc, x));
+}
+
+/* ──────── Operators for Algorithm 1 (Parameter-Trust Update) ──────── */
+
+/** Baseline-Prior Quantification: (r, s, W) → opinion */
+function quantify(r, s, W = 2) {
+  const denom = W + r + s;
+  return { b: r / denom, d: s / denom, u: W / denom, a: 0.5 };
+}
+
+/** Binomial multiplication ⊙ (Jøsang) */
+function multiply(x, y) {
+  const denom = 1 - x.a * y.a;
+  if (Math.abs(denom) < EPS) {
+    return { b: x.b * y.b, d: x.d + y.d - x.d * y.d, u: x.u * y.u, a: x.a * y.a };
+  }
+  const b = x.b * y.b + ((1 - x.a) * y.a * x.b * y.u + x.a * (1 - y.a) * x.u * y.b) / denom;
+  const d = x.d + y.d - x.d * y.d;
+  const u = x.u * y.u + ((1 - y.a) * x.b * y.u + (1 - x.a) * x.u * y.b) / denom;
+  return { b, d, u, a: x.a * y.a };
+}
+
+/** Conservative trust division ⊘: b = min, d = max, u = residual */
+function divideConservative(x, y) {
+  const b = Math.min(x.b, y.b);
+  const d = Math.max(x.d, y.d);
+  return { b, d, u: Math.max(0, 1 - (b + d)), a: 0.5 };
+}
+
+/** Inferential deduction ⊚ (simplified binomial form) */
+function deduce(X, Y_x, Y_notx) {
+  const b = X.b * Y_x.b + X.d * Y_notx.b;
+  const d = X.b * Y_x.d + X.d * Y_notx.d;
+  // The remaining mass (which includes X.u + conditional uncertainty) lands in u
+  const u = Math.max(0, 1 - b - d);
+  return { b, d, u, a: Y_x.a };
+}
+
+/** Revision ⊖ — fusion-based (paper Theorem 4 specifies ⊖ as a fusion operator). */
+function revise(o1, o2) { return fuseCumulative(o1, o2); }
+
+function fmt(omega) {
+  return `(${omega.b.toFixed(3)}, ${omega.d.toFixed(3)}, ${omega.u.toFixed(3)})`;
+}
+
+function fmt2(x) { return x.toFixed(3); }
+
+/* ════════════════════════════════════════════════════════════
+   STATE
+   ════════════════════════════════════════════════════════════ */
+const state = {
+  // perceptron stage
+  Ts:      { b: 0.85, d: 0.05, u: 0.10, a: 0.5 },
+  Tnr:     { b: 0.85, d: 0.05, u: 0.10, a: 0.5 },
+  Ttheta1: { b: 0.90, d: 0.00, u: 0.10, a: 0.5 },
+  Ttheta2: { b: 0.90, d: 0.00, u: 0.10, a: 0.5 },
+  fusion:  'cc',
+
+  // network stage
+  net_x1:  { b: 0.85, d: 0.05, u: 0.10, a: 0.5 },
+  net_x2:  { b: 0.85, d: 0.05, u: 0.10, a: 0.5 },
+  paramProfile: 'trusted',  // 'trusted'|'uncertain'|'partial'|'poisoned'
+  hidden: { h1: true, h2: true, h3: false },
+  aggOp: 'cc',
+
+  // ─── Parameter-Trust Update stage ───
+  pu_batch: [
+    { b: 0.90, d: 0.05, u: 0.05, a: 0.5 },
+    { b: 0.85, d: 0.05, u: 0.10, a: 0.5 },
+    { b: 0.80, d: 0.10, u: 0.10, a: 0.5 },
+  ],
+  pu_neuron: 'h1',       // selected target neuron
+  pu_gradients: [0.0023, 0.0789, 0.0001, 0.1500],  // truncated by neuron's #edges
+  pu_epsilon: 0.05,
+  pu_Tlr:     { b: 0.90, d: 0.00, u: 0.10, a: 0.5 },
+  pu_Tx:      { b: 0.85, d: 0.00, u: 0.15, a: 0.5 },
+  pu_Ttheta:  { b: 0.50, d: 0.10, u: 0.40, a: 0.5 },
+  pu_currentStep: 0,     // 0 = nothing shown; 1..6 = steps revealed
+  pu_results: null,      // memoized intermediate results
+};
+
+const PRESETS = {
+  fullTrusted:   { Ts:{b:1,d:0,u:0,a:0.5}, Tnr:{b:1,d:0,u:0,a:0.5}, Ttheta1:{b:1,d:0,u:0,a:0.5}, Ttheta2:{b:1,d:0,u:0,a:0.5}},
+  fullUncertain: { Ts:{b:0,d:0,u:1,a:0.5}, Tnr:{b:0,d:0,u:1,a:0.5}, Ttheta1:{b:0,d:0,u:1,a:0.5}, Ttheta2:{b:0,d:0,u:1,a:0.5}},
+  fullDistrusted:{ Ts:{b:0,d:1,u:0,a:0.5}, Tnr:{b:0,d:1,u:0,a:0.5}, Ttheta1:{b:0,d:1,u:0,a:0.5}, Ttheta2:{b:0,d:1,u:0,a:0.5}},
+  mixed:         { Ts:{b:0.25,d:0.25,u:0.50,a:0.5}, Tnr:{b:0.25,d:0.25,u:0.50,a:0.5}, Ttheta1:{b:0.25,d:0.25,u:0.50,a:0.5}, Ttheta2:{b:0.25,d:0.25,u:0.50,a:0.5}},
+  mild:          { Ts:{b:0.25,d:0,u:0.75,a:0.5}, Tnr:{b:0.25,d:0,u:0.75,a:0.5}, Ttheta1:{b:0.25,d:0,u:0.75,a:0.5}, Ttheta2:{b:0.25,d:0,u:0.75,a:0.5}},
+  // 4x4 adversarial patch from the paper: trust on patched input drops
+  adv:           { Ts:{b:0.50,d:0.30,u:0.20,a:0.5}, Tnr:{b:0.85,d:0.00,u:0.15,a:0.5}, Ttheta1:{b:0.60,d:0.15,u:0.25,a:0.5}, Ttheta2:{b:0.90,d:0.00,u:0.10,a:0.5}},
+  trustedInUncertainParam:
+                 { Ts:{b:1,d:0,u:0,a:0.5}, Tnr:{b:1,d:0,u:0,a:0.5}, Ttheta1:{b:0,d:0,u:1,a:0.5}, Ttheta2:{b:0,d:0,u:1,a:0.5}},
+};
+
+const PARAM_PROFILES = {
+  trusted:   { b:1.0, d:0.0, u:0.0, a:0.5 },
+  uncertain: { b:0.0, d:0.0, u:1.0, a:0.5 },
+  partial:   { b:0.7, d:0.0, u:0.3, a:0.5 },
+  poisoned:  { b:0.3, d:0.4, u:0.3, a:0.5 },
+};
+
+/* ════════════════════════════════════════════════════════════
+   UI WIRING — Opinion editors
+   ════════════════════════════════════════════════════════════ */
+function paintOpinion(key) {
+  const op = state[key];
+  const ctr = document.querySelector(`.opinion[data-key="${key}"], .mini-opinion[data-key="${key}"]`);
+  if (!ctr) return;
+
+  // value readout — mini uses .mval, full uses .value
+  const valueNode = ctr.querySelector('.value, .mval');
+  if (valueNode) {
+    valueNode.textContent = `(${op.b.toFixed(2)}, ${op.d.toFixed(2)}, ${op.u.toFixed(2)})`;
+  }
+
+  // triple bar
+  const segs = ctr.querySelectorAll('.bar-seg');
+  if (segs.length === 3) {
+    segs[0].style.width = (op.b * 100) + '%';
+    segs[1].style.width = (op.d * 100) + '%';
+    segs[2].style.width = (op.u * 100) + '%';
+    segs[0].textContent = op.b > 0.12 ? `b ${op.b.toFixed(2)}` : '';
+    segs[1].textContent = op.d > 0.12 ? `d ${op.d.toFixed(2)}` : '';
+    segs[2].textContent = op.u > 0.12 ? `u ${op.u.toFixed(2)}` : '';
+  }
+
+  // sliders + nums
+  ctr.querySelectorAll('input[type="range"]').forEach(input => {
+    const comp = input.dataset.comp;
+    input.value = op[comp];
+  });
+  ctr.querySelectorAll('.opinion-sliders .num').forEach((n, i) => {
+    n.textContent = [op.b, op.d, op.u][i].toFixed(2);
+  });
+}
+
+function bindOpinion(key) {
+  const ctr = document.querySelector(`.opinion[data-key="${key}"], .mini-opinion[data-key="${key}"]`);
+  if (!ctr) return;
+  const isPU = key.startsWith('pu_');
+  ctr.querySelectorAll('input[type="range"]').forEach(input => {
+    input.addEventListener('input', () => {
+      const comp = input.dataset.comp;
+      const newVal = parseFloat(input.value);
+      // Keep new component, then renormalize the other two proportionally
+      const op = state[key];
+      const others = ['b','d','u'].filter(k => k !== comp);
+      const otherSum = op[others[0]] + op[others[1]];
+      const remaining = 1 - newVal;
+      let n1, n2;
+      if (otherSum < EPS) {
+        n1 = remaining / 2; n2 = remaining / 2;
+      } else {
+        n1 = (op[others[0]] / otherSum) * remaining;
+        n2 = (op[others[1]] / otherSum) * remaining;
+      }
+      const next = { ...op };
+      next[comp] = newVal;
+      next[others[0]] = n1;
+      next[others[1]] = n2;
+      state[key] = normalize(next);
+      paintOpinion(key);
+      if (isPU) paintParamUpdate();
+      else recompute();
+    });
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   PERCEPTRON STAGE — Recompute & render
+   ════════════════════════════════════════════════════════════ */
+function recomputePerceptron() {
+  const { Ts, Tnr, Ttheta1, Ttheta2, fusion } = state;
+
+  const disc1 = discount(Ttheta1, Ts);
+  const disc2 = discount(Ttheta2, Tnr);
+  const Ty = fusion === 'cumulative' ? fuseCumulative(disc1, disc2) : fusion === 'cc' ? fuseCC(disc1, disc2) : fuseAveraging(disc1, disc2);
+
+  // Final output card
+  document.getElementById('ty-prime-vec').textContent =
+    `(${Ty.b.toFixed(3)}, ${Ty.d.toFixed(3)}, ${Ty.u.toFixed(3)})`;
+  document.getElementById('ty-b').textContent = Ty.b.toFixed(3);
+  document.getElementById('ty-d').textContent = Ty.d.toFixed(3);
+  document.getElementById('ty-u').textContent = Ty.u.toFixed(3);
+
+  // Trace
+  const trace = document.getElementById('trace-body-perceptron');
+  trace.innerHTML = `
+    <div class="trace-line section">1. Projected probabilities (P = b + a·u)</div>
+    <div class="trace-line"><span class="lbl">P(T<sub>θ₁</sub>)</span> = ${P(Ttheta1).toFixed(3)} &nbsp;·&nbsp;
+      <span class="lbl">P(T<sub>θ₂</sub>)</span> = ${P(Ttheta2).toFixed(3)}</div>
+
+    <div class="trace-line section">2. Trust discounting on each edge</div>
+    <div class="trace-line">T<sub>θ₁</sub> <span class="op">⊗</span> T<sub>s</sub>
+      <span class="arrow">→</span><span class="val">${fmt(disc1)}</span></div>
+    <div class="trace-line">T<sub>θ₂</sub> <span class="op">⊗</span> T<sub>nr</sub>
+      <span class="arrow">→</span><span class="val">${fmt(disc2)}</span></div>
+
+    <div class="trace-line section">3. Fusion at output neuron N₃ (${fusion})</div>
+    <div class="trace-line">(T<sub>θ₁</sub>⊗T<sub>s</sub>) <span class="op">⊕</span> (T<sub>θ₂</sub>⊗T<sub>nr</sub>)
+      <span class="arrow">→</span><span class="val">${fmt(Ty)}</span></div>
+
+    <div class="trace-line section">4. Interpretation</div>
+    <div class="trace-line">P(T<sub>y′</sub>) = ${P(Ty).toFixed(3)} — projected probability of the output's reliability</div>
+    ${interpret(Ty)}
+  `;
+
+  // Triple bars on the trust nodes
+  renderMiniBar('#tn-s .tn-bar', Ts);
+  renderMiniBar('#tn-nr .tn-bar', Tnr);
+  renderMiniBar('#tn-out .tn-bar', Ty);
+}
+
+function interpret(Ty) {
+  const t = Ty.b, d = Ty.d, u = Ty.u;
+  let line = '';
+  if (u > 0.7) line = `<span style="color:var(--uncertainty)">Output is dominated by <b>uncertainty</b> — insufficient evidence to support either trust or distrust.</span>`;
+  else if (d > t) line = `<span style="color:var(--disbelief)">Distrust exceeds trust — model output should be treated as <b>unreliable</b>.</span>`;
+  else if (t > 0.7) line = `<span style="color:var(--belief)">Output is <b>well-trusted</b>: belief mass dominates.</span>`;
+  else line = `<span style="color:var(--ink-2)">Mixed regime: trust and uncertainty contend; treat with <b>caution</b>.</span>`;
+  return `<div class="trace-line">${line}</div>`;
+}
+
+function renderMiniBar(selector, op) {
+  const g = document.querySelector(selector);
+  if (!g) return;
+  g.innerHTML = '';
+  const W = 52, H = 6;
+  const xs = [0, op.b * W, (op.b + op.d) * W];
+  const wbar = [op.b, op.d, op.u].map(x => x * W);
+  const colors = ['var(--belief)', 'var(--disbelief)', 'var(--uncertainty)'];
+  for (let i = 0; i < 3; i++) {
+    if (wbar[i] <= 0) continue;
+    g.insertAdjacentHTML('beforeend',
+      `<rect class="mini-bar" x="${xs[i]}" y="0" width="${wbar[i]}" height="${H}" fill="${colors[i]}"/>`);
+  }
+  // border
+  g.insertAdjacentHTML('beforeend',
+    `<rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="var(--ink)" stroke-width="0.7"/>`);
+}
+
+/* ════════════════════════════════════════════════════════════
+   NETWORK STAGE — 2 → 3 → 2 feedforward
+   ════════════════════════════════════════════════════════════ */
+// Fixed weights (just for show — the NN itself doesn't really run; only TNN does)
+// We treat ALL parameters as sharing one trust profile chosen by the user.
+const NET = {
+  layers: [2, 3, 2],
+  // edges: list of {from, to, idx} per layer
+};
+
+function buildNetSVG() {
+  const svg = document.getElementById('svg-network');
+  svg.innerHTML = '';
+  const W = 720, H = 420;
+  const layerX = [110, 360, 610];
+  const layerSizes = [2, 3, 2];
+  const layerLabels = ['Input', 'Hidden', 'Output'];
+
+  // Compute y positions
+  function ys(n) {
+    const total = 280;
+    const gap = total / (n + 1);
+    return Array.from({length: n}, (_, i) => 70 + gap * (i + 1));
+  }
+  const layers = layerSizes.map(n => ys(n));
+
+  // Edges
+  for (let l = 0; l < layerSizes.length - 1; l++) {
+    for (let i = 0; i < layerSizes[l]; i++) {
+      for (let j = 0; j < layerSizes[l+1]; j++) {
+        const x1 = layerX[l], y1 = layers[l][i];
+        const x2 = layerX[l+1], y2 = layers[l+1][j];
+        // Dim edges going through inactive hidden neurons (when l=0, j is hidden idx)
+        let dimmed = false;
+        if (l === 0) {
+          const hk = ['h1','h2','h3'][j];
+          if (!state.hidden[hk]) dimmed = true;
+        } else if (l === 1) {
+          const hk = ['h1','h2','h3'][i];
+          if (!state.hidden[hk]) dimmed = true;
+        }
+        svg.insertAdjacentHTML('beforeend',
+          `<line class="edge trust ${dimmed?'dimmed':''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`);
+      }
+    }
+  }
+
+  // Layer labels
+  for (let l = 0; l < 3; l++) {
+    svg.insertAdjacentHTML('beforeend',
+      `<text x="${layerX[l]}" y="40" text-anchor="middle" class="layer-lbl">${layerLabels[l]}</text>`);
+  }
+
+  // Nodes
+  for (let l = 0; l < layerSizes.length; l++) {
+    for (let i = 0; i < layerSizes[l]; i++) {
+      const x = layerX[l], y = layers[l][i];
+      let active = true;
+      if (l === 1) active = state.hidden[['h1','h2','h3'][i]];
+      svg.insertAdjacentHTML('beforeend',
+        `<circle class="trust-node ${l === 1 && active ? 'ipta-active' : ''}" cx="${x}" cy="${y}" r="22"/>`);
+      let name;
+      if (l === 0) name = `TN<tspan dy="3" font-size="10">x${i+1}</tspan>`;
+      else if (l === 1) name = `h<tspan dy="3" font-size="10">${i+1}</tspan>`;
+      else name = `y<tspan dy="3" font-size="10">${i+1}</tspan>`;
+      svg.insertAdjacentHTML('beforeend',
+        `<text x="${x}" y="${y+4}" text-anchor="middle" class="node-lbl">${name}</text>`);
+    }
+  }
+
+  // Store positions for bar overlay
+  NET._positions = { layerX, layers };
+}
+
+function recomputeNetwork() {
+  const Tparam = PARAM_PROFILES[state.paramProfile];
+  document.getElementById('param-profile-readout').textContent =
+    `T_θ = (${Tparam.b.toFixed(2)}, ${Tparam.d.toFixed(2)}, ${Tparam.u.toFixed(2)}) on every edge.`;
+
+  const inputs = [state.net_x1, state.net_x2];
+
+  // Layer 1: hidden = fuse over inputs of discount(Tparam, x)
+  const hiddenContribs = [0,1,2].map(j => {
+    return inputs.map(x => discount(Tparam, x));
+  });
+  // Each hidden trust = cc fusion (independent inputs)
+  const hiddenT = hiddenContribs.map(list => fuseList(list, 'cc'));
+
+  // Layer 2: outputs only count active hidden neurons (IPTA mask)
+  const activeMask = ['h1','h2','h3'].map(k => state.hidden[k]);
+  const activeHidden = hiddenT.filter((_, i) => activeMask[i]);
+
+  let outputT;
+  if (activeHidden.length === 0) {
+    // No active hidden — vacuous
+    outputT = [
+      { b:0, d:0, u:1, a:0.5 },
+      { b:0, d:0, u:1, a:0.5 }
+    ];
+  } else {
+    outputT = [0, 1].map(k => {
+      const contribs = activeHidden.map(h => discount(Tparam, h));
+      return fuseList(contribs, 'cc');
+    });
+  }
+
+  // Aggregate the two outputs
+  const aggregated = fuseList(outputT, state.aggOp);
+
+  // Paint mini bars
+  const { layerX, layers } = NET._positions;
+  // clear any previous bars
+  document.querySelectorAll('#svg-network .tn-mini').forEach(e => e.remove());
+
+  const placeBar = (x, y, op) => {
+    const W = 36, H = 5;
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('class', 'tn-mini');
+    g.setAttribute('transform', `translate(${x - W/2}, ${y + 28})`);
+    const segs = [
+      { w: op.b * W, fill: 'var(--belief)' },
+      { w: op.d * W, fill: 'var(--disbelief)' },
+      { w: op.u * W, fill: 'var(--uncertainty)' },
+    ];
+    let xpos = 0;
+    segs.forEach(s => {
+      if (s.w <= 0) return;
+      const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      r.setAttribute('x', xpos); r.setAttribute('y', 0);
+      r.setAttribute('width', s.w); r.setAttribute('height', H);
+      r.setAttribute('fill', s.fill); g.appendChild(r);
+      xpos += s.w;
+    });
+    const border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    border.setAttribute('x', 0); border.setAttribute('y', 0);
+    border.setAttribute('width', W); border.setAttribute('height', H);
+    border.setAttribute('fill', 'none');
+    border.setAttribute('stroke', 'var(--ink)');
+    border.setAttribute('stroke-width', '0.7');
+    g.appendChild(border);
+    document.getElementById('svg-network').appendChild(g);
+  };
+
+  placeBar(layerX[0], layers[0][0], inputs[0]);
+  placeBar(layerX[0], layers[0][1], inputs[1]);
+  hiddenT.forEach((h, i) => {
+    if (activeMask[i]) placeBar(layerX[1], layers[1][i], h);
+  });
+  outputT.forEach((o, i) => placeBar(layerX[2], layers[2][i], o));
+
+  // Output card
+  document.getElementById('net-ty-vec').textContent =
+    `(${aggregated.b.toFixed(3)}, ${aggregated.d.toFixed(3)}, ${aggregated.u.toFixed(3)})`;
+  document.getElementById('net-ty-b').textContent = aggregated.b.toFixed(3);
+  document.getElementById('net-ty-d').textContent = aggregated.d.toFixed(3);
+  document.getElementById('net-ty-u').textContent = aggregated.u.toFixed(3);
+
+  // Trace
+  const trace = document.getElementById('trace-body-network');
+  let html = `
+    <div class="trace-line section">Layer 1: Hidden Trust Nodes (Trust Feedforward)</div>
+    ${hiddenT.map((h, i) =>
+      `<div class="trace-line">T<sub>h${i+1}</sub> = ⋁<sub>j</sub>(T<sub>θ</sub> ⊗ T<sub>x<sub>j</sub></sub>)
+        <span class="arrow">→</span><span class="val">${fmt(h)}</span>
+        ${activeMask[i] ? '<span style="color:var(--belief)"> [active]</span>' : '<span style="color:var(--ink-3)"> [pruned by IPTA]</span>'}
+      </div>`).join('')}
+    <div class="trace-line section">Layer 2: Output Trust Nodes (only via active hiddens)</div>
+    ${outputT.map((o, i) =>
+      `<div class="trace-line">T<sub>y${i+1}</sub><span class="arrow">→</span><span class="val">${fmt(o)}</span></div>`).join('')}
+    <div class="trace-line section">Output-Trust Aggregation (${state.aggOp})</div>
+    <div class="trace-line">T<sub>y</sub> = T<sub>y₁</sub> ⊕ T<sub>y₂</sub>
+      <span class="arrow">→</span><span class="val">${fmt(aggregated)}</span></div>
+    <div class="trace-line section">Inference Path Trust Assessment (IPTA)</div>
+    <div class="trace-line">Active path: ${activeMask.map((a, i) => a ? `h${i+1}` : '').filter(Boolean).join(', ') || '(none)'}</div>
+  `;
+  trace.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════════
+   STAGE III — Theorem checks
+   ════════════════════════════════════════════════════════════ */
+function randomOpinion() {
+  let b = Math.random(), d = Math.random(), u = Math.random();
+  const s = b + d + u; return { b: b/s, d: d/s, u: u/s, a: 0.5 };
+}
+
+function check(target, got) {
+  const ok = ['b','d','u'].every(k => Math.abs(target[k] - got[k]) < 1e-6);
+  return ok;
+}
+
+function runThm2() {
+  const vacuous = { b:0, d:0, u:1, a:0.5 };
+  let lines = '';
+  for (let trial = 1; trial <= 4; trial++) {
+    const T1 = randomOpinion(), T2 = randomOpinion();
+    const disc1 = discount(T1, vacuous);
+    const disc2 = discount(T2, vacuous);
+    const out = fuseCC(disc1, disc2);
+    const pass = check(vacuous, out);
+    lines += `<div class="trace-line"><span class="lbl">Trial ${trial}:</span>
+      T<sub>θ₁</sub>=${fmt(T1)}, T<sub>θ₂</sub>=${fmt(T2)}
+      <span class="arrow">→</span> T<sub>y′</sub>=${fmt(out)}
+      <span class="check ${pass?'pass':'fail'}" style="margin-left:8px;">${pass?'pass':'fail'}</span></div>`;
+  }
+  document.getElementById('thm2-out').innerHTML =
+    `<div class="trace-line section">Theorem 2 — empirical verification with random parameter trust</div>` + lines;
+}
+
+function runThm3() {
+  let lines = '';
+  for (let trial = 1; trial <= 3; trial++) {
+    const Tx = randomOpinion();
+    const Tx_bar = { b: Tx.d, d: Tx.b, u: Tx.u, a: Tx.a };
+    const T1 = randomOpinion(), T2 = randomOpinion();
+    const y    = fuseCC(discount(T1, Tx), discount(T2, Tx));
+    const yBar = fuseCC(discount(T1, Tx_bar), discount(T2, Tx_bar));
+    const symPass = Math.abs(y.b - yBar.d) < 1e-6 && Math.abs(y.d - yBar.b) < 1e-6 && Math.abs(y.u - yBar.u) < 1e-6;
+    lines += `<div class="trace-line"><span class="lbl">Trial ${trial}:</span>
+      T<sub>x</sub>=${fmt(Tx)}, T<sub>x̄</sub>=${fmt(Tx_bar)}
+      <span class="arrow">→</span> T<sub>y</sub>=${fmt(y)}, T<sub>ȳ</sub>=${fmt(yBar)}
+      <span class="check ${symPass?'pass':'fail'}" style="margin-left:8px;">symmetric ${symPass?'✓':'✗'}</span></div>`;
+  }
+  // Boundary: fully trusted ⇒ d_y = 0; fully distrusted ⇒ b_y = 0
+  const trusted = { b:1, d:0, u:0, a:0.5 };
+  const distrusted = { b:0, d:1, u:0, a:0.5 };
+  const T1r = randomOpinion(), T2r = randomOpinion();
+  const yT = fuseCC(discount(T1r, trusted), discount(T2r, trusted));
+  const yD = fuseCC(discount(T1r, distrusted), discount(T2r, distrusted));
+  const dyZero = Math.abs(yT.d) < 1e-6;
+  const byZero = Math.abs(yD.b) < 1e-6;
+  lines += `<div class="trace-line section">Boundary cases</div>`;
+  lines += `<div class="trace-line">Fully trusted input → T<sub>y</sub>=${fmt(yT)}
+    <span class="check ${dyZero?'pass':'fail'}" style="margin-left:8px;">d<sub>y</sub>=0 ${dyZero?'✓':'✗'}</span></div>`;
+  lines += `<div class="trace-line">Fully distrusted input → T<sub>y</sub>=${fmt(yD)}
+    <span class="check ${byZero?'pass':'fail'}" style="margin-left:8px;">b<sub>y</sub>=0 ${byZero?'✓':'✗'}</span></div>`;
+  document.getElementById('thm3-out').innerHTML =
+    `<div class="trace-line section">Theorem 3 — empirical verification</div>` + lines;
+}
+
+function runConvergence(n) {
+  // Source opinion: a partial trust signal (every sample carries the same evidence)
+  const src = { b: 0.30, d: 0.10, u: 0.60, a: 0.5 };
+  let acc = src;
+  let lines = '';
+  for (let i = 2; i <= n; i++) {
+    acc = fuseCumulative(acc, src);
+  }
+  lines += `<div class="trace-line">Source opinion (per sample): ${fmt(src)}</div>`;
+  lines += `<div class="trace-line">After cumulative fusion of n = ${n} identical sources:
+    <span class="arrow">→</span><span class="val">${fmt(acc)}</span></div>`;
+  lines += `<div class="trace-line">P(T) projected probability: ${P(acc).toFixed(4)}</div>`;
+  lines += `<div class="trace-line"><i>Uncertainty decreases monotonically as n grows; trust and distrust accumulate in proportion to the source's b:d ratio.</i></div>`;
+  document.getElementById('conv-out').innerHTML =
+    `<div class="trace-line section">Convergence under repeated cumulative fusion</div>` + lines;
+}
+
+/* ════════════════════════════════════════════════════════════
+   GLUE
+   ════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   STAGE IV — Parameter-Trust Update (Algorithm 1)
+   ════════════════════════════════════════════════════════════ */
+
+// Architecture metadata: how many incoming edges each neuron has, and which inputs feed it
+const PU_NEURONS = {
+  h1: { layer: 'hidden', edges: 2, from: ['x₁', 'x₂'], pos: { x: 360, y: 95  } },
+  h2: { layer: 'hidden', edges: 2, from: ['x₁', 'x₂'], pos: { x: 360, y: 175 } },
+  h3: { layer: 'hidden', edges: 2, from: ['x₁', 'x₂'], pos: { x: 360, y: 255 } },
+  y1: { layer: 'output', edges: 3, from: ['h₁', 'h₂', 'h₃'], pos: { x: 600, y: 135 } },
+  y2: { layer: 'output', edges: 3, from: ['h₁', 'h₂', 'h₃'], pos: { x: 600, y: 215 } },
+};
+
+// Run Algorithm 1 for the currently selected neuron, return the full trace
+function runParameterTrustUpdate() {
+  const neuronMeta = PU_NEURONS[state.pu_neuron];
+  const nEdges = neuronMeta.edges;
+  const grads = state.pu_gradients.slice(0, nEdges);
+
+  // Step 1: T_ybatch = cumulative fusion of batch labels
+  const Tybatch = state.pu_batch.length === 1
+    ? state.pu_batch[0]
+    : state.pu_batch.reduce((acc, t, i) => i === 0 ? t : fuseCumulative(acc, t));
+
+  // Step 2: gather gradients
+  const gathered = grads;
+
+  // Step 3: NodeTrust via Baseline-Prior Quantification (W=2)
+  let r = 0, s = 0;
+  gathered.forEach(g => Math.abs(g) < state.pu_epsilon ? r++ : s++);
+  const Tn_ybatch = quantify(r, s);
+
+  // Step 4: DeduceTrust
+  const Tn_notybatch = { b: 0, d: 0, u: 1, a: 0.5 };
+  const Tn_Y = deduce(Tybatch, Tn_ybatch, Tn_notybatch);
+
+  // Step 5: Revise
+  const Ttheta_before = state.pu_Ttheta;
+  const Ttheta_after5 = revise(Ttheta_before, Tn_Y);
+
+  // Step 6: Update (multiply by T_x ⊘ T_ybatch); the paper also lists T_lr as auxiliary
+  // We honor the formula in the paper exactly: T_θ ⊙ (T_x ⊘ T_ybatch)
+  const aux = divideConservative(state.pu_Tx, Tybatch);
+  // The paper's wider Update may also incorporate T_lr; we apply it via a final discount-style step
+  // to reflect that learning-rate trust modulates the update magnitude.
+  const Ttheta_final_pre_lr = multiply(Ttheta_after5, aux);
+  // Discount by T_lr to capture learning-rate reliability:
+  const Ttheta_final = discount(state.pu_Tlr, Ttheta_final_pre_lr);
+
+  return {
+    Tybatch, gradients: gathered, r, s, Tn_ybatch, Tn_notybatch, Tn_Y,
+    Ttheta_before, Ttheta_after5, aux, Ttheta_final_pre_lr, Ttheta_final,
+    nEdges, neuronMeta,
+  };
+}
+
+function paintParamUpdate() {
+  // Render network SVG and current state
+  buildParamUpdateSVG();
+  // Render the batch list
+  paintBatchList();
+  // Render gradient cells
+  paintGradGrid();
+  // Update epsilon readout
+  document.getElementById('eps-val').textContent = state.pu_epsilon.toFixed(3);
+  // Run Algorithm 1 and update the visible steps
+  state.pu_results = runParameterTrustUpdate();
+  renderAlgoSteps();
+}
+
+function buildParamUpdateSVG() {
+  const svg = document.getElementById('svg-paramupdate');
+  if (!svg) return;
+  svg.innerHTML = '';
+
+  const layerX = [110, 360, 600];
+  const ys = (n) => { const total = 280; const gap = total / (n + 1); return Array.from({length: n}, (_, i) => 40 + gap * (i + 1)); };
+  const lays = [ys(2), ys(3), ys(2)];
+
+  // Layer labels
+  ['Input', 'Hidden', 'Output'].forEach((lbl, l) => {
+    svg.insertAdjacentHTML('beforeend',
+      `<text x="${layerX[l]}" y="22" text-anchor="middle" class="layer-lbl">${lbl}</text>`);
+  });
+
+  // Determine current target neuron and its edges
+  const meta = PU_NEURONS[state.pu_neuron];
+  const targetX = meta.pos.x, targetY = meta.pos.y;
+  const isOutput = meta.layer === 'output';
+  const fromLayerX = isOutput ? layerX[1] : layerX[0];
+  const fromYs = isOutput ? lays[1] : lays[0];
+  const grads = state.pu_gradients.slice(0, meta.edges);
+
+  // Draw all edges (dim), then highlight target edges
+  // First, all edges as base
+  for (let l = 0; l < 2; l++) {
+    const fromN = [2, 3][l], toN = [3, 2][l];
+    for (let i = 0; i < fromN; i++) {
+      for (let j = 0; j < toN; j++) {
+        const x1 = layerX[l], y1 = lays[l][i];
+        const x2 = layerX[l+1], y2 = lays[l+1][j];
+        svg.insertAdjacentHTML('beforeend',
+          `<line class="edge trust dimmed" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`);
+      }
+    }
+  }
+
+  // Highlight target neuron's incoming edges colored by weak/strong
+  for (let k = 0; k < meta.edges; k++) {
+    const x1 = fromLayerX, y1 = fromYs[k];
+    const cls = Math.abs(grads[k]) < state.pu_epsilon ? 'weak-grad' : 'strong-grad';
+    svg.insertAdjacentHTML('beforeend',
+      `<line class="edge ${cls}" x1="${x1}" y1="${y1}" x2="${targetX}" y2="${targetY}"/>`);
+    // gradient label at midpoint
+    const mx = (x1 + targetX) / 2, my = (y1 + targetY) / 2;
+    svg.insertAdjacentHTML('beforeend',
+      `<rect x="${mx-32}" y="${my-9}" width="64" height="16" fill="var(--paper-2)" stroke="var(--ink)" stroke-width="0.6"/>` +
+      `<text x="${mx}" y="${my+3}" text-anchor="middle" class="edge-lbl" style="font-size:9.5px;">g=${grads[k].toFixed(3)}</text>`);
+  }
+
+  // Draw all nodes
+  // Input layer
+  for (let i = 0; i < 2; i++) {
+    svg.insertAdjacentHTML('beforeend',
+      `<circle class="trust-node" cx="${layerX[0]}" cy="${lays[0][i]}" r="18"/>` +
+      `<text x="${layerX[0]}" y="${lays[0][i]+4}" text-anchor="middle" class="node-lbl" style="font-size:12px;">x${i+1}</text>`);
+  }
+  // Hidden layer
+  for (let i = 0; i < 3; i++) {
+    const isTarget = state.pu_neuron === ['h1','h2','h3'][i];
+    svg.insertAdjacentHTML('beforeend',
+      `<circle class="trust-node ${isTarget?'update-target':''}" cx="${layerX[1]}" cy="${lays[1][i]}" r="18"/>` +
+      `<text x="${layerX[1]}" y="${lays[1][i]+4}" text-anchor="middle" class="node-lbl" style="font-size:12px;">h${i+1}</text>`);
+  }
+  // Output layer
+  for (let i = 0; i < 2; i++) {
+    const isTarget = state.pu_neuron === ['y1','y2'][i];
+    svg.insertAdjacentHTML('beforeend',
+      `<circle class="trust-node ${isTarget?'update-target':''}" cx="${layerX[2]}" cy="${lays[2][i]}" r="18"/>` +
+      `<text x="${layerX[2]}" y="${lays[2][i]+4}" text-anchor="middle" class="node-lbl" style="font-size:12px;">y${i+1}</text>`);
+  }
+
+  // Legend
+  svg.insertAdjacentHTML('beforeend', `
+    <g transform="translate(20, 320)">
+      <line x1="0" y1="6" x2="32" y2="6" class="edge weak-grad"/>
+      <text x="38" y="10" class="edge-lbl" style="font-size:10px;">|g| &lt; ϵ  weak gradient (r)</text>
+      <line x1="0" y1="26" x2="32" y2="26" class="edge strong-grad"/>
+      <text x="38" y="30" class="edge-lbl" style="font-size:10px;">|g| ≥ ϵ  strong gradient (s)</text>
+    </g>
+  `);
+}
+
+function paintBatchList() {
+  const list = document.getElementById('batch-list');
+  if (!list) return;
+  list.innerHTML = '';
+  state.pu_batch.forEach((op, idx) => {
+    const row = document.createElement('div');
+    row.className = 'batch-row';
+    row.innerHTML = `
+      <span class="idx">y<sub>${idx+1}</sub></span>
+      <div class="bar-mini" data-idx="${idx}">
+        <div class="seg-b" style="width:${op.b*100}%;"></div>
+        <div class="seg-d" style="width:${op.d*100}%;"></div>
+        <div class="seg-u" style="width:${op.u*100}%;"></div>
+      </div>
+      <button class="x" data-remove="${idx}" title="Remove">×</button>
+    `;
+    list.appendChild(row);
+    
+    // Add expandable sliders panel
+    const sliders = document.createElement('div');
+    sliders.className = 'batch-sliders';
+    sliders.innerHTML = `
+      <div class="slider-row">
+        <label class="b">b</label>
+        <input type="range" min="0" max="1" step="0.01" value="${op.b}" data-bidx="${idx}" data-comp="b">
+        <span class="num">${op.b.toFixed(2)}</span>
+      </div>
+      <div class="slider-row">
+        <label class="d">d</label>
+        <input type="range" min="0" max="1" step="0.01" value="${op.d}" data-bidx="${idx}" data-comp="d">
+        <span class="num">${op.d.toFixed(2)}</span>
+      </div>
+      <div class="slider-row">
+        <label class="u">u</label>
+        <input type="range" min="0" max="1" step="0.01" value="${op.u}" data-bidx="${idx}" data-comp="u">
+        <span class="num">${op.u.toFixed(2)}</span>
+      </div>
+    `;
+    list.appendChild(sliders);
+  });
+  
+  // wire clicks: clicking a bar toggles sliders visibility
+  list.querySelectorAll('.bar-mini').forEach(bm => {
+    bm.addEventListener('click', () => {
+      const i = +bm.dataset.idx;
+      const sliders = bm.closest('.batch-row').nextElementSibling;
+      if (sliders && sliders.classList.contains('batch-sliders')) {
+        sliders.classList.toggle('show');
+      }
+    });
+  });
+  
+  // wire sliders
+  list.querySelectorAll('.batch-sliders input[type="range"]').forEach(input => {
+    input.addEventListener('input', () => {
+      const idx = +input.dataset.bidx;
+      const comp = input.dataset.comp;
+      const newVal = parseFloat(input.value);
+      
+      const op = state.pu_batch[idx];
+      const others = ['b','d','u'].filter(k => k !== comp);
+      const otherSum = op[others[0]] + op[others[1]];
+      const remaining = 1 - newVal;
+      let n1, n2;
+      if (otherSum < EPS) {
+        n1 = remaining / 2; n2 = remaining / 2;
+      } else {
+        n1 = (op[others[0]] / otherSum) * remaining;
+        n2 = (op[others[1]] / otherSum) * remaining;
+      }
+      const next = { ...op };
+      next[comp] = newVal;
+      next[others[0]] = n1;
+      next[others[1]] = n2;
+      state.pu_batch[idx] = normalize(next);
+      paintParamUpdate();
+    });
+  });
+  
+  // wire remove buttons
+  list.querySelectorAll('button.x').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = +btn.dataset.remove;
+      if (state.pu_batch.length > 1) {
+        state.pu_batch.splice(i, 1);
+        paintParamUpdate();
+      }
+    });
+  });
+}
+
+function randomLabelOpinion() {
+  // Mostly trusted with a bit of uncertainty; occasional noisy/distrusted
+  const roll = Math.random();
+  if (roll < 0.7) {
+    const b = 0.7 + Math.random() * 0.25;
+    const d = Math.random() * (1 - b) * 0.3;
+    const u = 1 - b - d;
+    return { b, d, u, a: 0.5 };
+  } else if (roll < 0.9) {
+    const u = 0.5 + Math.random() * 0.4;
+    const b = (1 - u) * 0.5;
+    const d = 1 - b - u;
+    return { b, d, u, a: 0.5 };
+  } else {
+    const d = 0.6 + Math.random() * 0.3;
+    const u = (1 - d) * 0.7;
+    const b = 1 - d - u;
+    return { b, d, u, a: 0.5 };
+  }
+}
+
+function paintGradGrid() {
+  const grid = document.getElementById('grad-grid');
+  if (!grid) return;
+  const meta = PU_NEURONS[state.pu_neuron];
+  grid.innerHTML = '';
+  grid.style.gridTemplateColumns = `repeat(${meta.edges}, 1fr)`;
+  for (let k = 0; k < meta.edges; k++) {
+    const g = state.pu_gradients[k];
+    const isWeak = Math.abs(g) < state.pu_epsilon;
+    const cell = document.createElement('div');
+    cell.className = 'grad-cell ' + (isWeak ? 'weak' : 'strong');
+    cell.innerHTML = `
+      <div class="glbl">g<sub>${k+1}</sub> &middot; from ${meta.from[k]}</div>
+      <input type="number" step="0.001" value="${g}" data-gidx="${k}"/>
+    `;
+    grid.appendChild(cell);
+  }
+  grid.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const k = +inp.dataset.gidx;
+      const v = parseFloat(inp.value);
+      if (!isNaN(v)) {
+        state.pu_gradients[k] = v;
+        paintParamUpdate();
+      }
+    });
+  });
+}
+
+function renderAlgoSteps() {
+  const res = state.pu_results;
+  if (!res) return;
+
+  // Activate/deactivate steps based on pu_currentStep
+  const stepDivs = document.querySelectorAll('.algo-step');
+  stepDivs.forEach((div) => {
+    const n = +div.dataset.step;
+    div.classList.toggle('active', n === state.pu_currentStep);
+    div.classList.toggle('done', n < state.pu_currentStep);
+  });
+
+  // Always render the actual values
+  document.getElementById('r-step1').textContent = fmt(res.Tybatch);
+  document.getElementById('r-step1-detail').innerHTML =
+    `cumulative fusion of ${state.pu_batch.length} sample${state.pu_batch.length>1?'s':''} →
+     P(T<sub>y<sub>batch</sub></sub>) = ${P(res.Tybatch).toFixed(3)}`;
+
+  document.getElementById('r-step2-target').innerHTML =
+    `<b>${state.pu_neuron}</b> · ${res.neuronMeta.edges} incoming edges`;
+  document.getElementById('r-step2').textContent =
+    `{ ${res.gradients.map(g => g.toFixed(4)).join(', ')} }`;
+
+  document.getElementById('r-step3-counts').innerHTML =
+    `r (weak, |g|&lt;ϵ) = <b>${res.r}</b>; s (strong, |g|≥ϵ) = <b>${res.s}</b>; W = 2`;
+  document.getElementById('r-step3').textContent = fmt(res.Tn_ybatch);
+
+  document.getElementById('r-step4').textContent = fmt(res.Tn_Y);
+
+  document.getElementById('r-step5-before').textContent = fmt(res.Ttheta_before);
+  document.getElementById('r-step5-after').textContent = fmt(res.Ttheta_after5);
+
+  document.getElementById('r-step6-aux').textContent = fmt(res.aux);
+  document.getElementById('r-step6-final').textContent = fmt(res.Ttheta_final);
+
+  // Interpretation
+  const before = res.Ttheta_before, after = res.Ttheta_final;
+  const db = after.b - before.b, dd = after.d - before.d, du = after.u - before.u;
+  let verdict;
+  if (db > 0.05) verdict = `<span style="color:var(--belief)">Parameter trust <b>strengthened</b> — evidence supports its reliability.</span>`;
+  else if (dd > 0.05) verdict = `<span style="color:var(--disbelief)">Parameter trust <b>eroded</b> — gradient evidence flags this weight as unreliable.</span>`;
+  else if (Math.abs(db) < 0.02 && Math.abs(dd) < 0.02) verdict = `<span style="color:var(--ink-2)">Parameter trust nearly unchanged; evidence is consistent with the prior.</span>`;
+  else verdict = `<span style="color:var(--ink-2)">Mixed adjustment — trust and uncertainty shifted.</span>`;
+  document.getElementById('r-step6-interpret').innerHTML = verdict;
+
+  // Delta panel
+  document.getElementById('pu-delta').textContent =
+    `(${(db>=0?'+':'')}${db.toFixed(3)}, ${(dd>=0?'+':'')}${dd.toFixed(3)}, ${(du>=0?'+':'')}${du.toFixed(3)})`;
+  document.getElementById('pu-db').textContent = (db>=0?'+':'') + db.toFixed(3);
+  document.getElementById('pu-dd').textContent = (dd>=0?'+':'') + dd.toFixed(3);
+  document.getElementById('pu-du').textContent = (du>=0?'+':'') + du.toFixed(3);
+
+  // Step pill
+  document.getElementById('step-pill').textContent = `Step ${state.pu_currentStep} / 6`;
+}
+
+const BATCH_PRESETS = {
+  clean: [
+    { b: 0.95, d: 0.00, u: 0.05, a: 0.5 },
+    { b: 0.92, d: 0.02, u: 0.06, a: 0.5 },
+    { b: 0.90, d: 0.03, u: 0.07, a: 0.5 },
+    { b: 0.93, d: 0.01, u: 0.06, a: 0.5 },
+  ],
+  poison: [
+    { b: 0.90, d: 0.05, u: 0.05, a: 0.5 },
+    { b: 0.85, d: 0.05, u: 0.10, a: 0.5 },
+    { b: 0.05, d: 0.85, u: 0.10, a: 0.5 },  // poisoned label
+    { b: 0.88, d: 0.04, u: 0.08, a: 0.5 },
+  ],
+  uncertain: [
+    { b: 0.00, d: 0.00, u: 1.00, a: 0.5 },
+    { b: 0.00, d: 0.00, u: 1.00, a: 0.5 },
+    { b: 0.00, d: 0.00, u: 1.00, a: 0.5 },
+  ],
+};
+
+
+
+function recompute() {
+  recomputePerceptron();
+  recomputeNetwork();
+}
+
+function applyPreset(name) {
+  const p = PRESETS[name];
+  if (!p) return;
+  Object.keys(p).forEach(k => { state[k] = normalize(p[k]); paintOpinion(k); });
+  recompute();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // bind opinion editors
+  ['Ts','Tnr','Ttheta1','Ttheta2','net_x1','net_x2'].forEach(k => {
+    bindOpinion(k); paintOpinion(k);
+  });
+
+  // fusion operator
+  document.getElementById('fusion-op').addEventListener('change', (e) => {
+    state.fusion = e.target.value; recompute();
+  });
+  document.getElementById('agg-op').addEventListener('change', (e) => {
+    state.aggOp = e.target.value; recomputeNetwork();
+  });
+
+  // presets
+  document.querySelectorAll('[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+  });
+
+  // param profile
+  document.querySelectorAll('[data-paramprofile]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.paramProfile = btn.dataset.paramprofile;
+      document.querySelectorAll('[data-paramprofile]').forEach(b => b.classList.remove('primary'));
+      btn.classList.add('primary');
+      buildNetSVG();
+      recomputeNetwork();
+    });
+  });
+
+  // hidden activation
+  document.querySelectorAll('[data-hidden]').forEach(box => {
+    box.addEventListener('change', () => {
+      state.hidden[box.dataset.hidden] = box.checked;
+      buildNetSVG();
+      recomputeNetwork();
+    });
+  });
+
+  // tabs
+  document.querySelectorAll('.stage-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.stage-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.stage-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('stage-' + tab.dataset.stage).classList.add('active');
+    });
+  });
+
+  // theorem buttons
+  document.getElementById('run-thm2').addEventListener('click', runThm2);
+  document.getElementById('run-thm3').addEventListener('click', runThm3);
+  const convInput = document.getElementById('convN');
+  const convVal = document.getElementById('convN-val');
+  convInput.addEventListener('input', () => {
+    convVal.textContent = convInput.value;
+    runConvergence(parseInt(convInput.value));
+  });
+
+  // ─── Stage IV: Parameter-Trust Update wiring ───
+  ['pu_Tlr', 'pu_Tx', 'pu_Ttheta'].forEach(k => {
+    bindOpinion(k);
+    paintOpinion(k);
+  });
+
+  // Neuron selector
+  document.querySelectorAll('#neuron-pick button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#neuron-pick button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.pu_neuron = btn.dataset.neuron;
+      // Pad gradients if needed
+      const need = PU_NEURONS[state.pu_neuron].edges;
+      while (state.pu_gradients.length < need) state.pu_gradients.push(0.01);
+      paintParamUpdate();
+    });
+  });
+
+  // Epsilon slider
+  document.getElementById('eps-slider').addEventListener('input', (e) => {
+    state.pu_epsilon = parseFloat(e.target.value);
+    paintParamUpdate();
+  });
+
+  // Add batch row
+  document.getElementById('add-batch-row').addEventListener('click', () => {
+    state.pu_batch.push(randomLabelOpinion());
+    paintParamUpdate();
+  });
+
+  // Batch presets
+  document.querySelectorAll('[data-batchpreset]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.dataset.batchpreset;
+      state.pu_batch = BATCH_PRESETS[name].map(o => ({ ...o }));
+      paintParamUpdate();
+    });
+  });
+
+  // Step controls
+  document.getElementById('step-next').addEventListener('click', () => {
+    if (state.pu_currentStep < 6) {
+      state.pu_currentStep++;
+      renderAlgoSteps();
+    }
+  });
+  document.getElementById('step-back').addEventListener('click', () => {
+    if (state.pu_currentStep > 0) {
+      state.pu_currentStep--;
+      renderAlgoSteps();
+    }
+  });
+  document.getElementById('step-runall').addEventListener('click', () => {
+    let i = state.pu_currentStep;
+    const advance = () => {
+      if (i < 6) {
+        i++; state.pu_currentStep = i; renderAlgoSteps();
+        setTimeout(advance, 450);
+      }
+    };
+    advance();
+  });
+  document.getElementById('step-reset').addEventListener('click', () => {
+    state.pu_currentStep = 0;
+    renderAlgoSteps();
+  });
+
+  // initial paint
+  buildNetSVG();
+  recompute();
+  runThm2();
+  runThm3();
+  runConvergence(10);
+  paintParamUpdate();
+});
+</script>
+</body>
+</html>
