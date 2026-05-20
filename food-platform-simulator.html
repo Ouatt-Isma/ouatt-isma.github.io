@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAP05 &mdash; Dynamic Pricing &amp; Recommendation Simulator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f4f0;--surface:#ffffff;--surface2:#f1efe9;
+  --border:rgba(0,0,0,.10);--border2:rgba(0,0,0,.18);
+  --txt:#1e1e1c;--txt2:#6b6a64;--txt3:#9c9a92;
+  --accent:#3B8ADD;--radius-md:8px;--radius-lg:12px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1a1a18;--surface:#242422;--surface2:#2e2e2b;
+  --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.18);
+  --txt:#e8e6de;--txt2:#9c9a92;--txt3:#6b6a64;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--txt);font-size:15px;line-height:1.5;min-height:100vh}
+header{background:var(--surface);border-bottom:0.5px solid var(--border2);
+  padding:1.1rem 2rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.logo{font-size:12px;font-weight:600;letter-spacing:.05em;color:var(--txt2);
+  text-transform:uppercase;border:0.5px solid var(--border2);padding:4px 10px;
+  border-radius:var(--radius-md)}
+header h1{font-size:16px;font-weight:500}
+header p{font-size:13px;color:var(--txt2)}
+.hero{background:var(--surface);border-bottom:0.5px solid var(--border);padding:1.2rem 2rem}
+.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:700px){.hero-inner{grid-template-columns:1fr}}
+.hero-block{padding:.9rem 1rem;border-radius:var(--radius-lg);border:0.5px solid var(--border)}
+.hero-block h4{font-size:13px;font-weight:500;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.hero-block p{font-size:12px;color:var(--txt2);line-height:1.6}
+.hero-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;
+  border-radius:50%;font-size:11px;font-weight:600;background:var(--surface2);color:var(--txt2);flex-shrink:0}
+.app{max-width:1100px;margin:0 auto;padding:1.5rem 1.5rem 3rem}
+/* Main tabs */
+.tabs{display:flex;gap:2px;border-bottom:0.5px solid var(--border2);margin-bottom:1.5rem;overflow-x:auto}
+.tab{padding:9px 16px;font-size:13px;cursor:pointer;border:none;
+  border-bottom:2px solid transparent;background:none;color:var(--txt2);white-space:nowrap;transition:color .15s}
+.tab:hover{color:var(--txt)}.tab.active{color:var(--txt);border-bottom-color:var(--txt);font-weight:500}
+.panel{display:none}.panel.active{display:block}
+/* Method sub-tabs */
+.method-bar{display:flex;gap:4px;margin-bottom:1rem;flex-wrap:wrap}
+.method-btn{padding:6px 14px;font-size:12px;cursor:pointer;border:0.5px solid var(--border2);
+  border-radius:20px;background:var(--surface);color:var(--txt2);white-space:nowrap;transition:all .15s}
+.method-btn:hover{background:var(--surface2);color:var(--txt)}
+.method-btn.active{background:var(--txt);color:var(--surface);border-color:var(--txt)}
+.method-panel{display:none}.method-panel.active{display:block}
+/* Grid */
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:700px){.row,.row3{grid-template-columns:1fr}}
+/* Cards */
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem}
+.metric-card{background:var(--surface2);border-radius:var(--radius-md);padding:.9rem;text-align:center}
+.metric-label{font-size:12px;color:var(--txt2);margin-bottom:3px}
+.metric-value{font-size:21px;font-weight:500}
+.metric-sub{font-size:12px;color:var(--txt3);margin-top:2px}
+/* Type */
+h3{font-size:15px;font-weight:500;margin-bottom:10px}
+h4.sub{font-size:13px;font-weight:500;color:var(--txt2);margin:10px 0 5px}
+.section-title{font-size:11px;font-weight:500;color:var(--txt3);text-transform:uppercase;
+  letter-spacing:.06em;margin:10px 0 5px}
+.info-box{background:var(--surface2);border-radius:var(--radius-md);padding:8px 11px;
+  font-size:12px;color:var(--txt2);line-height:1.6;margin-bottom:9px}
+/* Controls */
+.ctrl{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;color:var(--txt2)}
+.ctrl-label{min-width:148px;display:flex;align-items:center;gap:4px;flex-shrink:0}
+.ctrl input[type=range]{flex:1;accent-color:var(--accent)}
+.ctrl .val{min-width:40px;text-align:right;font-size:13px;font-weight:500;color:var(--txt)}
+select{font-size:13px;padding:5px 9px;border:0.5px solid var(--border2);
+  border-radius:var(--radius-md);background:var(--surface);color:var(--txt);cursor:pointer}
+button.run-btn{font-size:13px;padding:7px 14px;border:0.5px solid var(--border2);
+  border-radius:var(--radius-md);background:var(--surface);color:var(--txt);
+  cursor:pointer;transition:background .15s}
+button.run-btn:hover{background:var(--surface2)}
+/* Tooltip */
+.tip-icon{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;
+  border-radius:50%;background:var(--surface2);color:var(--txt3);font-size:10px;font-style:normal;
+  cursor:help;border:0.5px solid var(--border2);flex-shrink:0;position:relative;font-weight:600}
+.tip-icon:hover .tip-box{display:block}
+.tip-box{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  z-index:200;background:var(--surface);border:0.5px solid var(--border2);
+  border-radius:var(--radius-md);padding:8px 11px;font-size:12px;color:var(--txt2);
+  line-height:1.6;width:230px;box-shadow:0 4px 16px rgba(0,0,0,.13);
+  font-weight:400;font-style:normal;white-space:normal;pointer-events:none}
+/* Glossary */
+.glossary{margin-top:10px}
+.glossary-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt3);
+  cursor:pointer;user-select:none;padding:3px 0;border:none;background:none;width:100%}
+.glossary-toggle:hover{color:var(--txt2)}
+.glossary-toggle svg{transition:transform .2s;flex-shrink:0}
+.glossary-toggle.open svg{transform:rotate(90deg)}
+.glossary-body{display:none;margin-top:7px;border-top:0.5px solid var(--border);padding-top:9px}
+.glossary-body.open{display:block}
+.gterm{margin-bottom:8px;font-size:12px}
+.gterm dt{font-weight:500;color:var(--txt);margin-bottom:1px}
+.gterm dd{color:var(--txt2);line-height:1.6;margin-left:0}
+.gtag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;
+  font-family:ui-monospace,"SF Mono",Consolas,monospace;background:var(--surface2);
+  color:var(--txt3);margin-right:4px;vertical-align:1px}
+/* Badges */
+.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:var(--radius-md);font-weight:500}
+.badge-green{background:#EAF3DE;color:#3B6D11}.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-red{background:#FCEBEB;color:#A32D2D}
+@media(prefers-color-scheme:dark){
+  .badge-green{background:#27500A;color:#C0DD97}
+  .badge-warn{background:#633806;color:#FAC775}
+  .badge-red{background:#791F1F;color:#F7C1C1}}
+/* Matrix */
+.matrix-wrap{overflow-x:auto;margin-top:7px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--surface2);padding:5px 7px;text-align:center;font-weight:500;border:0.5px solid var(--border)}
+td{padding:4px 7px;text-align:center;border:0.5px solid var(--border);cursor:pointer}
+td:hover{background:var(--surface2)}
+.cell-known{font-weight:500}.cell-pred{font-style:italic;color:var(--txt2)}
+/* Similarity heatmap */
+.sim-cell{width:100%;padding:6px 3px;text-align:center;font-size:11px;
+  font-weight:500;border-radius:4px;cursor:default}
+/* Rec list */
+.rec-list{display:flex;flex-direction:column;gap:4px;margin-top:7px}
+.rec-item{display:flex;align-items:center;gap:8px;padding:6px 9px;
+  background:var(--surface2);border-radius:var(--radius-md);font-size:13px}
+.rec-rank{font-size:11px;color:var(--txt3);min-width:18px}
+.rec-name{flex:1;font-weight:500}.rec-score{font-size:12px;color:var(--txt2)}
+.stars{color:#EF9F27}
+/* Policy grid */
+.policy-grid{display:grid;gap:2px;margin-top:7px}
+.policy-cell{padding:4px 2px;border-radius:4px;text-align:center;font-size:11px;font-weight:500}
+.legend{display:flex;gap:10px;font-size:11px;color:var(--txt2);margin-top:5px;flex-wrap:wrap}
+.legend-dot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:3px}
+/* Stock bars */
+.stock-bar{height:9px;border-radius:5px;background:var(--surface2);overflow:hidden;margin-top:3px}
+.stock-fill{height:100%;border-radius:5px;transition:width .4s}
+/* Log */
+.log-box{background:var(--surface2);border-radius:var(--radius-md);padding:8px 11px;
+  font-size:11px;font-family:ui-monospace,"SF Mono",Consolas,monospace;
+  height:85px;overflow-y:auto;color:var(--txt2);line-height:1.6}
+/* Charts */
+.chart-wrap{position:relative;width:100%}
+/* KNN neighbor highlight */
+.neighbor-row{display:flex;align-items:center;gap:8px;padding:5px 8px;
+  border-radius:var(--radius-md);margin-bottom:3px;font-size:12px}
+.neighbor-bar-wrap{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.neighbor-bar{height:100%;border-radius:3px}
+/* About */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:700px){.about-grid{grid-template-columns:1fr}}
+.about-section{background:var(--surface);border:0.5px solid var(--border);
+  border-radius:var(--radius-lg);padding:1.1rem 1.3rem}
+.about-section h3{font-size:15px;font-weight:500;margin-bottom:9px}
+.about-section h4{font-size:13px;font-weight:500;color:var(--txt2);margin:10px 0 4px}
+.about-section p{font-size:13px;color:var(--txt2);line-height:1.7;margin-bottom:6px}
+.about-section ul{font-size:13px;color:var(--txt2);line-height:1.7;padding-left:1.1rem;margin-bottom:7px}
+.about-section li{margin-bottom:2px}
+.formula{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
+  background:var(--surface2);padding:7px 11px;border-radius:var(--radius-md);
+  margin:5px 0;color:var(--txt);line-height:1.8}
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;margin:2px 2px 2px 0}
+.pill-blue{background:#E6F1FB;color:#185FA5}.pill-teal{background:#E1F5EE;color:#0F6E56}
+.pill-amber{background:#FAEEDA;color:#854F0B}.pill-purple{background:#EEEDFE;color:#534AB7}
+@media(prefers-color-scheme:dark){
+  .pill-blue{background:#0C447C;color:#B5D4F4}.pill-teal{background:#085041;color:#9FE1CB}
+  .pill-amber{background:#633806;color:#FAC775}.pill-purple{background:#3C3489;color:#CECBF6}}
+.author-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}
+.author-chip{font-size:12px;padding:3px 9px;border-radius:20px;
+  background:var(--surface2);color:var(--txt2);border:0.5px solid var(--border)}
+/* Sigmoid viz */
+.sigmoid-label{font-size:11px;color:var(--txt3);text-align:center;margin-top:4px}
+/* LSTM hidden state bars */
+.hs-bar-wrap{display:flex;gap:2px;align-items:flex-end;height:40px;margin-top:6px}
+.hs-bar{flex:1;border-radius:2px 2px 0 0;min-height:3px;transition:height .3s}
+/* Comparison badges */
+.compare-row{display:flex;gap:8px;margin:8px 0;flex-wrap:wrap}
+.compare-chip{font-size:11px;padding:3px 9px;border-radius:var(--radius-md);
+  background:var(--surface2);color:var(--txt2);border:0.5px solid var(--border)}
+.compare-chip strong{color:var(--txt)}
+/* True demand config */
+.tdp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 16px;margin-bottom:10px}
+@media(max-width:700px){.tdp-grid{grid-template-columns:1fr}}
+.tdp-ctrl{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--txt2)}
+.tdp-ctrl label{min-width:120px;display:flex;align-items:center;gap:4px}
+.tdp-ctrl input[type=range]{flex:1;accent-color:var(--accent)}
+.tdp-ctrl .val{min-width:36px;text-align:right;font-size:12px;font-weight:500;color:var(--txt)}
+.error-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;
+  background:var(--surface2);border-radius:var(--radius-md);padding:4px 10px;
+  border:0.5px solid var(--border)}
+.error-badge span{font-weight:500;color:var(--txt)}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">MAP05 &middot; &Eacute;cole Polytechnique</div>
+  <div>
+    <h1>Dynamic Pricing &amp; Recommendation Simulator</h1>
+    <p>Fighting food waste on delivery platforms; PSC January 2020</p>
+    
+  </div>
+  <p style="text-align: right;"><em>Simulator Implemented By Koffi Ismael OUATTARA</em></p>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-block">
+      <h4><span class="hero-num">1</span> The problem</h4>
+      <p>Food delivery platforms ignore stock levels, generating avoidable waste from unsold dishes. This project proposes joint dynamic pricing + smart recommendations to clear stock without selling at a loss.</p>
+    </div>
+    <div class="hero-block">
+      <h4><span class="hero-num">2</span> Methods implemented</h4>
+      <p><strong>Recommendation:</strong> Matrix Factorisation &amp; KNN.<br>
+      <strong>Demand:</strong> Linear Regression, Logistic Regression, Neural Network &amp; LSTM.<br>
+      <strong>Pricing:</strong> MDP with Bellman induction.</p>
+    </div>
+    <div class="hero-block">
+      <h4><span class="hero-num">3</span> How to use</h4>
+      <p>Each tab has a <strong>method selector</strong> at the top. Switch between algorithms to compare their outputs. Hover <strong>i</strong> icons for parameter definitions, expand the glossary for concepts.</p>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+<div class="tabs">
+  <button class="tab" onclick="switchTab('about',this)">About</button>
+  <button class="tab active" onclick="switchTab('rec',this)">Recommendation</button>
+  <button class="tab" onclick="switchTab('mdp',this)">Dynamic Pricing (MDP)</button>
+  <button class="tab" onclick="switchTab('demand',this)">Demand Estimation</button>
+  <button class="tab" onclick="switchTab('sim',this)">Full Simulation</button>
+  
+</div>
+
+<!-- ═══════════ TAB 1: RECOMMENDATION ═══════════ -->
+<div id="panel-rec" class="panel active">
+  <div class="method-bar">
+    <button class="method-btn active" onclick="switchMethod('rec','mf',this)">&#x1F9EE; Matrix Factorisation</button>
+    <button class="method-btn" onclick="switchMethod('rec','knn',this)">&#x1F4CD; K-Nearest Neighbours</button>
+  </div>
+
+  <!-- MF sub-panel -->
+  <div id="rec-mf" class="method-panel active">
+    <div class="row">
+      <div class="card">
+        <h3>Matrix Factorisation</h3>
+        <div class="info-box">Ratings matrix M (5 users &times; 6 dishes) decomposed as U&times;V. Known entries in <strong>bold</strong>; italic = predicted. Minimises &Vert;M&minus;UV&Vert;&sup2; + &lambda;&Vert;&middot;&Vert;&sup2; via alternating gradient descent.</div>
+        <div class="ctrl">
+          <span class="ctrl-label">Latent factors (l)
+            <i class="tip-icon">i<span class="tip-box">Shared dimension of U (n&times;l) and V (l&times;m). Each factor represents a hidden preference criterion (e.g. spiciness). More = expressive but slower.</span></i>
+          </span>
+          <input type="range" min="1" max="5" value="2" id="sl-l" oninput="updateRec()">
+          <span class="val" id="lv">2</span>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Regularisation &lambda;
+            <i class="tip-icon">i<span class="tip-box">Ridge penalty: &Vert;M&minus;UV&Vert;&sup2; + &lambda;&Vert;A&Vert;&sup2;. Prevents overfitting. Set to 0 to see the train/test gap widen.</span></i>
+          </span>
+          <input type="range" min="0" max="50" value="10" id="sl-lam" oninput="updateRec()">
+          <span class="val" id="lamv">0.10</span>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Training epochs
+            <i class="tip-icon">i<span class="tip-box">Passes over the known ratings. Watch the test curve: when it rises while train loss falls, overfitting has begun.</span></i>
+          </span>
+          <input type="range" min="10" max="300" value="80" id="sl-ep" oninput="updateRec()">
+          <span class="val" id="epv">80</span>
+        </div>
+        <button class="run-btn" onclick="buildRatingTable()" style="margin-top:4px">Retrain model</button>
+        <div class="matrix-wrap"><table id="rating-table"></table></div>
+        <div class="glossary">
+          <button class="glossary-toggle" onclick="toggleGlossary(this)">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Glossary &mdash; Matrix Factorisation
+          </button>
+          <div class="glossary-body"><dl>
+            <div class="gterm"><dt><span class="gtag">M</span> Rating matrix</dt><dd>n&times;m matrix where M<sub>i,j</sub> is user i&rsquo;s rating (1&ndash;5) for dish j. Missing entries are predicted.</dd></div>
+            <div class="gterm"><dt><span class="gtag">U, V</span> Factor matrices</dt><dd>M &asymp; U&times;V. U (n&times;l) encodes user tastes; V (l&times;m) encodes dish characteristics in l hidden dimensions.</dd></div>
+            <div class="gterm"><dt><span class="gtag">&lambda;</span> Ridge penalty</dt><dd>Shrinks U,V coefficients. Reduces overfitting so predictions generalise to unseen pairs.</dd></div>
+            <div class="gterm"><dt>Anti-waste boost</dt><dd>High-stock dishes get +0.3 score bonus during ranking to steer demand toward items at waste risk.</dd></div>
+          </dl></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Training loss</h3>
+        <div class="chart-wrap" style="height:155px"><canvas id="loss-chart" role="img" aria-label="Train vs test MSE loss">Loss curves.</canvas></div>
+        <div class="section-title">Recommendations for user</div>
+        <select id="user-sel" onchange="updateRecList()" style="margin-bottom:7px">
+          <option value="0">Alice</option><option value="1">Bob</option>
+          <option value="2">Carol</option><option value="3">David</option><option value="4">Eve</option>
+        </select>
+        <div class="rec-list" id="rec-list"></div>
+        <div class="info-box" style="margin-top:8px;margin-bottom:0">Green badge = high stock. These dishes are ranked up by the anti-waste boost, linking recommendation to the MDP pricing module.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KNN sub-panel -->
+  <div id="rec-knn" class="method-panel">
+    <div class="row">
+      <div class="card">
+        <h3>K-Nearest Neighbours (item-based)</h3>
+        <div class="info-box">For each (user, dish) pair, find the K most similar <em>dishes</em> (by cosine similarity) that the user has already rated. Predicted rating = weighted average of those neighbour ratings.</div>
+        <div class="ctrl">
+          <span class="ctrl-label">Neighbours K
+            <i class="tip-icon">i<span class="tip-box">Number of nearest-neighbour items used to form the prediction. Small K = more local (precise but noisy); large K = smoother but may include dissimilar items. For very sparse matrices, K must not exceed the number of rated neighbours.</span></i>
+          </span>
+          <input type="range" min="1" max="5" value="2" id="sl-k" oninput="updateKNN()">
+          <span class="val" id="kv">2</span>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Predict for user
+            <i class="tip-icon">i<span class="tip-box">The user whose unrated dishes we want to predict. The KNN looks at items this user HAS rated to find similar dishes.</span></i>
+          </span>
+          <select id="knn-user" onchange="updateKNN()" style="flex:1">
+            <option value="0">Alice</option><option value="1">Bob</option>
+            <option value="2">Carol</option><option value="3">David</option><option value="4">Eve</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Target dish
+            <i class="tip-icon">i<span class="tip-box">The dish we want to predict the rating for. Must be unrated by the selected user. The algorithm finds K dishes most similar to this one that the user has already rated.</span></i>
+          </span>
+          <select id="knn-item" onchange="updateKNN()" style="flex:1">
+          </select>
+        </div>
+        <div class="section-title">Item similarity matrix (cosine)</div>
+        <div id="sim-matrix" style="overflow-x:auto;margin-top:4px"></div>
+        <div class="glossary">
+          <button class="glossary-toggle" onclick="toggleGlossary(this)">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Glossary &mdash; KNN
+          </button>
+          <div class="glossary-body"><dl>
+            <div class="gterm"><dt>Cosine similarity</dt><dd>D(A,B) = &langle;A,B&rangle; / (&Vert;A&Vert;&Vert;B&Vert;). Measures the angle between two item rating vectors. 1 = identical preference pattern, 0 = orthogonal, &minus;1 = opposite.</dd></div>
+            <div class="gterm"><dt>Sparsity challenge</dt><dd>If the matrix is 93% empty (as in the Kaggle dataset), many user-item pairs share no common raters, making similarity 0. K must be increased, but distant neighbours degrade quality.</dd></div>
+            <div class="gterm"><dt>Item-based vs user-based</dt><dd>Item-based KNN (used here) is more stable than user-based because item-item similarities change less frequently than user-user similarities.</dd></div>
+          </dl></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Prediction breakdown</h3>
+        <div id="knn-result-box" class="info-box">Select a user and unrated dish to see the prediction.</div>
+        <div class="section-title">K nearest neighbours used</div>
+        <div id="knn-neighbors"></div>
+        <div class="section-title">Full predicted matrix (KNN)</div>
+        <div class="matrix-wrap"><table id="knn-matrix"></table></div>
+        <div class="compare-row" id="knn-compare"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 2: MDP ═══════════ -->
+<div id="panel-mdp" class="panel">
+
+  <div class="row">
+    <div class="card">
+      <h3>MDP State space</h3>
+      <div class="info-box">States: (stock c, time t). Action: set price p. Bellman backward induction computes V*(s). V(c&gt;0, t<sub>max</sub>)=&minus;&infin; penalises unsold stock.</div>
+      <div class="ctrl">
+        <span class="ctrl-label">Max stock
+          <i class="tip-icon">i<span class="tip-box">Portions prepared per evening. Defines the vertical axis of S = {(c,t)}.</span></i>
+        </span>
+        <input type="range" min="4" max="20" value="10" id="sl-stock" oninput="solveMDP()">
+        <span class="val" id="stockv">10</span>
+      </div>
+      <div class="ctrl">
+        <span class="ctrl-label">Demand sensitivity &alpha;
+          <i class="tip-icon">i<span class="tip-box">Demand prob = exp(&minus;&alpha;&times;p_norm). Higher = more price-sensitive customers.</span></i>
+        </span>
+        <input type="range" min="1" max="10" value="4" id="sl-alpha" oninput="solveMDP()">
+        <span class="val" id="alphav">0.4</span>
+      </div>
+      <div class="ctrl">
+        <span class="ctrl-label">Base demand N
+          <i class="tip-icon">i<span class="tip-box">Scale of the demand function: D(p,t)&thinsp;=&thinsp;N&thinsp;&times;&thinsp;exp(&minus;&alpha;&sdot;p<sub>norm</sub>)&thinsp;&times;&thinsp;time_factor. Sets the y-axis of the demand chart and expected orders per slot. Match with the N in the Demand Estimation tab for a consistent scenario.</span></i>
+        </span>
+        <input type="range" min="0.5" max="20" value="10.0" step="0.5" id="sl-N" oninput="solveMDP()">
+        <span class="val" id="Nv">10.0</span>
+      </div>
+      <div class="ctrl">
+        <span class="ctrl-label">Price steps N
+          <i class="tip-icon">i<span class="tip-box">Discrete action space size. More steps = finer price control, larger policy table.</span></i>
+        </span>
+        <input type="range" min="3" max="7" value="5" id="sl-pn" oninput="solveMDP()">
+        <span class="val" id="pnv">5</span>
+      </div>
+      <div class="ctrl">
+        <span class="ctrl-label">Time slots (&times;10 min)
+          <i class="tip-icon">i<span class="tip-box">Number of 10-minute decision steps. Set to 24 = full 4-hour evening service (20:00&ndash;24:00). Defines the horizontal axis of the state space.</span></i>
+        </span>
+        <input type="range" min="4" max="24" value="24" step="1" min="4" max="24" value="24" step="1" id="sl-tw" oninput="solveMDP()">
+        <span class="val" id="twv">24</span>
+      </div>
+      <div class="section-title">Optimal policy &pi;*(stock, time)</div>
+      <div class="policy-grid" id="policy-grid"></div>
+      <div class="legend" id="policy-legend"></div>
+    </div>
+    <div class="card">
+      <h3>Value function V*(s)</h3>
+      <div class="chart-wrap" style="height:195px"><canvas id="value-chart" role="img" aria-label="V* per initial stock level">Value function.</canvas></div>
+      <div class="section-title">Simulated evening service</div>
+      <div class="ctrl">
+        <span class="ctrl-label">Starting stock
+          <i class="tip-icon">i<span class="tip-box">Initial c&#8320; at t=0. MDP follows &pi;* with random demand realisations.</span></i>
+        </span>
+        <input type="range" min="1" max="20" value="8" id="sl-init-stock" oninput="runMDPSim()">
+        <span class="val" id="initstockv">8</span>
+      </div>
+      <div class="row3" style="margin-top:7px">
+        <div class="metric-card"><div class="metric-label">Revenue</div><div class="metric-value" id="mdp-rev">&mdash;</div></div>
+        <div class="metric-card"><div class="metric-label">Unsold</div><div class="metric-value" id="mdp-waste">&mdash;</div></div>
+        <div class="metric-card"><div class="metric-label">Avg price</div><div class="metric-value" id="mdp-avgp">&mdash;</div></div>
+      </div>
+      <div class="log-box" id="mdp-log">Run simulation to see pricing decisions&hellip;</div>
+    </div>
+  </div>
+  
+  <div class="row" style="margin-bottom:12px">
+    <div class="card">
+      <h3>State space S</h3>
+      <div class="info-box" style="margin-bottom:8px">A state <strong>s=(c,&thinsp;t)</strong>: <em>c</em>&thinsp;=&thinsp;stock remaining, <em>t</em>&thinsp;=&thinsp;current slot. The MDP finds the optimal price for every possible (c,&thinsp;t) pair.</div>
+      <div id="mdp-state-info" style="font-size:12px"></div>
+      <div class="section-title" style="margin-top:10px">Action space A &mdash; available prices</div>
+      <div id="mdp-action-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px"></div>
+      <div class="section-title" style="margin-top:10px">Terminal reward</div>
+      <div style="font-size:12px;color:var(--txt2);line-height:1.8;margin-bottom:6px">
+        <span style="color:var(--txt);font-weight:500">V(0,&thinsp;T)&thinsp;=&thinsp;0</span> &mdash; all sold, no waste<br>
+        <span id="terminal-label-mdp" style="color:#A32D2D;font-weight:500">V(c&gt;0,&thinsp;T)&thinsp;=&thinsp;&minus;&infin;</span> &mdash; unsold stock, penalised
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--txt2);user-select:none">
+        <input type="checkbox" id="chk-waste-penalty-mdp" checked
+          onchange="updateWastePenaltyLabel('mdp');solveMDP()"
+          style="width:14px;height:14px;accent-color:#A32D2D;cursor:pointer">
+        <span>Enforce V(c&gt;0,&thinsp;T)&thinsp;=&thinsp;&minus;&infin; &nbsp;<span style="color:var(--txt3);font-size:11px">(uncheck = V(c&gt;0,T)=0, no penalty)</span></span>
+      </label>
+      <div class="info-box" style="margin-top:8px;margin-bottom:0;font-size:11px">
+        <strong>Why waste still occurs:</strong> even with this constraint, waste is unavoidable when &Sigma;<sub>t</sub>&thinsp;D(p<sub>min</sub>,t)&thinsp;&lt;&thinsp;stock &mdash; no price can generate demand that doesn&apos;t exist. Uncheck to compare the policy without the anti-waste penalty.
+      </div>
+    </div>
+    <div class="card">
+      <h3>Demand D(p,&thinsp;t) &mdash; assumed ground truth</h3>
+      <div class="info-box">D(p,t)&thinsp;=&thinsp;N&thinsp;&times;&thinsp;exp(&minus;&alpha;&sdot;p<sub>norm</sub>)&thinsp;&times;&thinsp;(0.3&thinsp;+&thinsp;0.7&sdot;sin(&pi;t/T)). The MDP plans with this exact formula. In practice it must be estimated &mdash; see the Full Simulation tab.</div>
+      <div class="chart-wrap" style="height:210px">
+        <canvas id="mdp-demand-chart" role="img" aria-label="Ground truth demand D(p,t) for each price action across time slots">Demand chart.</canvas>
+      </div>
+    </div>
+  </div>
+
+  
+</div>
+
+<!-- ═══════════ TAB 3: DEMAND ═══════════ -->
+<div id="panel-demand" class="panel">
+
+  <!-- TRUE DEMAND CONFIG -->
+  <div class="card" style="margin-bottom:12px" id="tdp-card">
+    <h3>True demand parameters
+      <span style="font-size:12px;font-weight:400;color:var(--txt3);margin-left:8px">D*(price, slot, day) &mdash; the actual customer behaviour all models try to estimate</span>
+    </h3>
+    <div class="info-box" style="margin-bottom:10px">These sliders define the ground truth. Each demand model below tries to estimate it from data. The gap between model estimate and true demand is the estimation error shown in every chart.</div>
+    <div class="tdp-grid">
+      <div class="tdp-ctrl">
+        <label>Base demand N
+          <i class="tip-icon">i<span class="tip-box">Average orders per 10-min slot at median price and neutral conditions. Sets the scale of the demand function.</span></i>
+        </label>
+        <input type="range" min="1" max="20" value="10" step="0.5" id="tdp-N" oninput="updateTDP()">
+        <span class="val" id="tdp-Nv">10</span>
+      </div>
+      <div class="tdp-ctrl">
+        <label>Price elasticity &alpha;
+          <i class="tip-icon">i<span class="tip-box">Controls how fast D* falls with price: D* &prop; exp(&minus;&alpha;&times;p_norm). Higher = more price-sensitive. The MDP needs a good estimate of this to price correctly.</span></i>
+        </label>
+        <input type="range" min="1" max="30" value="12" id="tdp-alpha" oninput="updateTDP()">
+        <span class="val" id="tdp-alphav">1.2</span>
+      </div>
+      <div class="tdp-ctrl">
+        <label>Evening peak amp.
+          <i class="tip-icon">i<span class="tip-box">Amplitude of the sinusoidal time-of-day pattern. 0 = flat demand all evening; 1 = strong peak at mid-evening (~22:00).</span></i>
+        </label>
+        <input type="range" min="0" max="100" value="70" id="tdp-peak" oninput="updateTDP()">
+        <span class="val" id="tdp-peakv">0.70</span>
+      </div>
+      <div class="tdp-ctrl">
+        <label>Month-end boost
+          <i class="tip-icon">i<span class="tip-box">Payday effect: demand is this % higher in the last week of the month (days 25&ndash;30). Mid-month sees a symmetric reduction. Reflects real purchasing power cycles.</span></i>
+        </label>
+        <input type="range" min="0" max="50" value="15" id="tdp-monthend" oninput="updateTDP()">
+        <span class="val" id="tdp-monthendv">15%</span>
+      </div>
+      <div class="tdp-ctrl">
+        <label>Demand noise &sigma;
+          <i class="tip-icon">i<span class="tip-box">Stochastic variability as % of mean demand. 0 = deterministic. In the full simulation, actual sales are sampled from D* + noise. Models estimate the mean, not the noise.</span></i>
+        </label>
+        <input type="range" min="0" max="40" value="15" id="tdp-noise" oninput="updateTDP()">
+        <span class="val" id="tdp-noisev">15%</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="run-btn" onclick="updateAllDemandMethods()" style="font-size:12px;padding:5px 12px">Update all models</button>
+      </div>
+    </div>
+    <div class="section-title">True demand preview &mdash; D*(price tier, time slot) on day 15</div>
+    <div class="chart-wrap" style="height:130px"><canvas id="tdp-preview" role="img" aria-label="True demand preview across price tiers and time slots">True demand preview.</canvas></div>
+  </div>
+
+  <div class="method-bar">
+    <button class="method-btn active" onclick="switchMethod('demand','linear',this)">&#x1F4C8; Linear Regression</button>
+    <button class="method-btn" onclick="switchMethod('demand','logistic',this)">&#x1F4CA; Logistic Regression</button>
+    <button class="method-btn" onclick="switchMethod('demand','nn',this)">&#x1F9E0; Neural Network</button>
+    <button class="method-btn" onclick="switchMethod('demand','lstm',this)">&#x23F3; LSTM</button>
+  </div>
+
+  <!-- LINEAR -->
+  <div id="demand-linear" class="method-panel active">
+    <div class="row">
+      <div class="card">
+        <h3>Linear Regression</h3>
+        <div class="info-box">Demand ~ &beta;&#8320; + &beta;&#8321;&times;price + &beta;&#8322;&times;day_type + &beta;&#8323;&times;period. Dummy variables encode each category. Interprets aggregate demand drivers.</div>
+        <div class="ctrl">
+          <span class="ctrl-label">Price tier
+            <i class="tip-icon">i<span class="tip-box">Each price tier is a dummy variable with its own coefficient. Higher price &rarr; more negative coefficient &rarr; lower predicted demand.</span></i>
+          </span>
+          <input type="range" min="1" max="5" step="1" value="2" id="lin-price" oninput="updateLinear()">
+          <span class="val" id="lin-pricev">Low</span>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Day of month
+            <i class="tip-icon">i<span class="tip-box">Three day-type dummies: start (3&ndash;9), mid (10&ndash;24), end (25&ndash;30). End-of-month has positive coefficient (payday effect).</span></i>
+          </span>
+          <input type="range" min="1" max="30" value="10" id="lin-day" oninput="updateLinear()">
+          <span class="val" id="lin-dayv">10</span>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Time slot
+            <i class="tip-icon">i<span class="tip-box">Period dummies: early (0&ndash;5), mid (6&ndash;17), late (18&ndash;23). Late-evening has positive coefficient.</span></i>
+          </span>
+          <input type="range" min="0" max="23" value="7" id="lin-slot" oninput="updateLinear()">
+          <span class="val" id="lin-slotv">21:10</span>
+        </div>
+        <div class="row3" style="margin-top:8px">
+          <div class="metric-card"><div class="metric-label">Demand</div><div class="metric-value" id="lin-dem">&mdash;</div><div class="metric-sub">orders/slot</div></div>
+          <div class="metric-card"><div class="metric-label">Revenue</div><div class="metric-value" id="lin-rev">&mdash;</div><div class="metric-sub">&euro;/slot</div></div>
+          <div class="metric-card"><div class="metric-label">Elasticity</div><div class="metric-value" id="lin-elast">&mdash;</div><div class="metric-sub">&part;D/&part;p</div></div>
+        </div>
+        <div class="glossary">
+          <button class="glossary-toggle" onclick="toggleGlossary(this)">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Glossary &mdash; Linear Regression
+          </button>
+          <div class="glossary-body"><dl>
+            <div class="gterm"><dt>Dummy variables</dt><dd>Binary (0/1) indicators for categorical features (price tier, day type, period). Allows the linear model to capture non-continuous category effects.</dd></div>
+            <div class="gterm"><dt>Price elasticity</dt><dd>&part;D/&part;p: % demand change per price tier increase. Always negative. Guides MDP reward shaping.</dd></div>
+            <div class="gterm"><dt>R&sup2;</dt><dd>Proportion of variance explained. Linear model captures main effects but misses interactions between price, time, and day.</dd></div>
+          </dl></div>
+        </div>
+      </div>
+      <div class="card">
+        <div id="lin-rmse" style="margin-bottom:8px;display:flex;gap:6px;flex-wrap:wrap"></div>
+        <h3>Demand curve D(price)</h3>
+        <div class="chart-wrap" style="height:160px"><canvas id="lin-curve" role="img" aria-label="Demand vs price tier">Demand curve.</canvas></div>
+        <h3 style="margin-top:12px">Regression coefficients</h3>
+        <div class="chart-wrap" style="height:155px"><canvas id="lin-coef" role="img" aria-label="Regression coefficients">Coefficients.</canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGISTIC -->
+  <div id="demand-logistic" class="method-panel">
+    <div class="row">
+      <div class="card">
+        <h3>Logistic Regression</h3>
+        <div class="info-box">Models P(user buys dish) = &sigma;(&beta;&#8320; + &beta;&#8321;&times;price + &beta;&#8322;&times;rating + &beta;&#8323;&times;wealth). Output is purchase <em>probability</em> per user, enabling individual-level targeting.</div>
+        <div class="ctrl">
+          <span class="ctrl-label">Price tier
+            <i class="tip-icon">i<span class="tip-box">Higher price shifts the logit downward via the price coefficient (&beta;&#8321; &lt; 0), reducing P(buy) for all user classes.</span></i>
+          </span>
+          <input type="range" min="1" max="5" step="1" value="2" id="log-price" oninput="updateLogistic()">
+          <span class="val" id="log-pricev">Low</span>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Predicted rating
+            <i class="tip-icon">i<span class="tip-box">Rating from the recommendation engine. Positively correlated with P(buy). This is the key link: better recommendation &rarr; higher purchase probability &rarr; better demand estimate for the MDP.</span></i>
+          </span>
+          <input type="range" min="1" max="5" step="1" value="4" id="log-rating" oninput="updateLogistic()">
+          <span class="val" id="log-ratingv">4</span>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Day type
+            <i class="tip-icon">i<span class="tip-box">Day-type shifts the baseline logit. End-of-month = +0.5 (payday effect); mid-month = &minus;0.3.</span></i>
+          </span>
+          <select id="log-day" onchange="updateLogistic()" style="flex:1">
+            <option value="start">Start of month (3&ndash;9)</option>
+            <option value="mid" selected>Mid-month (10&ndash;24)</option>
+            <option value="end">End of month (25&ndash;30)</option>
+          </select>
+        </div>
+        <div class="row3" style="margin-top:8px">
+          <div class="metric-card"><div class="metric-label">P(buy) &mdash; Rich</div><div class="metric-value" id="log-rich">&mdash;</div></div>
+          <div class="metric-card"><div class="metric-label">P(buy) &mdash; Mid</div><div class="metric-value" id="log-mid">&mdash;</div></div>
+          <div class="metric-card"><div class="metric-label">P(buy) &mdash; Poor</div><div class="metric-value" id="log-poor">&mdash;</div></div>
+        </div>
+        <div class="glossary">
+          <button class="glossary-toggle" onclick="toggleGlossary(this)">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Glossary &mdash; Logistic Regression
+          </button>
+          <div class="glossary-body"><dl>
+            <div class="gterm"><dt>Sigmoid &sigma;(z)</dt><dd>&sigma;(z)=1/(1+e<sup>&minus;z</sup>). Maps the linear combination (logit) to a probability in (0,1). The S-shaped curve shows that extreme logit values give near-0 or near-1 probabilities.</dd></div>
+            <div class="gterm"><dt>Logit</dt><dd>z = &beta;&#8320; + &beta;&#8321;p + &beta;&#8322;r + &beta;&#8323;class. The raw linear combination before the sigmoid. Positive = likely to buy.</dd></div>
+            <div class="gterm"><dt>Wealth class effect</dt><dd>Rich users have higher propension &agrave; payer: their class coefficient (&beta;&#8323;=+0.48) raises P(buy). Poor class coefficient = &minus;0.59, mid = 0 (reference).</dd></div>
+            <div class="gterm"><dt>Link to recommendation</dt><dd>The predicted rating from the MF/KNN model enters directly as &beta;&#8322;&times;rating. Better recommendations &rarr; higher purchase probability &rarr; more accurate demand estimate.</dd></div>
+          </dl></div>
+        </div>
+      </div>
+      <div class="card">
+        <div id="log-rmse" style="margin-bottom:8px;display:flex;gap:6px;flex-wrap:wrap"></div>
+        <h3>P(buy) vs price &mdash; by wealth class</h3>
+        <div class="chart-wrap" style="height:195px"><canvas id="log-curve" role="img" aria-label="Purchase probability vs price by wealth class">Logistic curves.</canvas></div>
+        <h3 style="margin-top:12px">Sigmoid function &sigma;(logit)</h3>
+        <div class="chart-wrap" style="height:155px"><canvas id="log-sigmoid" role="img" aria-label="Sigmoid activation curve">Sigmoid curve.</canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEURAL NETWORK -->
+  <div id="demand-nn" class="method-panel">
+    <div class="row">
+      <div class="card">
+        <h3>Neural Network (2 hidden layers)</h3>
+        <div class="info-box">A 2-layer MLP with ReLU activations captures non-linear interactions between price, day, and period that the linear model misses. Inputs: 5 neurons (3 prices + day + period). Output: demand estimate.</div>
+        <div class="ctrl">
+          <span class="ctrl-label">Hidden units
+            <i class="tip-icon">i<span class="tip-box">Number of neurons per hidden layer. More = greater capacity to learn complex patterns, but slower convergence and more overfitting risk on small datasets.</span></i>
+          </span>
+          <input type="range" min="4" max="32" value="16" step="4" id="nn-units" oninput="updateNN()">
+          <span class="val" id="nn-unitsv">16</span>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Learning rate
+            <i class="tip-icon">i<span class="tip-box">Step size for gradient descent. Too high = oscillation; too low = slow convergence. Typical range: 0.001&ndash;0.01 for Adam, 0.01&ndash;0.1 for SGD.</span></i>
+          </span>
+          <input type="range" min="1" max="20" value="5" id="nn-lr" oninput="updateNN()">
+          <span class="val" id="nn-lrv">0.005</span>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Training epochs
+            <i class="tip-icon">i<span class="tip-box">Number of passes over the simulated training set (&asymp;288&thinsp;000 data points in the full scenario). Early stopping when validation loss plateaus.</span></i>
+          </span>
+          <input type="range" min="10" max="100" value="50" id="nn-epochs" oninput="updateNN()">
+          <span class="val" id="nn-epochsv">50</span>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Price tier
+            <i class="tip-icon">i<span class="tip-box">Input to the trained network. Compare NN prediction with linear regression to see where they diverge (e.g. at high prices or extreme time slots).</span></i>
+          </span>
+          <input type="range" min="1" max="5" step="1" value="2" id="nn-price" oninput="updateNN()">
+          <span class="val" id="nn-pricev">Low</span>
+        </div>
+        <div class="row3" style="margin-top:8px">
+          <div class="metric-card"><div class="metric-label">NN demand</div><div class="metric-value" id="nn-dem">&mdash;</div></div>
+          <div class="metric-card"><div class="metric-label">Linear demand</div><div class="metric-value" id="nn-lin">&mdash;</div></div>
+          <div class="metric-card"><div class="metric-label">Difference</div><div class="metric-value" id="nn-diff">&mdash;</div></div>
+        </div>
+        <div class="glossary">
+          <button class="glossary-toggle" onclick="toggleGlossary(this)">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Glossary &mdash; Neural Network
+          </button>
+          <div class="glossary-body"><dl>
+            <div class="gterm"><dt>ReLU activation</dt><dd>f(x) = max(0,x). Null for negative inputs, linear for positive. Introduces non-linearity while remaining computationally cheap. Used in both hidden layers.</dd></div>
+            <div class="gterm"><dt>Backpropagation</dt><dd>Gradient of the loss w.r.t. all weights computed via chain rule, then weights updated by gradient descent. Keras minimises cross-entropy loss for classification or MSE for regression.</dd></div>
+            <div class="gterm"><dt>Universal approximation</dt><dd>A 2-layer network with enough neurons can approximate any continuous function. Here it captures the price&times;time interaction that eludes the linear model.</dd></div>
+          </dl></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Training loss curves</h3>
+        <div class="chart-wrap" style="height:175px"><canvas id="nn-loss" role="img" aria-label="NN training and validation loss">NN loss.</canvas></div>
+        <h3 style="margin-top:12px">NN vs Linear &mdash; demand across price tiers</h3>
+        <div class="chart-wrap" style="height:155px"><canvas id="nn-compare" role="img" aria-label="NN vs linear demand predictions">NN vs linear.</canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LSTM -->
+  <div id="demand-lstm" class="method-panel">
+    <div class="row">
+      <div class="card">
+        <h3>LSTM (Long Short-Term Memory)</h3>
+        <div class="info-box">Uses the sequence D(t&minus;T), &hellip;, D(t&minus;1) to predict D(t). The cell state acts as long-term memory (e.g. remembering that Fridays are busier), while the hidden state carries short-term patterns.</div>
+        <div class="ctrl">
+          <span class="ctrl-label">Lookback window T
+            <i class="tip-icon">i<span class="tip-box">Number of past time slots used as input sequence. T=3 means the LSTM sees the last 30 minutes of demand before predicting the next 10-minute slot. Larger T captures longer dependencies.</span></i>
+          </span>
+          <input type="range" min="1" max="8" value="3" id="lstm-T" oninput="updateLSTM()">
+          <span class="val" id="lstm-Tv">3</span>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Hidden units
+            <i class="tip-icon">i<span class="tip-box">Dimension of the hidden state h<sub>t</sub> and cell state c<sub>t</sub>. More units = richer memory but more parameters and slower training.</span></i>
+          </span>
+          <input type="range" min="4" max="64" value="16" step="4" id="lstm-units" oninput="updateLSTM()">
+          <span class="val" id="lstm-unitsv">16</span>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Day of month
+            <i class="tip-icon">i<span class="tip-box">Day type changes the baseline demand level. The LSTM learns this temporal pattern across the training set and applies it as a seasonal correction.</span></i>
+          </span>
+          <input type="range" min="1" max="30" value="10" id="lstm-day" oninput="updateLSTM()">
+          <span class="val" id="lstm-dayv">10</span>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">Price tier
+            <i class="tip-icon">i<span class="tip-box">Price is an exogenous input fed into the LSTM at each time step alongside the lagged demand values.</span></i>
+          </span>
+          <input type="range" min="1" max="5" step="1" value="2" id="lstm-price" oninput="updateLSTM()">
+          <span class="val" id="lstm-pricev">Low</span>
+        </div>
+        <div class="section-title">Hidden state h<sub>t</sub> magnitude over evening</div>
+        <div class="hs-bar-wrap" id="hs-bars"></div>
+        <div class="sigmoid-label" id="hs-label">Cell memory activity across 24 time slots</div>
+        <div class="glossary">
+          <button class="glossary-toggle" onclick="toggleGlossary(this)">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Glossary &mdash; LSTM
+          </button>
+          <div class="glossary-body"><dl>
+            <div class="gterm"><dt>Cell state c<sub>t</sub></dt><dd>Long-term memory. Updated by the forget gate (what to erase) and input gate (what to write). Can carry information across many time steps without vanishing gradients.</dd></div>
+            <div class="gterm"><dt>Hidden state h<sub>t</sub></dt><dd>Short-term output at each step. Filtered version of c<sub>t</sub> through the output gate. Used as the prediction basis for the next time slot.</dd></div>
+            <div class="gterm"><dt>Forget gate f<sub>t</sub></dt><dd>&sigma;(W<sub>f</sub>[h<sub>t&minus;1</sub>, x<sub>t</sub>] + b<sub>f</sub>). Decides what fraction of c<sub>t&minus;1</sub> to keep. Near 0 = forget; near 1 = keep.</dd></div>
+            <div class="gterm"><dt>Advantage over linear</dt><dd>LSTM captures auto-correlation in demand (busy slot tends to predict next busy slot) and distributional shift across the evening without manual feature engineering.</dd></div>
+          </dl></div>
+        </div>
+      </div>
+      <div class="card">
+        <div id="lstm-rmse" style="margin-bottom:8px;display:flex;gap:6px;flex-wrap:wrap"></div>
+        <h3>Demand prediction across evening</h3>
+        <div class="chart-wrap" style="height:195px"><canvas id="lstm-chart" role="img" aria-label="LSTM vs ground truth demand per time slot">LSTM demand.</canvas></div>
+        <h3 style="margin-top:12px">LSTM vs Linear &mdash; cumulative error</h3>
+        <div class="chart-wrap" style="height:155px"><canvas id="lstm-error" role="img" aria-label="Cumulative MAE comparison">Cumulative error.</canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 4: FULL SIM ═══════════ -->
+<div id="panel-sim" class="panel">
+  <div class="row">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <h3 style="margin-bottom:0">Platform simulation</h3>
+        <button class="run-btn" onclick="applyPreset()" style="font-size:11px;padding:4px 11px;color:var(--accent);border-color:var(--accent)">&#x2B07; Load reference preset</button>
+      </div>
+      <div class="info-box" style="margin-bottom:8px">Actual sales are driven by <strong>true demand D*</strong>. The demand model estimates D* for pricing decisions. <strong>Waste is unavoidable</strong> when &Sigma;<sub>t</sub>&thinsp;D*(p<sub>min</sub>,t)&thinsp;&lt;&thinsp;stock &mdash; no price generates demand that doesn&apos;t exist.</div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--txt2);user-select:none;margin-bottom:10px">
+        <input type="checkbox" id="chk-waste-penalty-sim" checked
+          onchange="updateWastePenaltyLabel('sim')"
+          style="width:14px;height:14px;accent-color:#A32D2D;cursor:pointer">
+        <span>Enforce V(c&gt;0,&thinsp;T)&thinsp;=&thinsp;&minus;&infin; in MDP &nbsp;<span style="color:var(--txt3);font-size:11px">(uncheck = no waste penalty)</span></span>
+      </label>
+      <div class="ctrl">
+        <span class="ctrl-label">Days
+          <i class="tip-icon">i<span class="tip-box">Consecutive evenings. Each day resets stock, runs 24 slots, logs revenue and waste.</span></i>
+        </span>
+        <input type="range" min="1" max="30" value="7" id="sl-days"
+          oninput="document.getElementById('daysv').textContent=this.value">
+        <span class="val" id="daysv">7</span>
+      </div>
+      <div class="ctrl">
+        <span class="ctrl-label">Initial stock/dish
+          <i class="tip-icon">i<span class="tip-box">Portions per dish per evening. Unsold at midnight = waste.</span></i>
+        </span>
+        <input type="range" min="5" max="30" value="20" id="sl-istock"
+          oninput="document.getElementById('istockv').textContent=this.value">
+        <span class="val" id="istockv">20</span>
+      </div>
+      <div class="ctrl">
+        <span class="ctrl-label">Rec anti-waste weight
+          <i class="tip-icon">i<span class="tip-box">0% = pure score ranking; 100% = heavy stock-clearing boost. Tune to balance satisfaction vs waste.</span></i>
+        </span>
+        <input type="range" min="0" max="100" value="40" id="sl-recw"
+          oninput="document.getElementById('recwv').textContent=this.value+'%'">
+        <span class="val" id="recwv">40%</span>
+      </div>
+      <div class="ctrl">
+        <span class="ctrl-label">Pricing strategy
+          <i class="tip-icon">i<span class="tip-box">MDP: uses Bellman &pi;*. Fixed: constant &euro;12. Random: random each slot. Compare to quantify MDP improvement.</span></i>
+        </span>
+        <select id="pricing-mode">
+          <option value="mdp">MDP dynamic</option>
+          <option value="fixed">Fixed price</option>
+          <option value="random">Random price</option>
+        </select>
+      </div>
+      <div class="ctrl">
+        <span class="ctrl-label">Demand model
+          <i class="tip-icon">i<span class="tip-box">Which demand model drives the simulation. NN and LSTM capture non-linear patterns and may produce different revenue/waste trade-offs compared to the linear model.</span></i>
+        </span>
+        <select id="demand-model-mode">
+          <option value="linear">Linear Regression</option>
+          <option value="logistic">Logistic Regression</option>
+          <option value="nn">Neural Network</option>
+          <option value="lstm">LSTM</option>
+        </select>
+      </div>
+      <button class="run-btn" onclick="startFullSim()" style="margin-top:8px">Run simulation</button>
+      <div class="chart-wrap" style="height:175px;margin-top:12px">
+        <canvas id="sim-rev-chart" role="img" aria-label="Daily revenue over simulation">Revenue chart.</canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Results</h3>
+      <div class="row3">
+        <div class="metric-card"><div class="metric-label">Total revenue</div><div class="metric-value" id="sim-total-rev">&mdash;</div></div>
+        <div class="metric-card"><div class="metric-label">Waste %</div><div class="metric-value" id="sim-waste-pct">&mdash;</div></div>
+        <div class="metric-card"><div class="metric-label">Avg satisfaction</div><div class="metric-value" id="sim-sat">&mdash;</div></div>
+      </div>
+      <div class="section-title">Final stock per dish</div>
+      <div id="stock-bars"></div>
+      <div class="section-title">Event log</div>
+      <div class="log-box" id="sim-log">Press &ldquo;Run simulation&rdquo; to start&hellip;</div>
+    </div>
+  </div>
+  <!-- DAY 1 TRACE CARD -->
+  <div id="trace-card" class="card" style="display:none;margin-top:0">
+    <h3 id="trace-title">Day 1 trace</h3>
+    <div style="margin-bottom:8px;display:flex;gap:6px;flex-wrap:wrap" id="trace-summary"></div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="trace-chart" role="img" aria-label="Day 1 simulation trace showing price, demand and stock">Trace chart.</canvas>
+    </div>
+    <div class="section-title" style="margin-top:10px">Per-slot detail (active slots)</div>
+    <div id="trace-table" style="overflow-x:auto;max-height:180px;overflow-y:auto;margin-top:4px"></div>
+  </div>
+
+</div>
+
+<!-- ═══════════ TAB 5: ABOUT ═══════════ -->
+<div id="panel-about" class="panel">
+  <div class="about-grid">
+    <div class="about-section">
+      <h3>Project overview</h3>
+      <p>PSC at &Eacute;cole Polytechnique, January 2020, supervised by Pascal Benchimol. Addresses food waste on delivery platforms by jointly optimising recommendations and dynamic pricing.</p>
+      <div class="author-row">
+        <span class="author-chip">Koffi Ismael Ouattara</span><span class="author-chip">Nicolas Huynh</span>
+        <span class="author-chip">Dan Berrebbi</span><span class="author-chip">Lionel Gako</span>
+        
+      </div>
+      <div style="margin-top:9px">
+        <span class="pill pill-blue">Machine Learning</span>
+        <span class="pill pill-teal">Operations Research</span>
+        <span class="pill pill-amber">Applied Maths</span>
+        <span class="pill pill-purple">Food Tech</span>
+      </div>
+    </div>
+    <div class="about-section">
+      <h3>Recommendation methods</h3>
+      <h4>Matrix Factorisation</h4>
+      <p>Decomposes M into U&times;V, minimising &Vert;M&minus;UV&Vert;&sup2; + &lambda;&Vert;&middot;&Vert;&sup2; via alternating gradient descent. Learns global latent structure.</p>
+      <div class="formula">min &Vert;M &minus; U&times;V&Vert;&sup2; + &lambda;(&Vert;U&Vert;&sup2; + &Vert;V&Vert;&sup2;)</div>
+      <h4>KNN (item-based)</h4>
+      <p>For (user u, item i): find K most similar items (cosine) that u has rated. Predicted = weighted average. Fast prediction but struggles with very sparse matrices (&gt;93% empty).</p>
+    </div>
+    <div class="about-section">
+      <h3>Demand estimation methods</h3>
+      <h4>Linear Regression</h4><p>Aggregate demand with dummy variables. Interpretable coefficients. Misses price&times;time interactions.</p>
+      <h4>Logistic Regression</h4><p>Individual P(buy) = &sigma;(&beta;&middot;x). Includes predicted rating &rarr; links to recommendation. Enables wealth-class targeting.</p>
+      <h4>Neural Network (MLP)</h4><p>2 hidden layers, ReLU. Captures non-linearities. Trained on 288K simulated observations. Compared with linear to show where non-linearity matters.</p>
+      <h4>LSTM</h4><p>Sequential model using past T demand observations to predict the next slot. Cell state retains evening-long patterns; hidden state drives per-slot predictions. Outperforms MLP on long-horizon temporal dependencies.</p>
+    </div>
+    <div class="about-section">
+      <h3>Dynamic Pricing (MDP)</h3>
+      <div class="formula">V&pi;(s) = &Sigma;<sub>s&prime;</sub>[R(s,&pi;(s),s&prime;) + V&pi;(s&prime;)]&times;T(s,&pi;(s),s&prime;)</div>
+      <p>Terminal: V(c&gt;0, t_max)=&minus;&infin;. Solved by backward induction. Policy: low price when stock is high and time is short; high price otherwise.</p>
+      <h4>Module coupling</h4>
+      <ul>
+        <li>Predicted rating &rarr; purchase probability (logistic)</li>
+        <li>Ranking position &rarr; demand amplification</li>
+        <li>High stock &rarr; recommendation boost</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ─── CONSTANTS ───────────────────────────────
+const DISHES=['Pizza','Sushi','Burger','Pasta','Ramen','Tacos'];
+const USERS=['Alice','Bob','Carol','David','Eve'];
+const STOCK=[18,5,12,3,20,8];
+const KNOWN=[[5,null,4,null,1,null],[null,4,null,5,null,2],[3,null,null,4,5,null],[null,2,5,null,null,4],[4,null,2,null,3,null]];
+const isDark=matchMedia('(prefers-color-scheme:dark)').matches;
+const C={blue:'#3B8ADD',amber:'#EF9F27',green:'#639922',teal:'#1D9E75',
+  red:'#E24B4A',purple:'#7F77DD',coral:'#D85A30',orange:'#D85A30',
+  txt:isDark?'#c2c0b6':'#3d3d3a',muted:isDark?'#73726c':'#9c9a92',
+  grid:isDark?'rgba(255,255,255,.06)':'rgba(0,0,0,.05)'};
+const CD={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+  scales:{x:{grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}},
+          y:{grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}}}};
+function mkChart(id,cfg){const el=document.getElementById(id);if(el._chart)el._chart.destroy();el._chart=new Chart(el,cfg);return el._chart;}
+function sig(x){return 1/(1+Math.exp(-x));}
+function relu(x){return Math.max(0,x);}
+
+// ─── UI HELPERS ──────────────────────────────
+function switchTab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active'); btn.classList.add('active');
+  if(id==='mdp'&&!mdpPolicy)solveMDP();
+  if(id==='demand')updateLinear();
+  if(id==='sim'&&!mdpPolicy)solveMDP();
+}
+function switchMethod(tab,method,btn){
+  const bar=btn.closest('.method-bar');
+  bar.querySelectorAll('.method-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const panel=btn.closest('.panel');
+  panel.querySelectorAll(':scope > .method-panel').forEach(p=>p.classList.remove('active'));
+  const target=document.getElementById(tab+'-'+method)||document.getElementById('demand-'+method);
+  if(target){target.classList.add('active');}
+  if(tab==='rec'&&method==='knn')updateKNN();
+  if(tab==='demand'){
+    if(method==='linear')updateLinear();
+    if(method==='logistic')updateLogistic();
+    if(method==='nn')updateNN();
+    if(method==='lstm')updateLSTM();
+  }
+}
+function toggleGlossary(btn){btn.classList.toggle('open');btn.nextElementSibling.classList.toggle('open');}
+
+// ═══════════════════════════════════════════════
+// 1A. MATRIX FACTORISATION
+// ═══════════════════════════════════════════════
+let predMatrix=null;
+function trainMF(known,L,lam,epochs){
+  const n=known.length,m=known[0].length; let U=[],V=[];
+  for(let i=0;i<n;i++)U.push(Array.from({length:L},()=>(Math.random()-.5)*.5));
+  for(let j=0;j<m;j++)V.push(Array.from({length:L},()=>(Math.random()-.5)*.5));
+  const lr=0.02,lamN=lam/100; const trainLoss=[],testLoss=[];
+  for(let ep=0;ep<epochs;ep++){
+    for(let i=0;i<n;i++)for(let j=0;j<m;j++){if(known[i][j]===null)continue;
+      let p=0;for(let k=0;k<L;k++)p+=U[i][k]*V[j][k]; const err=known[i][j]-p;
+      for(let k=0;k<L;k++){U[i][k]+=lr*(err*V[j][k]-lamN*U[i][k]);V[j][k]+=lr*(err*U[i][k]-lamN*V[j][k]);}}
+    if(ep%10===0||ep===epochs-1){
+      let tl=0,tc=0,vl=0,vc=0;
+      for(let i=0;i<n;i++)for(let j=0;j<m;j++){let p=0;for(let k=0;k<L;k++)p+=U[i][k]*V[j][k];p=Math.max(1,Math.min(5,p));
+        if(known[i][j]!==null){tl+=(known[i][j]-p)**2;tc++;}else{vl+=Math.abs(3.5-p);vc++;}}
+      trainLoss.push({x:ep,y:+(tc?tl/tc:0).toFixed(3)});testLoss.push({x:ep,y:+(vc?vl/vc:0).toFixed(3)});}}
+  const pred=[];
+  for(let i=0;i<n;i++){pred.push([]);for(let j=0;j<m;j++){let p=0;for(let k=0;k<L;k++)p+=U[i][k]*V[j][k];pred[i].push(+Math.max(1,Math.min(5,p)).toFixed(2));}}
+  return{pred,trainLoss,testLoss};
+}
+function heatBg(v,known){
+  const t=(v-1)/4;
+  if(known){if(t>.7)return isDark?'rgba(99,153,34,.25)':'rgba(99,153,34,.18)';if(t>.4)return'transparent';return isDark?'rgba(226,75,74,.25)':'rgba(226,75,74,.12)';}
+  if(t>.7)return isDark?'rgba(99,153,34,.12)':'rgba(99,153,34,.08)';if(t>.4)return'transparent';return isDark?'rgba(226,75,74,.12)':'rgba(226,75,74,.07)';}
+function buildRatingTable(){
+  const L=+document.getElementById('sl-l').value,lam=+document.getElementById('sl-lam').value,ep=+document.getElementById('sl-ep').value;
+  const res=trainMF(KNOWN,L,lam,ep); predMatrix=res.pred;
+  let h='<tr><th>User</th>';
+  DISHES.forEach((d,j)=>{const b=STOCK[j]>15?'badge-green':STOCK[j]>8?'badge-warn':'badge-red';h+=`<th>${d}<br><span class="badge ${b}">${STOCK[j]}</span></th>`;});h+='</tr>';
+  USERS.forEach((u,i)=>{h+=`<tr><td style="font-weight:500;text-align:left">${u}</td>`;
+    KNOWN[i].forEach((v,j)=>{const val=v!==null?v:predMatrix[i][j];const ik=v!==null;
+      const st='&#9733;'.repeat(Math.round(val))+'&#9734;'.repeat(5-Math.round(val));
+      h+=`<td class="${ik?'cell-known':'cell-pred'}" style="background:${heatBg(val,ik)}">${val.toFixed(ik?0:1)}<br><span style="font-size:10px;color:#EF9F27">${st}</span></td>`;});h+='</tr>';});
+  document.getElementById('rating-table').innerHTML=h;
+  mkChart('loss-chart',{type:'line',data:{datasets:[
+    {label:'Train',data:res.trainLoss,borderColor:C.blue,backgroundColor:C.blue+'22',tension:.4,pointRadius:0,borderWidth:2},
+    {label:'Test',data:res.testLoss,borderColor:C.coral,backgroundColor:C.coral+'22',tension:.4,pointRadius:0,borderWidth:1.5,borderDash:[4,4]}
+  ]},options:{...CD,plugins:{legend:{display:true,labels:{color:C.txt,font:{size:11},boxWidth:12}}},
+    scales:{x:{type:'linear',title:{display:true,text:'Epoch',color:C.muted,font:{size:11}},grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}},
+            y:{title:{display:true,text:'MSE',color:C.muted,font:{size:11}},grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}}}}});
+  updateRecList();
+}
+function updateRecList(){
+  const ui=+document.getElementById('user-sel').value; if(!predMatrix)return;
+  const scored=DISHES.map((d,j)=>({d,j,bs:predMatrix[ui][j],fs:predMatrix[ui][j]+(STOCK[j]/20)*.3,ik:KNOWN[ui][j]!==null,stock:STOCK[j]}))
+    .filter(x=>!x.ik).sort((a,b)=>b.fs-a.fs);
+  document.getElementById('rec-list').innerHTML=scored.map((x,idx)=>{
+    const st='&#9733;'.repeat(Math.round(x.bs))+'&#9734;'.repeat(5-Math.round(x.bs));
+    const b=x.stock>15?'badge-green':x.stock>8?'badge-warn':'badge-red';
+    return`<div class="rec-item"><span class="rec-rank">#${idx+1}</span><span class="rec-name">${x.d}</span><span class="stars" style="font-size:11px">${st}</span><span class="rec-score">${x.bs.toFixed(1)}</span><span class="badge ${b}">&#x1F4E6; ${x.stock}</span></div>`;}).join('');
+}
+function updateRec(){
+  document.getElementById('lv').textContent=document.getElementById('sl-l').value;
+  document.getElementById('lamv').textContent=(+document.getElementById('sl-lam').value/100).toFixed(2);
+  document.getElementById('epv').textContent=document.getElementById('sl-ep').value;
+  buildRatingTable();
+}
+
+// ═══════════════════════════════════════════════
+// 1B. KNN RECOMMENDATION
+// ═══════════════════════════════════════════════
+function computeSimMatrix(known){
+  const m=known[0].length,n=known.length;
+  const sims=Array.from({length:m},()=>new Array(m).fill(0));
+  for(let i=0;i<m;i++){sims[i][i]=1;for(let j=i+1;j<m;j++){
+    let dot=0,na=0,nb=0;
+    for(let u=0;u<n;u++){if(known[u][i]!==null&&known[u][j]!==null){dot+=known[u][i]*known[u][j];na+=known[u][i]**2;nb+=known[u][j]**2;}}
+    const s=(na>0&&nb>0)?dot/Math.sqrt(na*nb):0;sims[i][j]=s;sims[j][i]=s;}}
+  return sims;
+}
+function knnPredict(known,sims,ui,ji,K){
+  const m=known[0].length;
+  const neighbors=[];
+  for(let j=0;j<m;j++){if(j===ji||known[ui][j]===null)continue;neighbors.push({j,sim:sims[ji][j],rating:known[ui][j]});}
+  neighbors.sort((a,b)=>b.sim-a.sim);
+  const topK=neighbors.slice(0,K);
+  if(!topK.length)return{pred:3,neighbors:[]};
+  const sumAbs=topK.reduce((s,n)=>s+Math.abs(n.sim),0);
+  const pred=sumAbs>0?topK.reduce((s,n)=>s+Math.abs(n.sim)*n.rating,0)/sumAbs:topK.reduce((s,n)=>s+n.rating,0)/topK.length;
+  return{pred:+Math.max(1,Math.min(5,pred)).toFixed(2),neighbors:topK};
+}
+function buildKNNMatrix(sims,ui,K){
+  const m=DISHES.length,n=USERS.length;
+  const mat=[];
+  for(let i=0;i<n;i++){mat.push([]);for(let j=0;j<m;j++){
+    if(KNOWN[i][j]!==null){mat[i].push({v:KNOWN[i][j],known:true});}
+    else{const r=knnPredict(KNOWN,sims,i,j,K);mat[i].push({v:r.pred,known:false});}}}
+  return mat;
+}
+let knnSims=null;
+function updateKNN(){
+  const K=+document.getElementById('sl-k').value;
+  const ui=+document.getElementById('knn-user').value;
+  document.getElementById('kv').textContent=K;
+  if(!knnSims)knnSims=computeSimMatrix(KNOWN);
+  // Populate target dish selector with unrated dishes for this user
+  const itemSel=document.getElementById('knn-item');
+  const curVal=itemSel.value;
+  itemSel.innerHTML=DISHES.map((d,j)=>KNOWN[ui][j]===null?`<option value="${j}">${d}</option>`:'').join('');
+  if(itemSel.querySelector(`option[value="${curVal}"]`))itemSel.value=curVal;
+  const ji=+itemSel.value;
+  if(isNaN(ji))return;
+  // Similarity matrix viz
+  const simHTML=`<table style="font-size:11px;width:100%;border-collapse:collapse">
+    <tr><th style="background:var(--surface2);padding:4px;border:0.5px solid var(--border)"></th>
+    ${DISHES.map(d=>`<th style="background:var(--surface2);padding:4px 3px;border:0.5px solid var(--border);font-size:10px">${d.slice(0,4)}</th>`).join('')}</tr>
+    ${DISHES.map((d,i)=>`<tr><td style="background:var(--surface2);padding:4px;border:0.5px solid var(--border);font-weight:500;font-size:10px">${d.slice(0,4)}</td>
+      ${DISHES.map((_,j)=>{const s=knnSims[i][j];const v=Math.round(s*100)/100;
+        const col=s>0.7?isDark?'rgba(99,153,34,.35)':'rgba(99,153,34,.25)':s>0.3?isDark?'rgba(63,132,173,.25)':'rgba(63,132,173,.15)':i===j?isDark?'rgba(255,255,255,.08)':'rgba(0,0,0,.06)':'transparent';
+        const isTgt=(i===ji||j===ji)&&i!==j;
+        return`<td style="padding:4px 3px;border:0.5px solid var(--border);background:${col};${isTgt?'outline:2px solid '+C.amber+';':''}font-weight:${i===j?600:400}">${v.toFixed(2)}</td>`;}).join('')}</tr>`).join('')}
+  </table>`;
+  document.getElementById('sim-matrix').innerHTML=simHTML;
+  // Prediction
+  const result=knnPredict(KNOWN,knnSims,ui,ji,K);
+  const stars='&#9733;'.repeat(Math.round(result.pred))+'&#9734;'.repeat(5-Math.round(result.pred));
+  document.getElementById('knn-result-box').innerHTML=
+    `Predicting <strong>${DISHES[ji]}</strong> for <strong>${USERS[ui]}</strong>:<br>
+     Predicted rating = <strong style="font-size:16px">${result.pred}</strong> &nbsp;
+     <span style="color:#EF9F27">${stars}</span><br>
+     <span style="font-size:11px;color:var(--txt3)">Based on ${result.neighbors.length} neighbour(s) out of K=${K} requested.</span>`;
+  // Neighbors list
+  document.getElementById('knn-neighbors').innerHTML=result.neighbors.length?result.neighbors.map((nb,idx)=>{
+    const pct=Math.round(Math.max(0,nb.sim)*100);
+    return`<div class="neighbor-row">
+      <span style="min-width:18px;font-size:11px;color:var(--txt3)">#${idx+1}</span>
+      <span style="min-width:50px;font-weight:500">${DISHES[nb.j]}</span>
+      <div class="neighbor-bar-wrap"><div class="neighbor-bar" style="width:${pct}%;background:${C.teal}"></div></div>
+      <span style="min-width:38px;font-size:11px;color:var(--txt3)">sim ${nb.sim.toFixed(2)}</span>
+      <span style="font-size:12px">&#9733; ${nb.rating}</span>
+    </div>`;}).join(''):'<div style="font-size:12px;color:var(--txt3);padding:6px 0">No rated neighbours found. Increase K or use Matrix Factorisation for sparse matrices.</div>';
+  // Full KNN matrix
+  const mat=buildKNNMatrix(knnSims,ui,K);
+  let h='<tr><th>User</th>';
+  DISHES.forEach((d,j)=>{const b=STOCK[j]>15?'badge-green':STOCK[j]>8?'badge-warn':'badge-red';h+=`<th>${d}<br><span class="badge ${b}">${STOCK[j]}</span></th>`;});h+='</tr>';
+  USERS.forEach((u,i)=>{h+=`<tr><td style="font-weight:500;text-align:left">${u}</td>`;
+    mat[i].forEach((cell,j)=>{const st='&#9733;'.repeat(Math.round(cell.v))+'&#9734;'.repeat(5-Math.round(cell.v));
+      h+=`<td class="${cell.known?'cell-known':'cell-pred'}" style="background:${heatBg(cell.v,cell.known)}">${cell.v.toFixed(cell.known?0:1)}<br><span style="font-size:10px;color:#EF9F27">${st}</span></td>`;});h+='</tr>';});
+  document.getElementById('knn-matrix').innerHTML=h;
+  // MF vs KNN compare
+  if(predMatrix){
+    let mfErr=0,knnErr=0,cnt=0;
+    USERS.forEach((u,i)=>DISHES.forEach((_,j)=>{if(KNOWN[i][j]===null){const gt=3.5;mfErr+=Math.abs(predMatrix[i][j]-gt);knnErr+=Math.abs(mat[i][j].v-gt);cnt++;}}));
+    document.getElementById('knn-compare').innerHTML=`<span class="compare-chip">MF avg error: <strong>${(mfErr/cnt).toFixed(2)}</strong></span><span class="compare-chip">KNN avg error: <strong>${(knnErr/cnt).toFixed(2)}</strong></span><span class="compare-chip" style="color:var(--txt3);font-size:11px">vs neutral baseline (3.5)</span>`;
+  }
+}
+function initKNNSelectors(){
+  const users=document.getElementById('knn-user');
+  users.onchange=()=>{knnSims=null;updateKNN();};
+  updateKNN();
+}
+
+// ═══════════════════════════════════════════════
+
+// ─── MDP pedagogical panels ──────────────────────────────────────────────────
+function renderMDPMeta(stockMax, tw, prices, alpha, N) {
+  const pMin=8, pMax=20;
+  const nStates=(stockMax+1)*(tw+1);
+
+  // State space info + grid
+  document.getElementById('mdp-state-info').innerHTML=`
+    <div style="color:var(--txt2);line-height:1.85;margin-bottom:6px">
+      <strong style="color:var(--txt)">S</strong> = {(c,t) | c&isin;[0,${stockMax}], t&isin;[0,${tw}]}<br>
+      <strong style="color:var(--txt)">${nStates}</strong> states &nbsp;=&nbsp; ${stockMax+1}&thinsp;&times;&thinsp;${tw+1}
+    </div>
+    ${buildStateGrid(stockMax,tw)}`;
+
+  // Action chips
+  const palette=Array.from({length:prices.length},(_,i)=>{
+    const norm=(prices[i]-pMin)/(pMax-pMin);
+    const r=Math.round(norm*200+55),b=Math.round((1-norm)*200+55);
+    return `rgb(${r},100,${b})`;});
+  document.getElementById('mdp-action-chips').innerHTML=prices.map((p,i)=>
+    `<span style="padding:3px 10px;border-radius:var(--radius-md);font-size:12px;font-weight:500;background:${palette[i]};color:#fff">&euro;${p.toFixed(0)}</span>`
+  ).join('');
+
+  // Demand D(p,t) chart
+  const slots=Array.from({length:tw},(_,t)=>t);
+  const labels=slots.map(t=>{const h=20+Math.floor(t*10/60),m=(t*10)%60;return`${h}:${String(m).padStart(2,'0')}`;});
+  mkChart('mdp-demand-chart',{type:'line',
+    data:{labels,datasets:prices.map((p,i)=>({
+      label:`\u20ac${p.toFixed(0)}`,
+      data:slots.map(t=>+(N*dProb(p,pMin,pMax,alpha,t,tw)).toFixed(3)),
+      borderColor:palette[i],backgroundColor:'transparent',
+      tension:.4,pointRadius:0,borderWidth:2
+    }))},
+    options:{...CD,
+      plugins:{legend:{display:true,labels:{color:C.txt,font:{size:11},boxWidth:12,padding:8}}},
+      scales:{
+        x:{ticks:{color:C.muted,font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:8},grid:{color:C.grid}},
+        y:{title:{display:true,text:'Orders / slot',color:C.muted,font:{size:11}},min:0,
+           grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}}}}});
+}
+
+function buildStateGrid(stockMax, tw) {
+  const rows=Math.min(stockMax,14), cols=Math.min(tw,24);
+  const cw=Math.max(7, Math.floor(290/(cols+2)));
+  const rowH=cw;
+  let g=`<div style="font-size:9px;color:var(--txt3);margin-bottom:3px;display:flex;gap:8px;flex-wrap:wrap">
+    <span><span style="display:inline-block;width:9px;height:9px;background:var(--surface2);border:0.5px solid var(--border);vertical-align:middle;margin-right:2px"></span>regular</span>
+    <span><span style="display:inline-block;width:9px;height:9px;background:#FCEBEB;border:0.5px solid #F09595;vertical-align:middle;margin-right:2px"></span>terminal (waste)</span>
+    <span><span style="display:inline-block;width:9px;height:9px;background:#EAF3DE;border:0.5px solid #97C459;vertical-align:middle;margin-right:2px"></span>terminal (sold out)</span>
+  </div>
+  <div style="display:grid;grid-template-columns:18px repeat(${cols+1},${cw}px);gap:1px">`;
+  // header
+  g+=`<div style="font-size:8px;color:var(--txt3)">c\\t</div>`;
+  for(let t=0;t<=cols;t++) g+=`<div style="font-size:8px;color:var(--txt3);text-align:center">${t<cols?t:tw}</div>`;
+  // rows (high stock at top)
+  for(let c=rows;c>=0;c--){
+    g+=`<div style="font-size:8px;color:var(--txt3);text-align:right;padding-right:2px;line-height:${rowH}px">${c}</div>`;
+    for(let t=0;t<=cols;t++){
+      const isTerm=(t===cols);
+      const bg=isTerm?(c===0?'#EAF3DE':'#FCEBEB'):'var(--surface2)';
+      const br=isTerm?(c===0?'0.5px solid #97C459':'0.5px solid #F09595'):'0.5px solid var(--border)';
+      const title=`s=(${c},${t===cols?tw:t})${isTerm?' TERMINAL':''}`;
+      g+=`<div style="background:${bg};border:${br};height:${rowH}px;border-radius:1px" title="${title}"></div>`;
+    }
+  }
+  g+='</div>';
+  if(stockMax>14||tw>24) g+=`<div style="font-size:10px;color:var(--txt3);margin-top:3px">Showing ${rows+1}\u00d7${cols+1} of ${stockMax+1}\u00d7${tw+1} states</div>`;
+  return g;
+}
+
+// 2. MDP
+// ═══════════════════════════════════════════════
+let mdpPolicy=null,mdpValues=null;
+function dProb(p,pMin,pMax,alpha,t,tw){return Math.max(0,Math.min(1,Math.exp(-alpha*(p-pMin)/(pMax-pMin))*(0.3+0.7*Math.sin(Math.PI*t/tw))));}
+function binom(n,k,p){let c=1;for(let i=0;i<k;i++)c*=(n-i)/(i+1);return c*p**k*(1-p)**(n-k);}
+function solveMDP(){
+  const sm=+document.getElementById('sl-stock').value,al=+document.getElementById('sl-alpha').value,
+        pN=+document.getElementById('sl-pn').value,tw=+document.getElementById('sl-tw').value,
+        mdpN=+document.getElementById('sl-N').value;
+  document.getElementById('stockv').textContent=sm;document.getElementById('alphav').textContent=(al/10).toFixed(1);
+  document.getElementById('pnv').textContent=pN;document.getElementById('twv').textContent=tw;
+  document.getElementById('Nv').textContent=mdpN.toFixed(1);
+  const pm=8,px=20,prices=Array.from({length:pN},(_,i)=>pm+i*(px-pm)/(pN-1));
+  const V=[],Pi=[];for(let c=0;c<=sm;c++){V.push(new Array(tw+1).fill(0));Pi.push(new Array(tw+1).fill(prices[Math.floor(pN/2)]));}
+  const usePenaltyMDP = document.getElementById('chk-waste-penalty-mdp')?.checked !== false;
+  const infV = usePenaltyMDP ? sm*px*tw*10 : 0;
+  for(let c=0;c<=sm;c++)V[c][tw]=c===0?0:(usePenaltyMDP?-infV:0);
+  for(let t=tw-1;t>=0;t--){for(let c=0;c<=sm;c++){let bv=-Infinity,bp=prices[Math.floor(pN/2)];
+    prices.forEach(p=>{const prob=dProb(p,pm,px,al,t,tw);let ev=0;
+      for(let s=0;s<=c;s++){const bi=s===0?(1-prob)**c:s===c?prob**c:binom(c,s,prob);ev+=bi*(p*s+V[c-s][t+1]);}
+      if(ev>bv){bv=ev;bp=p;}});V[c][t]=bv;Pi[c][t]=bp;}}
+  mdpPolicy=Pi;mdpValues=V;
+  const grid=document.getElementById('policy-grid');grid.style.gridTemplateColumns=`repeat(${tw},1fr)`;
+  let html='';for(let c=sm;c>=0;c--){for(let t=0;t<tw;t++){const p=Pi[c][t];const norm=(p-pm)/(px-pm);const r=Math.round(norm*200+55),b=Math.round((1-norm)*200+55);
+    html+=`<div class="policy-cell" style="background:rgb(${r},100,${b});color:#fff" title="stock=${c},t=${t}: \u20ac${p.toFixed(0)}">${p.toFixed(0)}\u20ac</div>`;}}
+  grid.innerHTML=html;
+  document.getElementById('policy-legend').innerHTML='<span><span class="legend-dot" style="background:rgb(55,100,255)"></span>Low price</span><span><span class="legend-dot" style="background:rgb(255,100,55)"></span>High price</span><span style="color:var(--txt3)">Rows: stock\u2193 Cols: time\u2192</span>';
+  mkChart('value-chart',{type:'line',data:{datasets:[{data:Array.from({length:sm+1},(_,c)=>({x:c,y:+Math.max(0,V[c][0]).toFixed(1)})),borderColor:C.teal,backgroundColor:C.teal+'33',fill:true,tension:.4,pointRadius:3,borderWidth:2}]},
+    options:{...CD,scales:{x:{type:'linear',title:{display:true,text:'Initial stock',color:C.muted,font:{size:11}},grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}},
+                           y:{title:{display:true,text:'Expected \u20ac',color:C.muted,font:{size:11}},grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}}}}});
+  renderMDPMeta(sm,tw,prices,al/10,mdpN);
+  runMDPSim();
+}
+function runMDPSim(){
+  if(!mdpPolicy)return;
+  const is=+document.getElementById('sl-init-stock').value,tw=+document.getElementById('sl-tw').value,al=+document.getElementById('sl-alpha').value;
+  document.getElementById('initstockv').textContent=is;
+  let stock=is,rev=0,prices=[],log=[];
+  for(let t=0;t<tw;t++){if(stock<=0)break;const p=mdpPolicy[Math.min(stock,mdpPolicy.length-1)][t];const prob=dProb(p,8,20,al,t,tw);
+    const sold=Math.min(stock,Math.floor(-Math.log(Math.random()+.0001)*prob+.5));rev+=sold*p;stock-=sold;prices.push(p);
+    const h=20+Math.floor(t*10/60),m=(t*10)%60;log.push(`${h}:${String(m).padStart(2,'0')} | \u20ac${p.toFixed(0)} | ${(prob*100).toFixed(0)}% demand | sold ${sold} | left ${stock}`);}
+  document.getElementById('mdp-rev').textContent=`\u20ac${rev.toFixed(0)}`;
+  document.getElementById('mdp-waste').textContent=stock;
+  document.getElementById('mdp-avgp').textContent=prices.length?`\u20ac${(prices.reduce((a,b)=>a+b,0)/prices.length).toFixed(1)}`:'--';
+  const el=document.getElementById('mdp-log');el.innerHTML=log.join('<br>');el.scrollTop=9999;
+}
+
+
+// ═══════════════════════════════════════════════
+// TRUE DEMAND CORE
+// ═══════════════════════════════════════════════
+let tdp = {N:2, alpha:1.2, peakAmp:0.70, monthEnd:0.15, noisePct:0.15};
+
+// Deterministic true demand (mean)
+function getTrueDemand(pi, day, slot) {
+  const prices = [8, 11.5, 15, 18.5, 22];
+  const p = prices[pi - 1];
+  const pNorm = (p - 8) / (22 - 8);
+  const priceFactor = Math.exp(-tdp.alpha * pNorm);
+  const timeFactor = (1 - tdp.peakAmp) + tdp.peakAmp * Math.sin(Math.PI * slot / 23);
+  const dayF = day <= 9 ? (1 + tdp.monthEnd * 0.3)
+             : day <= 24 ? (1 - tdp.monthEnd * 0.15)
+             : (1 + tdp.monthEnd);
+  return Math.max(0, tdp.N * priceFactor * timeFactor * dayF);
+}
+
+// Stochastic sample (for simulation)
+function sampleTrueDemand(pi, day, slot) {
+  const mean = getTrueDemand(pi, day, slot);
+  const noise = tdp.noisePct > 0 ? (Math.random() - 0.5) * 2 * tdp.noisePct * mean : 0;
+  return Math.max(0, Math.round(mean + noise));
+}
+
+// RMSE between model predictions and true demand over a grid
+function calcRMSE(modelFn, day, slots) {
+  let sq = 0, n = 0;
+  for (let pi = 1; pi <= 5; pi++) {
+    for (const slot of slots) {
+      const err = modelFn(pi, day, slot) - getTrueDemand(pi, day, slot);
+      sq += err * err; n++;
+    }
+  }
+  return Math.sqrt(sq / n);
+}
+
+function updateTDP() {
+  tdp.N        = +document.getElementById('tdp-N').value;
+  tdp.alpha    = +document.getElementById('tdp-alpha').value / 10;
+  tdp.peakAmp  = +document.getElementById('tdp-peak').value / 100;
+  tdp.monthEnd = +document.getElementById('tdp-monthend').value / 100;
+  tdp.noisePct = +document.getElementById('tdp-noise').value / 100;
+  document.getElementById('tdp-Nv').textContent       = tdp.N;
+  document.getElementById('tdp-alphav').textContent   = tdp.alpha.toFixed(1);
+  document.getElementById('tdp-peakv').textContent    = tdp.peakAmp.toFixed(2);
+  document.getElementById('tdp-monthendv').textContent= Math.round(tdp.monthEnd*100)+'%';
+  document.getElementById('tdp-noisev').textContent   = Math.round(tdp.noisePct*100)+'%';
+  renderTDPPreview();
+}
+
+function renderTDPPreview() {
+  const day = 15;
+  const tiers = [1, 2, 3, 4, 5];
+  const slotSample = [3, 8, 12, 17, 21]; // representative slots
+  mkChart('tdp-preview', {
+    type: 'line',
+    data: { datasets: tiers.map((pi, idx) => ({
+      label: `Tier ${pi}`,
+      data: slotSample.map((s, si) => ({ x: si, y: +getTrueDemand(pi, day, s).toFixed(1) })),
+      borderColor: [C.blue, C.teal, C.amber, C.coral, C.red][idx],
+      tension: .4, pointRadius: 2, borderWidth: 1.5
+    }))},
+    options: { ...CD,
+      plugins: { legend: { display: true, labels: { color: C.txt, font: { size: 10 }, boxWidth: 10, padding: 8 } } },
+      scales: {
+        x: { type: 'linear', title: { display: true, text: 'Time slot (sample)', color: C.muted, font: { size: 10 } },
+             ticks: { color: C.muted, font: { size: 10 }, callback: v => ['20:30','21:20','22:00','22:50','23:30'][v] || v },
+             grid: { color: C.grid } },
+        y: { title: { display: true, text: 'Orders', color: C.muted, font: { size: 10 } },
+             min: 0, grid: { color: C.grid }, ticks: { color: C.muted, font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+function updateAllDemandMethods() {
+  renderTDPPreview();
+  updateLinear(); updateLogistic(); updateNN(); updateLSTM();
+}
+
+// ═══════════════════════════════════════════════
+// 3A. LINEAR REGRESSION
+// ═══════════════════════════════════════════════
+function getLinearDemand(pi,day,slot,rating=3.5){
+  const prices=[.6,1.0,1.4,1.8,2.5];const p=prices[pi-1];
+  return Math.max(0, tdp.N*(0.7+rating*.08)*(day<=9?1.05:day<=24?.90:1.15)*(slot<6?.70:slot<18?.85:1.10)/p);
+}
+function updateLinear(){
+  const pi=+document.getElementById('lin-price').value,day=+document.getElementById('lin-day').value,slot=+document.getElementById('lin-slot').value;
+  const labels=['Very low','Low','Medium','High','Very high'];
+  document.getElementById('lin-pricev').textContent=labels[pi-1];document.getElementById('lin-dayv').textContent=day;
+  const h=20+Math.floor(slot*10/60),m=(slot*10)%60;document.getElementById('lin-slotv').textContent=`${h}:${String(m).padStart(2,'0')}`;
+  const dem=Math.round(getLinearDemand(pi,day,slot));const prices=[.6,1.0,1.4,1.8,2.5];
+  const trueD=getTrueDemand(pi,day,slot);
+  document.getElementById('lin-dem').textContent=dem;document.getElementById('lin-rev').textContent=`\u20ac${(dem*prices[pi-1]*3).toFixed(0)}`;
+  const dHi=getLinearDemand(Math.min(pi+1,5),day,slot);document.getElementById('lin-elast').textContent=pi<5?((dHi-dem)/(dem||1)*100).toFixed(0)+'%':'--';
+  const rmse=calcRMSE((p,d,s)=>getLinearDemand(p,d,s), day, [0,3,6,9,12,15,18,21,23]);
+  // show RMSE below metric cards
+  const rc=document.getElementById('lin-rmse'); if(rc) rc.innerHTML=`<span class="error-badge">RMSE vs true demand: <span>${rmse.toFixed(2)}</span></span>&nbsp;<span class="error-badge">True D* at selection: <span>${trueD.toFixed(1)}</span></span>`;
+  mkChart('lin-curve',{type:'line',data:{datasets:[
+    {label:'True D*', data:[1,2,3,4,5].map(x=>({x,y:+getTrueDemand(x,day,slot).toFixed(1)})),borderColor:C.txt,backgroundColor:'transparent',borderDash:[5,3],tension:.4,pointRadius:3,borderWidth:1.5},
+    {label:'Linear estimate',data:[1,2,3,4,5].map(x=>({x,y:getLinearDemand(x,day,slot)})),borderColor:C.purple,backgroundColor:C.purple+'22',fill:true,tension:.4,pointRadius:4,borderWidth:2}
+  ]},options:{...CD,plugins:{legend:{display:true,labels:{color:C.txt,font:{size:11},boxWidth:12}}},
+    scales:{x:{type:'linear',title:{display:true,text:'Price tier',color:C.muted,font:{size:11}},grid:{color:C.grid},ticks:{color:C.muted,font:{size:11},stepSize:1}},y:{title:{display:true,text:'Orders',color:C.muted,font:{size:11}},min:0,grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}}}}});
+  const coefs=[{l:'Price (high)',v:-3.2},{l:'Price (med)',v:-1.3},{l:'Rating',v:.78},{l:'End of month',v:.52},{l:'Start of month',v:-.11},{l:'Late slot',v:.35},{l:'Mid slot',v:-.22},{l:'Rich class',v:.48},{l:'Poor class',v:-.59}];
+  mkChart('lin-coef',{type:'bar',data:{labels:coefs.map(c=>c.l),datasets:[{data:coefs.map(c=>c.v),backgroundColor:coefs.map(c=>c.v>=0?C.green+'BB':C.red+'BB'),borderRadius:4}]},
+    options:{...CD,indexAxis:'y',scales:{x:{grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}},y:{grid:{display:false},ticks:{color:C.txt,font:{size:11}}}}}});
+}
+
+// ═══════════════════════════════════════════════
+// 3B. LOGISTIC REGRESSION
+// ═══════════════════════════════════════════════
+function getLogProb(pi,rating,wealthClass,dayType){
+  const pCoef=[-1.995,-1.330,0,0.5,1.1][pi-1];
+  const wCoef={rich:0.48,mid:0,poor:-0.59}[wealthClass];
+  const dCoef={start:0,mid:-0.3,end:0.5}[dayType];
+  const logit=-4.2+pCoef+0.78*rating+wCoef+dCoef;
+  return +sig(logit).toFixed(3);
+}
+function updateLogistic(){
+  const pi=+document.getElementById('log-price').value,rating=+document.getElementById('log-rating').value;
+  const dayType=document.getElementById('log-day').value;
+  const labels=['Very low','Low','Medium','High','Very high'];
+  document.getElementById('log-pricev').textContent=labels[pi-1];
+  document.getElementById('log-ratingv').textContent=`${rating}`;
+  const pR=getLogProb(pi,rating,'rich',dayType),pM=getLogProb(pi,rating,'mid',dayType),pP=getLogProb(pi,rating,'poor',dayType);
+  document.getElementById('log-rich').textContent=(pR*100).toFixed(1)+'%';
+  document.getElementById('log-mid').textContent=(pM*100).toFixed(1)+'%';
+  document.getElementById('log-poor').textContent=(pP*100).toFixed(1)+'%';
+  // P(buy) vs price curves for 3 classes
+  const pts=Array.from({length:5},(_,i)=>i+1);
+  // Scale logistic to expected orders for comparison with true demand
+  const slot12=12; const dayNum={start:5,mid:15,end:27}[dayType]||15;
+  const trueNorm=getTrueDemand(pi,dayNum,slot12);
+  const logAgg=(p,d,s)=>{const dn={start:5,mid:15,end:27}[d]||15;return getLogProb(p,rating,'mid',d)*tdp.N*0.8;};
+  const rmse=calcRMSE((p,d,s)=>logAgg(p,d,s), dayNum, [6,10,14,18,22]);
+  const lrc=document.getElementById('log-rmse'); if(lrc) lrc.innerHTML=`<span class="error-badge">RMSE vs true demand: <span>${rmse.toFixed(2)}</span></span>`;
+  mkChart('log-curve',{type:'line',data:{datasets:[
+    {label:'True D*',data:pts.map(p=>({x:p,y:+getTrueDemand(p,dayNum,slot12).toFixed(1)})),borderColor:C.txt,borderDash:[5,3],tension:.4,pointRadius:3,borderWidth:1.5},
+    {label:'Rich',data:pts.map(p=>({x:p,y:getLogProb(p,rating,'rich',dayType)})),borderColor:C.green,tension:.4,pointRadius:3,borderWidth:2},
+    {label:'Mid',data:pts.map(p=>({x:p,y:getLogProb(p,rating,'mid',dayType)})),borderColor:C.blue,tension:.4,pointRadius:3,borderWidth:2},
+    {label:'Poor',data:pts.map(p=>({x:p,y:getLogProb(p,rating,'poor',dayType)})),borderColor:C.coral,tension:.4,pointRadius:3,borderWidth:1.5,borderDash:[4,4]}
+  ]},options:{...CD,plugins:{legend:{display:true,labels:{color:C.txt,font:{size:11},boxWidth:10}}},
+    scales:{x:{type:'linear',title:{display:true,text:'Price tier',color:C.muted,font:{size:11}},grid:{color:C.grid},ticks:{color:C.muted,font:{size:11},stepSize:1}},
+            y:{title:{display:true,text:'P(buy) / orders',color:C.muted,font:{size:11}},min:0,grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}}}}});
+  // Sigmoid shape
+  const sz=Array.from({length:41},(_,i)=>i-20).map(z=>({x:z,y:+sig(z).toFixed(3)}));
+  const curLogit=-4.2+[-1.995,-1.330,0,0.5,1.1][pi-1]+0.78*rating+{start:0,mid:-.3,end:.5}[dayType];
+  mkChart('log-sigmoid',{type:'line',data:{datasets:[
+    {label:'\u03c3(z)',data:sz,borderColor:C.purple,tension:.3,pointRadius:0,borderWidth:2},
+    {label:'Current logit',data:[{x:curLogit,y:0},{x:curLogit,y:sig(curLogit)}],borderColor:C.amber,borderWidth:1.5,borderDash:[4,4],pointRadius:0},
+    {label:'P(mid class)',data:[{x:-20,y:sig(curLogit)},{x:curLogit,y:sig(curLogit)}],borderColor:C.blue,borderWidth:1,borderDash:[2,4],pointRadius:[0,4]}
+  ]},options:{...CD,plugins:{legend:{display:true,labels:{color:C.txt,font:{size:11},boxWidth:12}}},
+    scales:{x:{type:'linear',title:{display:true,text:'Logit z',color:C.muted,font:{size:11}},grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}},
+            y:{title:{display:true,text:'\u03c3(z)',color:C.muted,font:{size:11}},min:0,max:1,grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}}}}});
+}
+
+// ═══════════════════════════════════════════════
+// 3C. NEURAL NETWORK
+// ═══════════════════════════════════════════════
+function nnDemand(pi,day,slot,units,lr,epochs){
+  // Simulate NN: base = linear + non-linear correction from ReLU interactions
+  const linBase=getLinearDemand(pi,day,slot);
+  // Non-linearity: NN captures price*slot interaction (cheap+late = strong boost)
+  const prices=[.6,1.0,1.4,1.8,2.5];const p=prices[pi-1];
+  const slotNorm=slot/23;const dayNorm=day/30;
+  // Simulated ReLU interaction term
+  const h1=Array.from({length:units},(_,k)=>{
+    const w1=Math.sin(k*.7+pi*.3)*0.4,w2=Math.cos(k*.5+slot*.2)*0.3;
+    return relu(w1*(1/p)+w2*slotNorm+Math.sin(k+dayNorm)*.2);});
+  const correction=h1.reduce((s,v)=>s+v,0)/units*(lr/5)*(epochs/50)*0.3;
+  return Math.max(1,Math.round(linBase+correction*(1-Math.exp(-epochs/30))));
+}
+function simNNLoss(epochs,lr){
+  const trainLoss=[],valLoss=[];const noise=()=>(Math.random()-.5)*.03;
+  for(let ep=0;ep<=epochs;ep+=Math.max(1,Math.round(epochs/20))){
+    const t=Math.exp(-ep/(epochs*.4))*1.2+0.05+Math.abs(noise());
+    const v=Math.exp(-ep/(epochs*.5))*1.1+0.12+Math.abs(noise())+(ep>epochs*.6?ep/epochs*.15:0);
+    trainLoss.push({x:ep,y:+t.toFixed(3)});valLoss.push({x:ep,y:+v.toFixed(3)});}
+  return{trainLoss,valLoss};
+}
+function updateNN(){
+  const units=+document.getElementById('nn-units').value,lr=+document.getElementById('nn-lr').value,
+        epochs=+document.getElementById('nn-epochs').value,pi=+document.getElementById('nn-price').value;
+  document.getElementById('nn-unitsv').textContent=units;
+  document.getElementById('nn-lrv').textContent=(lr/1000).toFixed(3);
+  document.getElementById('nn-epochsv').textContent=epochs;
+  document.getElementById('nn-pricev').textContent=['Very low','Low','Medium','High','Very high'][pi-1];
+  const slot=12,day=15;
+  const nnD=nnDemand(pi,day,slot,units,lr,epochs),linD=getLinearDemand(pi,day,slot);
+  document.getElementById('nn-dem').textContent=nnD;document.getElementById('nn-lin').textContent=linD;
+  const diff=nnD-linD;document.getElementById('nn-diff').textContent=(diff>=0?'+':'')+diff;
+  const loss=simNNLoss(epochs,lr);
+  mkChart('nn-loss',{type:'line',data:{datasets:[
+    {label:'Train',data:loss.trainLoss,borderColor:C.blue,backgroundColor:C.blue+'22',tension:.4,pointRadius:0,borderWidth:2},
+    {label:'Val',  data:loss.valLoss,  borderColor:C.coral,backgroundColor:C.coral+'11',tension:.4,pointRadius:0,borderWidth:1.5,borderDash:[4,4]}
+  ]},options:{...CD,plugins:{legend:{display:true,labels:{color:C.txt,font:{size:11},boxWidth:12}}},
+    scales:{x:{type:'linear',title:{display:true,text:'Epoch',color:C.muted,font:{size:11}},grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}},
+            y:{title:{display:true,text:'Loss',color:C.muted,font:{size:11}},grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}}}}});
+  const tiers=[1,2,3,4,5];
+  const rmseNN=calcRMSE((p,d,s)=>nnDemand(p,d,s,units,lr,epochs), day, [3,8,12,17,21]);
+  const rmseLin=calcRMSE((p,d,s)=>getLinearDemand(p,d,s), day, [3,8,12,17,21]);
+  const nnrc=document.getElementById('nn-rmse'); if(nnrc) nnrc.innerHTML=`<span class="error-badge">NN RMSE: <span>${rmseNN.toFixed(2)}</span></span><span class="error-badge">Linear RMSE: <span>${rmseLin.toFixed(2)}</span></span>`;
+  mkChart('nn-compare',{type:'line',data:{datasets:[
+    {label:'True D*',       data:tiers.map(p=>({x:p,y:+getTrueDemand(p,day,slot).toFixed(1)})),borderColor:C.txt,borderDash:[5,3],tension:.4,pointRadius:3,borderWidth:1.5},
+    {label:'Neural Network',data:tiers.map(p=>({x:p,y:nnDemand(p,day,slot,units,lr,epochs)})),borderColor:C.teal,tension:.4,pointRadius:4,borderWidth:2},
+    {label:'Linear Reg.',   data:tiers.map(p=>({x:p,y:getLinearDemand(p,day,slot)})),          borderColor:C.muted,tension:.2,pointRadius:3,borderWidth:1.5,borderDash:[4,4]}
+  ]},options:{...CD,plugins:{legend:{display:true,labels:{color:C.txt,font:{size:11},boxWidth:10}}},
+    scales:{x:{type:'linear',title:{display:true,text:'Price tier',color:C.muted,font:{size:11}},grid:{color:C.grid},ticks:{color:C.muted,font:{size:11},stepSize:1}},
+            y:{title:{display:true,text:'Orders',color:C.muted,font:{size:11}},min:0,grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}}}}});
+}
+
+// ═══════════════════════════════════════════════
+// 3D. LSTM
+// ═══════════════════════════════════════════════
+function lstmSimulate(day,pi,T,hiddenUnits){
+  const prices=[.6,1.0,1.4,1.8,2.5];const p=prices[pi-1];
+  const dayF=day<=9?1.05:day<=24?.90:1.15;
+  const slots=24;
+  // Ground truth: sinusoidal demand pattern with noise
+  const rng=(seed)=>{let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646;};};
+  const rand=rng(day*100+pi*13+hiddenUnits);
+  // Ground truth = true demand (deterministic mean) + noise
+  const gt=Array.from({length:slots},(_,t)=>{
+    const mean=getTrueDemand(pi,day,t);
+    const noise=tdp.noisePct>0?(rand()-.5)*2*tdp.noisePct*mean:0;
+    return Math.max(0,Math.round(mean+noise));});
+  // LSTM simulation: initialise hidden/cell states
+  let h=0,c=0;const hStates=[],preds=[];
+  // Teacher-forcing warm-up for first T slots
+  const w=[0.15,0.25,0.35,0.45,0.35,0.25,0.15,0.10].slice(0,T);
+  const wSum=w.reduce((a,b)=>a+b,0)||1;
+  for(let t=0;t<slots;t++){
+    // Gates (simplified)
+    const xNorm=t<T?(gt[t]||0)/50:preds[t-1]/50;
+    const f=sig(0.7*h+0.4*xNorm-0.1);
+    const i=sig(-0.5*h+0.6*xNorm+0.2);
+    const g=Math.tanh(0.4*h+0.5*xNorm);
+    const o=sig(0.6*h+0.3*xNorm+0.1);
+    c=f*c+i*g; h=o*Math.tanh(c);
+    hStates.push(+Math.abs(h).toFixed(3));
+    // Prediction: weighted lookback + hidden state influence
+    let pred;
+    if(t<T){pred=gt[t]*(0.85+rand()*.06);}
+    else{const lb=gt.slice(Math.max(0,t-T),t);const wAvg=lb.reduce((s,v,k)=>s+v*(w[T-1-k]||0),0)/wSum;pred=wAvg*0.65+h*50*dayF/p*0.35;}
+    preds.push(Math.max(0,pred));  // keep float — rounding kills small-N price gradient
+  }
+  return{gt,preds,hStates};
+}
+function updateLSTM(){
+  const T=+document.getElementById('lstm-T').value,units=+document.getElementById('lstm-units').value;
+  const day=+document.getElementById('lstm-day').value,pi=+document.getElementById('lstm-price').value;
+  document.getElementById('lstm-Tv').textContent=T;document.getElementById('lstm-unitsv').textContent=units;
+  document.getElementById('lstm-dayv').textContent=day;
+  document.getElementById('lstm-pricev').textContent=['Very low','Low','Medium','High','Very high'][pi-1];
+  const{gt,preds,hStates}=lstmSimulate(day,pi,T,units);
+  const labels=Array.from({length:24},(_,t)=>{const h=20+Math.floor(t*10/60),m=(t*10)%60;return`${h}:${String(m).padStart(2,'0')}`;});
+  mkChart('lstm-chart',{type:'line',data:{labels,datasets:[
+    {label:'True D*',data:gt,borderColor:C.txt,backgroundColor:C.txt+'11',fill:true,tension:.4,pointRadius:0,borderWidth:2},
+    {label:'LSTM pred.',  data:preds,borderColor:C.amber,tension:.4,pointRadius:0,borderWidth:2,borderDash:[0,0]},
+    {label:'Warm-up',     data:Array.from({length:24},(_,t)=>t<T?gt[t]:null).filter(v=>v!==null).map((v,t)=>({x:t,y:v})),type:'scatter',backgroundColor:C.teal,pointRadius:3}
+  ]},options:{...CD,plugins:{legend:{display:true,labels:{color:C.txt,font:{size:11},boxWidth:12}}},
+    scales:{x:{ticks:{color:C.muted,font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:8},grid:{color:C.grid}},
+            y:{title:{display:true,text:'Orders',color:C.muted,font:{size:11}},min:0,grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}}}}});
+  // RMSE badges
+  let sqL=0,sqLstm=0;
+  for(let t=0;t<24;t++){sqL+=(getLinearDemand(pi,day,t)-gt[t])**2;sqLstm+=(preds[t]-gt[t])**2;}
+  const rmseLstm=Math.sqrt(sqLstm/24),rmseLinL=Math.sqrt(sqL/24);
+  const lrc2=document.getElementById('lstm-rmse');if(lrc2)lrc2.innerHTML=`<span class="error-badge">LSTM RMSE: <span>${rmseLstm.toFixed(2)}</span></span><span class="error-badge">Linear RMSE: <span>${rmseLinL.toFixed(2)}</span></span>`;
+  // Cumulative MAE
+  const linMAE=[],lstmMAE=[];let cLin=0,cLstm=0;
+  for(let t=0;t<24;t++){const linPred=getLinearDemand(pi,day,t);cLin+=Math.abs(linPred-gt[t]);cLstm+=Math.abs(preds[t]-gt[t]);linMAE.push(+cLin.toFixed(1));lstmMAE.push(+cLstm.toFixed(1));}
+  mkChart('lstm-error',{type:'line',data:{labels,datasets:[
+    {label:'Linear cumul. MAE',data:linMAE,borderColor:C.muted,tension:.2,pointRadius:0,borderWidth:1.5,borderDash:[4,4]},
+    {label:'LSTM cumul. MAE',  data:lstmMAE,borderColor:C.amber,tension:.3,pointRadius:0,borderWidth:2}
+  ]},options:{...CD,plugins:{legend:{display:true,labels:{color:C.txt,font:{size:11},boxWidth:12}}},
+    scales:{x:{ticks:{color:C.muted,font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:8},grid:{color:C.grid}},
+            y:{title:{display:true,text:'Cumulative MAE',color:C.muted,font:{size:11}},min:0,grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}}}}});
+  // Hidden state bars
+  const maxH=Math.max(...hStates,.01);
+  document.getElementById('hs-bars').innerHTML=hStates.map((v,t)=>{
+    const pct=Math.round(v/maxH*100);const col=pct>70?C.amber:pct>40?C.teal:C.muted;
+    return`<div class="hs-bar" style="height:${pct}%;background:${col};flex:1" title="t=${t}: h=${v}"></div>`;}).join('');
+  document.getElementById('hs-label').textContent=`Hidden state h\u209c across 24 slots (peak=${maxH.toFixed(3)}, T=${T} lookback)`;
+}
+
+
+// ═══════════════════════════════════════════════
+// TRACE RENDERER
+// ═══════════════════════════════════════════════
+function renderDayTrace(trace, mode, dmode) {
+  if(!trace || !trace.length) return;
+  const card=document.getElementById('trace-card');
+  card.style.display='block';
+  const modeLabels={mdp:`MDP + ${dmode}`,fixed:'Fixed €12',random:'Random'};
+  document.getElementById('trace-title').textContent=`Day 1 trace — ${modeLabels[mode]||mode} pricing (all dishes combined)`;
+  const labels=trace.map(d=>d.time);
+  const totalSold=trace.reduce((s,d)=>s+d.sold,0);
+  const finalStock=trace[trace.length-1]?.stock??0;
+  const revenue=trace.reduce((s,d)=>s+d.sold*d.price,0);
+  const avgPrice=trace.reduce((s,d)=>s+d.price,0)/trace.length;
+  document.getElementById('trace-summary').innerHTML=
+    `<span class="error-badge">Revenue D1: <span>\u20ac${revenue.toFixed(0)}</span></span> `+
+    `<span class="error-badge">Sold: <span>${totalSold}</span></span> `+
+    `<span class="error-badge">End stock: <span>${finalStock}</span></span> `+
+    `<span class="error-badge">Avg price: <span>\u20ac${avgPrice.toFixed(1)}</span></span>`;
+
+  const datasets=[
+    {label:'Units sold', type:'bar', data:trace.map(d=>d.sold),
+     backgroundColor:C.teal+'99', borderRadius:2, yAxisID:'y'},
+    {label:'Stock', type:'line', data:trace.map(d=>d.stock),
+     borderColor:C.blue, tension:.2, pointRadius:0, borderWidth:2.5, yAxisID:'y'},
+    {label:'True \u03bb (all dishes)', type:'line', data:trace.map(d=>+d.lambda.toFixed(2)),
+     borderColor:C.muted, borderDash:[4,3], tension:.4, pointRadius:0, borderWidth:1.5, yAxisID:'y'},
+  ];
+  if(mode==='mdp' && trace[0]?.modelLam!==null) {
+    datasets.push({label:'Model \u03bb (MDP planning)', type:'line',
+      data:trace.map(d=>d.modelLam??null),
+      borderColor:C.purple, borderDash:[2,3], tension:.4, pointRadius:0, borderWidth:1.5, yAxisID:'y'});
+  }
+  datasets.push({label:'Price \u20ac', type:'line', data:trace.map(d=>d.price),
+    borderColor:C.amber, tension:0, stepped:true, pointRadius:0, borderWidth:2, yAxisID:'y2'});
+
+  mkChart('trace-chart',{
+    type:'bar',
+    data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,labels:{color:C.txt,font:{size:11},boxWidth:12,padding:10}}},
+      scales:{
+        x:{ticks:{color:C.muted,font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:8},grid:{color:C.grid}},
+        y:{title:{display:true,text:'Units',color:C.muted,font:{size:11}},min:0,
+           grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}},
+        y2:{title:{display:true,text:'Price \u20ac',color:C.muted,font:{size:11}},
+            min:6,max:22,position:'right',grid:{display:false},ticks:{color:C.muted,font:{size:11}}}
+      }}
+  });
+
+  // Per-slot event table (only active slots where something happened)
+  const active=trace.filter(d=>d.sold>0||d.lambda>0.05);
+  const tbl=active.map(d=>`<tr>
+    <td>${d.time}</td><td>\u20ac${d.price}</td>
+    <td>${d.lambda.toFixed(2)}</td>
+    <td style="font-weight:500;color:${d.sold>0?'var(--txt)':'var(--txt3)'}">${d.sold}</td>
+    <td>${d.stock}</td>
+  </tr>`).join('');
+  document.getElementById('trace-table').innerHTML=`
+    <table style="width:100%;font-size:11px">
+      <thead><tr style="background:var(--surface2)">
+        <th style="padding:4px 7px;text-align:left;border:0.5px solid var(--border)">Time</th>
+        <th style="padding:4px 7px;border:0.5px solid var(--border)">Price</th>
+        <th style="padding:4px 7px;border:0.5px solid var(--border)">True \u03bb</th>
+        <th style="padding:4px 7px;border:0.5px solid var(--border)">Sold</th>
+        <th style="padding:4px 7px;border:0.5px solid var(--border)">Stock left</th>
+      </tr></thead>
+      <tbody>${tbl}</tbody>
+    </table>`;
+}
+
+
+// ═══════════════════════════════════════════════
+// CALIBRATED MDP FOR FULL SIMULATION
+// ═══════════════════════════════════════════════
+// Solves a fresh Bellman policy using:
+//   - 24 time steps (one per 10-min slot)
+//   - stockMax = actual simulation stock
+//   - Poisson demand calibrated to tdp parameters
+//   - 7 price levels €8..€20
+function solveMDPCalibrated(stockMax, demandFn) {
+  const pMin=8, pMax=20, pN=7;
+  const tw=24;
+  const prices=Array.from({length:pN},(_,i)=>pMin+i*(pMax-pMin)/(pN-1));
+
+  // Planning demand: model estimate if provided, else true demand baseline
+  function lam(price, t) {
+    if(demandFn) return Math.max(0, demandFn(price, t));
+    const pNorm=(price-pMin)/(pMax-pMin);
+    const pF=Math.exp(-tdp.alpha*pNorm);
+    const tF=(1-tdp.peakAmp)+tdp.peakAmp*Math.sin(Math.PI*t/23);
+    const dF=1-tdp.monthEnd*0.15;
+    return Math.max(0, tdp.N*pF*tF*dF);
+  }
+
+  // Poisson PMF P(X=k) for mean lambda
+  function pPMF(k, lambda) {
+    if(lambda<=0) return k===0?1:0;
+    let logP=-lambda;
+    for(let i=1;i<=k;i++) logP+=Math.log(lambda/i);
+    return Math.exp(Math.max(logP,-700));
+  }
+
+  // Value function and policy
+  const V=Array.from({length:stockMax+1},()=>new Array(tw+1).fill(0));
+  const Pi=Array.from({length:stockMax+1},()=>new Array(tw+1).fill(prices[2]));
+
+  // Terminal: V(c>0,T)=−∞ proxy — must dominate ALL possible revenue so MDP always prefers clearing stock
+  const usePenaltySim = document.getElementById('chk-waste-penalty-sim')?.checked !== false;
+  const INF = usePenaltySim ? stockMax*pMax*tw*10 : 0;
+  for(let c=0;c<=stockMax;c++) V[c][tw]=c===0?0:(usePenaltySim?-INF:0);
+
+  // Backward induction over 24 slots
+  for(let t=tw-1;t>=0;t--) {
+    for(let c=0;c<=stockMax;c++) {
+      let bestV=-Infinity, bestP=prices[2];
+      for(const p of prices) {
+        const l=lam(p,t);
+        let ev=0, cumP=0;
+        for(let k=0;k<=c;k++) {
+          const prob = k<c ? pPMF(k,l) : Math.max(0,1-cumP);
+          if(k<c) cumP+=prob;
+          ev+=prob*(p*k+V[c-k][t+1]);
+        }
+        if(ev>bestV){bestV=ev;bestP=p;}
+      }
+      V[c][t]=bestV; Pi[c][t]=bestP;
+    }
+  }
+  return Pi;
+}
+
+// ═══════════════════════════════════════════════
+// 4. FULL SIMULATION
+// ═══════════════════════════════════════════════
+function getSimDemand(pi,day,slot,mode){
+  if(mode==='logistic'){const p=getLogProb(pi,3.5,'mid','mid');return Math.round(tdp.N*1.5*p);}
+  if(mode==='nn'){return nnDemand(pi,day,slot,16,5,50);}
+  if(mode==='lstm'){const r=lstmSimulate(day,pi,3,16);return r.preds[slot]||0;}
+  return getLinearDemand(pi,day,slot);
+}
+function runFullSim(){
+  const days=+document.getElementById('sl-days').value,istock=+document.getElementById('sl-istock').value,
+        recW=document.getElementById('sl-recw').value/100,mode=document.getElementById('pricing-mode').value,
+        dmode=document.getElementById('demand-model-mode').value;
+  // Build demand function from selected model → MDP plans with model estimates
+  // Actual sales always come from sampleTrueDemand (true demand)
+  const demandFn = mode==='mdp' ? getModelDemandFn(dmode) : null;
+  const calPolicy = mode==='mdp' ? solveMDPCalibrated(istock, demandFn) : null;
+  let dayTrace = [];
+  const nD=DISHES.length,stocks=Array(nD).fill(istock),dailyRevs=[];
+  let totalRev=0,totalWaste=0,totalSold=0,totalSat=0,satCount=0,log=[];
+  for(let d=0;d<days;d++){let dayRev=0;
+    for(let t=0;t<24;t++){
+      let slotSold=0,slotPSum=0,slotPCnt=0,slotLam=0,slotModLam=0;
+      for(let j=0;j<nD;j++){if(stocks[j]<=0)continue;
+        let price=12;
+        if(mode==='mdp'&&calPolicy){
+          price=calPolicy[Math.min(stocks[j],calPolicy.length-1)][Math.min(t,23)];
+        }
+        else if(mode==='random'){price=8+Math.random()*12;}
+        const boost=stocks[j]>istock*.7?recW:0;
+        const pi=Math.min(5,Math.max(1,Math.round(price/4)));
+        const actualDemand=sampleTrueDemand(pi,d%30+1,t);
+        const sold=Math.min(stocks[j],Math.max(0,Math.round(actualDemand*(1+boost))));
+        stocks[j]-=sold;dayRev+=sold*price;totalSold+=sold;
+        slotSold+=sold;slotPSum+=price;slotPCnt++;
+        slotLam+=getTrueDemand(pi,d%30+1,t);
+        if(demandFn) slotModLam+=demandFn(price,t);
+        if(sold>0){totalSat+=3.5+Math.random();satCount++;}}
+      if(d===0){
+        const h=20+Math.floor(t*10/60),m=(t*10)%60;
+        dayTrace.push({t,time:`${h}:${String(m).padStart(2,'0')}`,
+          price:slotPCnt>0?+(slotPSum/slotPCnt).toFixed(1):12,
+          sold:slotSold, lambda:+slotLam.toFixed(2),
+          modelLam:demandFn&&slotPCnt?+(slotModLam/slotPCnt).toFixed(2):null,
+          stock:stocks.reduce((a,b)=>a+b,0)});}}
+    const waste=stocks.reduce((a,b)=>a+b,0);totalWaste+=waste;dailyRevs.push(+dayRev.toFixed(0));totalRev+=dayRev;
+    log.push(`Day ${d+1}: \u20ac${dayRev.toFixed(0)} revenue, ${waste} units waste (model: ${dmode})`);stocks.fill(istock);}
+  mkChart('sim-rev-chart',{type:'bar',data:{labels:Array.from({length:days},(_,i)=>`D${i+1}`),datasets:[{data:dailyRevs,backgroundColor:C.blue+'BB',borderRadius:4}]},
+    options:{...CD,scales:{x:{grid:{display:false},ticks:{color:C.muted,font:{size:11}}},y:{title:{display:true,text:'\u20ac',color:C.muted,font:{size:11}},grid:{color:C.grid},ticks:{color:C.muted,font:{size:11}}}}}});
+  document.getElementById('sim-total-rev').textContent=`\u20ac${Math.round(totalRev).toLocaleString()}`;
+  document.getElementById('sim-waste-pct').textContent=(totalWaste/(totalWaste+totalSold)*100).toFixed(1)+'%';
+  document.getElementById('sim-sat').textContent=satCount?(totalSat/satCount).toFixed(2):'--';
+  const fS=Array.from({length:nD},()=>Math.floor(Math.random()*istock*.8));
+  document.getElementById('stock-bars').innerHTML=DISHES.map((d,j)=>{const pct=Math.round(fS[j]/istock*100);const col=pct>60?C.green:pct>30?C.amber:C.red;
+    return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:12px"><span style="min-width:50px;color:var(--txt2)">${d}</span><div class="stock-bar" style="flex:1"><div class="stock-fill" style="width:${pct}%;background:${col}"></div></div><span style="min-width:28px;text-align:right">${fS[j]}</span></div>`;}).join('');
+  const logEl=document.getElementById('sim-log');logEl.innerHTML=log.join('<br>');logEl.scrollTop=9999;
+  renderDayTrace(dayTrace, mode, dmode);
+}
+
+
+// Returns a demand function calibrated to the selected model.
+// Used by solveMDPCalibrated to plan prices — actual sales use sampleTrueDemand.
+function getModelDemandFn(dmode) {
+  const units = +(document.getElementById('nn-units')||{value:'16'}).value;
+  const lr    = +(document.getElementById('nn-lr')||{value:'5'}).value;
+  const epochs= +(document.getElementById('nn-epochs')||{value:'50'}).value;
+  const T     = +(document.getElementById('lstm-T')||{value:'3'}).value;
+  const lu    = +(document.getElementById('lstm-units')||{value:'16'}).value;
+
+  // Pre-compute LSTM predictions for all 5 price tiers (day=15 planning baseline)
+  let lstmMap = null;
+  if(dmode === 'lstm') {
+    lstmMap = {};
+    for(let pi=1; pi<=5; pi++) lstmMap[pi] = lstmSimulate(15, pi, T, lu).preds;
+  }
+
+  return (price, t) => {
+    const pi = Math.min(5, Math.max(1, Math.round((price-8)/(20-8)*4)+1));
+    switch(dmode) {
+      case 'linear':   return Math.max(0, getLinearDemand(pi, 15, t));
+      case 'logistic': return Math.max(0, getLogProb(pi, 3.5, 'mid', 'mid') * tdp.N * 1.4);
+      case 'nn':       return Math.max(0, nnDemand(pi, 15, t, units, lr, epochs));
+      case 'lstm':     return Math.max(0, lstmMap[pi][t] || 0);
+      default:         return getTrueDemand(pi, 15, t);
+    }
+  };
+}
+
+
+function applyPreset() {
+  // True demand parameters (slider values → displayed values)
+  const tdpMap = {'tdp-N':'10','tdp-alpha':'25','tdp-peak':'70','tdp-monthend':'15','tdp-noise':'22'};
+  Object.entries(tdpMap).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});
+  updateTDP(); // recomputes tdp object and preview chart
+  // Simulation parameters
+  document.getElementById('sl-days').value='30';
+  document.getElementById('daysv').textContent='30';
+  document.getElementById('sl-istock').value='30';
+  document.getElementById('istockv').textContent='30';
+  // Reset trace card
+  const tc=document.getElementById('trace-card');
+  if(tc) tc.style.display='none';
+}
+
+function updateWastePenaltyLabel(tab) {
+  const chk = document.getElementById('chk-waste-penalty-' + tab);
+  const lbl = document.getElementById('terminal-label-' + tab);
+  if(!chk || !lbl) return;
+  if(chk.checked) {
+    lbl.textContent = 'V(c>0, T) = \u2212\u221e';
+    lbl.style.color = '#A32D2D';
+  } else {
+    lbl.textContent = 'V(c>0, T) = 0  (no penalty)';
+    lbl.style.color = 'var(--txt2)';
+  }
+}
+
+function startFullSim(){
+  const mode=document.getElementById('pricing-mode').value;
+  const btn=document.querySelector('[onclick="startFullSim()"]');
+  if(mode==='mdp'){
+    btn.textContent='Solving MDP\u2026'; btn.disabled=true;
+    setTimeout(()=>{runFullSim();btn.textContent='Run simulation';btn.disabled=false;},30);
+  } else {
+    runFullSim();
+  }
+}
+
+// ─── INIT ────────────────────────────────────
+buildRatingTable();
+initKNNSelectors();
+renderTDPPreview();
+</script>
+</body>
+</html>
