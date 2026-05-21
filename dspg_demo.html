@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>DSPG Framework Demo</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:system-ui,sans-serif;margin:0;padding:12px;background:#f8f7f4;color:#1a1a18;font-size:14px}
+.tabs{display:flex;gap:3px;margin-bottom:12px;border-bottom:1px solid #ddd;padding-bottom:7px;flex-wrap:wrap}
+.tb{padding:5px 13px;font-size:12px;border-radius:6px;border:1px solid transparent;background:transparent;color:#666;cursor:pointer;white-space:nowrap}
+.tb:hover{background:#eee}.tb.on{border-color:#ccc;background:#fff;color:#111;font-weight:500}
+.tp{display:none}.tp.on{display:block}
+.crow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:8px}
+.cl{font-size:12px;color:#666;white-space:nowrap}
+.si{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:7px 10px;margin-bottom:6px;min-height:44px}
+.sm{font-size:12px;line-height:1.5;color:#111}.sn{font-size:10px;color:#888;margin-bottom:2px}
+.slog{height:145px;overflow-y:auto;background:#f2f1ee;border-radius:8px;padding:7px 9px;font-size:11px;font-family:monospace;line-height:1.75}
+.sle{padding:1px 0;border-bottom:1px solid #e5e4e0}.sle:last-child{border-bottom:none}
+.ok{color:#0a7c54}.no{color:#a32d2d}.hi{color:#185fa5}.dim{color:#888}.bld{font-weight:500;color:#111}
+.gc{background:#f2f1ee;border-radius:8px;overflow:hidden}
+.pb{height:3px;background:#ddd;border-radius:2px;margin:5px 0;overflow:hidden}
+.pf{height:100%;background:#1D9E75;border-radius:2px;transition:width .2s}
+.nnlw{display:flex;gap:5px;flex-wrap:wrap;min-height:22px;margin-bottom:6px}
+.nnli{display:flex;align-items:center;gap:3px;font-size:11px;background:#eee;padding:2px 7px;border-radius:5px}
+.nnln{font-weight:500}.nnlv{font-family:monospace;color:#185fa5}
+.twocol{display:grid;grid-template-columns:minmax(0,55%) minmax(0,1fr);gap:10px}
+.opc{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:6px}
+.opm{background:#f2f1ee;border-radius:6px;padding:4px 6px;text-align:center}
+.opml{font-size:10px;color:#888;display:block;margin-bottom:1px}
+.opmv{font-size:14px;font-weight:500;font-family:monospace;color:#111;display:block}
+.cc{background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:10px 13px;margin-bottom:8px}
+.ct{font-size:13px;font-weight:500;margin:0 0 5px;color:#111}
+.cb{font-size:12px;color:#555;line-height:1.6;margin:0}
+.fml{font-family:monospace;font-size:11px;background:#f2f1ee;padding:3px 7px;border-radius:5px;display:inline-block;margin:3px 0}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:6px}
+.cbox{padding:8px 10px;border-radius:7px;font-size:11px;line-height:1.8}
+.co{background:#fff8e8}.cn{background:#eaf7f1}
+.pill{display:inline-block;font-size:10px;padding:2px 7px;border-radius:8px;font-weight:500}
+.popt{background:#eaf7f1;color:#0a7c54}.porig{background:#fff8e8;color:#8a5c00}
+.pps-badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:6px;background:#e8f0fb;color:#185fa5;margin:2px 2px}
+.opbar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:4px 0}
+select,button,input[type=text],input[type=number]{font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid #ccc;background:#fff;color:#111;cursor:pointer}
+input[type=range]{cursor:pointer}
+button:hover{background:#f0f0f0}
+.playbtn{border-color:#1D9E75;color:#1D9E75}
+.ep{background:#f9f8f5;border:1px solid #e0e0e0;border-radius:8px;padding:10px;margin-top:8px}
+.ep-head{font-size:12px;font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.infobox{background:#f2f1ee;border-radius:6px;padding:6px 9px;font-size:11px;font-family:monospace;margin-bottom:6px;min-height:20px;word-break:break-all;color:#333;line-height:1.6}
+.leg{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.legi{display:flex;align-items:center;gap:5px;font-size:12px;color:#666}
+.legd{width:22px;height:3px;border-radius:2px;flex-shrink:0}
+hr.sep{margin:14px 0;border:none;border-top:1px solid #e8e7e4}
+</style></head><body>
+<div class="tabs">
+  <button class="tb on" id="tab-btn-fw" onclick="switchTab('fw')">Framework</button>
+  <button class="tb" id="tab-btn-sl" onclick="switchTab('sl')">SL Operators</button>
+  <button class="tb" id="tab-btn-syn" onclick="switchTab('syn')">Synthesis</button>
+  <button class="tb" id="tab-btn-ana" onclick="switchTab('ana')">Analysis</button>
+  <button class="tb" id="tab-btn-eval" onclick="switchTab('eval')">Evaluation</button>
+</div>
+
+<!-- ===== FRAMEWORK ===== -->
+<div class="tp on" id="tp-fw">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+<div>
+<div class="cc"><div class="ct">Directed Series-Parallel Graph (DSPG)</div><div class="cb">A DAG with unique source <em>s</em> and sink <em>t</em> reducible to a single edge via (i) series: remove degree-2 internal nodes; (ii) parallel: collapse multi-edges. Required structure for valid SL trust computation.</div></div>
+<div class="cc"><div class="ct">Parallel Non-intersecting Path Subnetwork (PNPS)</div><div class="cb">Pair (A,B) with ≥2 <em>non-intersecting</em> simple paths from A to B. A graph is not DSPG iff a PNPS has an intermediate node with an edge leaving or entering outside the PNPS.</div></div>
+<div class="cc"><div class="ct">Node Nesting Level (NNL) &amp; nodeToPNPS</div><div class="cb">NNL(v) = number of PNPSs in which v is an intermediate node.<br><br><strong>nodeToPNPS[v]</strong> = the most-nested PNPS in which v is intermediate. By Theorem 7: <em>nodeToPNPS[a]=∅ or b∈nodeToPNPS[a]</em> iff for every PNPS p containing a as intermediate, b is inside p. This allows O(1) criterion checks.</div><div style="margin-top:6px"><span class="fml">NNL(v) = |{PNPS p : v ∈ intermediates(p)}|</span></div></div>
+</div>
+<div>
+<div class="cc"><div class="ct">Synthesis criteria to admit branch A→B into G'</div>
+<div class="cgrid">
+<div class="cbox co"><span class="pill porig">Original (Jøsang)</span><br><br>① Path A→B exists<br>② <strong>NNL(A) = NNL(B)</strong><br>③ ∀ C intermediate: NNL(C) ≥ NNL(A)</div>
+<div class="cbox cn"><span class="pill popt">Optimized (this paper)</span><br><br>① Path A→B exists<br>② <strong>|NNL(A)−NNL(B)| ≤ 1</strong><br>③ ∀ C intermediate: NNL(C) ≥ max(NNL(A),NNL(B))</div>
+</div>
+<div class="cb" style="margin-top:7px">Implemented via NNL (recomputed) or <strong>nodeToPNPS</strong> (maintained incrementally — Algorithm 1 from the paper).</div></div>
+<div class="cc"><div class="ct">DSPG Analysis — two algorithms</div><div class="cb">
+<strong>Original (Jøsang):</strong> iterate over all PPSs; pick max-NL one; recompute edge NLs from scratch.<br><br>
+<strong>Optimized (nodeToPNPS):</strong> maintain nodeToPNPS after each reduction. Find <em>innermost</em> PNPS directly: the one whose intermediate nodes all point to it in nodeToPNPS — no full NL recompute needed. After removing internal nodes, just delete their entries from the map.
+</div></div>
+</div>
+</div>
+</div>
+
+<!-- ===== SL OPERATORS ===== -->
+<div class="tp" id="tp-sl">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div>
+<div class="cc"><div class="ct">Binomial opinion ω = (b, d, u, a)</div>
+<div class="crow"><span class="cl" style="width:14px">b</span><input type="range" min="0" max="100" value="33" id="sl-b" oninput="updateSL()" style="flex:1;margin:0"><span id="sl-bv" style="font-family:monospace;font-size:12px;width:34px;text-align:right">0.33</span></div>
+<div class="crow"><span class="cl" style="width:14px">d</span><input type="range" min="0" max="100" value="33" id="sl-d" oninput="updateSL()" style="flex:1;margin:0"><span id="sl-dv" style="font-family:monospace;font-size:12px;width:34px;text-align:right">0.33</span></div>
+<div style="font-size:12px;color:#555;margin:2px 0 6px">u (auto) = <span id="sl-uv" style="font-family:monospace">0.33</span> &nbsp; a: <input type="range" min="0" max="100" value="50" id="sl-a" oninput="updateSL()" style="width:80px;vertical-align:middle"> <span id="sl-av" style="font-family:monospace;font-size:12px">0.50</span></div>
+<div class="opbar" id="sl-bar" style="height:11px;margin-top:7px"></div>
+<div style="font-size:10px;color:#888;margin-top:3px;display:flex;gap:10px"><span style="color:#1D9E75">■ belief</span><span style="color:#a32d2d">■ disbelief</span><span style="color:#aaa">■ uncertainty</span></div>
+<div style="margin-top:8px;font-size:12px">Projected P(x) = b + a·u = <strong id="sl-pv" style="font-family:monospace">0.50</strong></div>
+</div>
+<div class="cc"><div class="ct">Trust discounting TE: ω<sup>A</sup><sub>B</sub> ⊗ ω<sup>B</sup><sub>X</sub></div>
+<div class="crow"><span class="cl">ω<sup>A</sup><sub>B</sub> u=</span><input type="range" min="0" max="100" value="33" id="te-u1" oninput="updateTE()" style="flex:1"><span id="te-u1v" style="font-family:monospace;font-size:12px;width:34px;text-align:right">0.33</span></div>
+<div class="crow"><span class="cl">ω<sup>B</sup><sub>X</sub> u=</span><input type="range" min="0" max="100" value="33" id="te-u2" oninput="updateTE()" style="flex:1"><span id="te-u2v" style="font-family:monospace;font-size:12px;width:34px;text-align:right">0.33</span></div>
+<div style="font-size:11px;color:#888;margin:5px 0 3px">ω<sup>[A;B]</sup><sub>X</sub>:</div>
+<div class="opc" id="te-res"></div>
+<div style="margin-top:6px;font-size:11px;color:#888">Uncertainty always increases after discounting.</div>
+</div>
+</div>
+<div>
+<div class="cc"><div class="ct">Fusion: ω₁ ⊕ ω₂</div>
+<div class="crow"><span class="cl">ω₁ u=</span><input type="range" min="0" max="100" value="40" id="f-u1" oninput="updateFuse()" style="flex:1"><span id="f-u1v" style="font-family:monospace;font-size:12px;width:34px;text-align:right">0.40</span></div>
+<div class="crow"><span class="cl">ω₂ u=</span><input type="range" min="0" max="100" value="60" id="f-u2" oninput="updateFuse()" style="flex:1"><span id="f-u2v" style="font-family:monospace;font-size:12px;width:34px;text-align:right">0.60</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+<div><div style="font-size:11px;color:#888;margin-bottom:3px">Cumulative</div><div class="opc" id="f-cum"></div></div>
+<div><div style="font-size:11px;color:#888;margin-bottom:3px">Averaging</div><div class="opc" id="f-avg"></div></div>
+</div>
+<div style="margin-top:8px;padding:6px 9px;background:#eaf7f1;border-radius:6px;font-size:11px;color:#0a7c54"><strong>Theorem 1:</strong> u_cum ≤ min(u₁,u₂) always holds.</div>
+</div>
+<div class="cc"><div class="ct">Theorem 1 live verification</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px">
+<div class="opm"><span class="opml">u₁</span><span class="opmv" id="t1u1">0.40</span></div>
+<div class="opm"><span class="opml">u₂</span><span class="opmv" id="t1u2">0.60</span></div>
+<div class="opm"><span class="opml">min(u₁,u₂)</span><span class="opmv" id="t1min">0.40</span></div>
+<div class="opm"><span class="opml">u_cum</span><span class="opmv ok" id="t1cum">—</span></div>
+<div class="opm"><span class="opml">u_avg</span><span class="opmv" id="t1avg">—</span></div>
+<div class="opm"><span class="opml">Holds?</span><span class="opmv ok" id="t1ok">✓</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== SYNTHESIS ===== -->
+<div class="tp" id="tp-syn">
+<div class="crow">
+  <span class="cl">Method</span>
+  <select id="syn-meth" onchange="synReset()">
+    <option value="optimized">Optimized (NNL)</option>
+    <option value="ntp">Optimized (nodeToPNPS)</option>
+    <option value="original">Original (Jøsang NNL)</option>
+  </select>
+  <span class="cl">Preset</span>
+  <select id="syn-gr" onchange="clearCG('syn');synReset()">
+    <option value="paper">Paper Fig 5a</option>
+    <option value="diamond">Diamond+shortcut</option>
+  </select>
+  <button onclick="toggleEditor('syn')" id="syn-ed-btn">✏ Edit / Random</button>
+  <button class="playbtn" id="syn-pbtn" onclick="synPP()">▶ Play</button>
+  <button onclick="synStep()">Step →</button>
+  <button onclick="synReset()">↺ Reset</button>
+</div>
+<div class="twocol">
+<div>
+  <div class="si"><div class="sn" id="syn-stepn">Ready</div><div class="sm" id="syn-stepm">Choose a method and press Play</div></div>
+  <div class="gc" id="syn-ga" style="min-height:240px"></div>
+  <div class="pb"><div class="pf" id="syn-pf" style="width:0%"></div></div>
+  <div style="font-size:10px;color:#888;margin-top:2px;display:flex;gap:10px">
+    <span style="color:#1D9E75">● in G'</span><span style="color:#EF9F27">● testing</span><span style="color:#a32d2d">● rejected</span><span style="color:#bbb">● not yet</span>
+  </div>
+</div>
+<div>
+  <div id="syn-nnl-sec">
+    <div style="font-size:12px;font-weight:500;margin-bottom:4px">NNL in current G'</div>
+    <div class="nnlw" id="syn-nnl"><span style="font-size:11px;color:#aaa">—</span></div>
+  </div>
+  <div id="syn-ntp-sec" style="display:none">
+    <div style="font-size:12px;font-weight:500;margin-bottom:4px">nodeToPNPS mapping</div>
+    <div class="nnlw" id="syn-ntp"><span style="font-size:11px;color:#aaa">∅</span></div>
+  </div>
+  <div style="font-size:12px;font-weight:500;margin-bottom:4px">Step log</div>
+  <div class="slog" id="syn-log"></div>
+  <div id="syn-res" style="margin-top:8px"></div>
+</div>
+</div>
+<!-- Graph editor -->
+<div class="ep" id="syn-editor" style="display:none">
+<div class="ep-head">🎲 Random DAG
+  <span class="cl">layers</span><input type="number" id="syn-rd-nl" value="4" min="2" max="8" style="width:42px">
+  <span class="cl">npl</span><input type="number" id="syn-rd-npl" value="3" min="2" max="5" style="width:42px">
+  <span class="cl">skip</span><input type="number" id="syn-rd-ms" value="2" min="1" max="3" style="width:42px">
+  <span class="cl">ep</span><input type="range" min="10" max="90" value="55" id="syn-rd-ep" oninput="document.getElementById('syn-rd-epv').textContent=(this.value/100).toFixed(2)" style="width:70px"><span id="syn-rd-epv" style="font-family:monospace;font-size:12px">0.55</span>
+  <span class="cl">seed</span><input type="number" id="syn-rd-seed" value="42" min="0" max="9999" style="width:52px">
+  <button onclick="genRandDAG('syn')" style="background:#eaf7f1;border-color:#b0dfc7;color:#0a7c54">Generate</button>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<div>
+  <div style="font-size:11px;color:#666;margin-bottom:5px;font-weight:500">Nodes</div>
+  <div class="crow"><input type="text" id="syn-new-node" placeholder="name" style="width:70px"><button onclick="addNode('syn')">+ Add</button><select id="syn-del-node" style="flex:1;font-size:12px"></select><button onclick="removeNode('syn')">− Remove</button></div>
+  <div style="font-size:11px;color:#666;margin:5px 0;font-weight:500">Source / Sink</div>
+  <div class="crow"><span class="cl">src</span><select id="syn-src-sel" style="font-size:12px;flex:1" onchange="setSrcSnk('syn')"></select><span class="cl">snk</span><select id="syn-snk-sel" style="font-size:12px;flex:1" onchange="setSrcSnk('syn')"></select></div>
+</div>
+<div>
+  <div style="font-size:11px;color:#666;margin-bottom:5px;font-weight:500">Edges (b / d / u auto-normalized)</div>
+  <div class="crow"><select id="syn-ef" style="font-size:12px;width:58px"></select><span>→</span><select id="syn-et" style="font-size:12px;width:58px"></select><input type="number" id="syn-eb" value="0.33" min="0" max="1" step="0.01" style="width:44px;font-size:12px"><input type="number" id="syn-ed" value="0.33" min="0" max="1" step="0.01" style="width:44px;font-size:12px"><input type="number" id="syn-eu" value="0.33" min="0" max="1" step="0.01" style="width:44px;font-size:12px"><button onclick="addEdge('syn')">+ Add</button></div>
+  <div class="crow"><select id="syn-del-edge" style="font-size:12px;flex:1"></select><button onclick="removeEdge('syn')">− Remove</button></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== ANALYSIS ===== -->
+<div class="tp" id="tp-ana">
+<div class="crow">
+  <span class="cl">Method</span>
+  <select id="ana-meth" onchange="anaReset()">
+    <option value="ntp">Optimized (nodeToPNPS)</option>
+    <option value="original">Original (Jøsang)</option>
+  </select>
+  <span class="cl">Fusion</span>
+  <select id="ana-fus" onchange="anaReset()"><option value="cumulative">Cumulative</option><option value="averaging">Averaging</option></select>
+  <span class="cl">Preset</span>
+  <select id="ana-gr" onchange="clearCG('ana');anaReset()">
+    <option value="opt-paper">Paper Fig 5a — optimized result</option>
+    <option value="orig-paper">Paper Fig 5a — original result</option>
+    <option value="opt-diamond">Diamond — optimized result</option>
+  </select>
+  <button onclick="importFromSyn()" title="Use current synthesis G' as input">↗ From Synthesis</button>
+  <button onclick="toggleEditor('ana')" id="ana-ed-btn">✏ Edit / Random</button>
+  <button class="playbtn" id="ana-pbtn" onclick="anaPP()">▶ Play</button>
+  <button onclick="anaStep()">Step →</button>
+  <button onclick="anaReset()">↺ Reset</button>
+</div>
+<div class="twocol">
+<div>
+  <div class="si"><div class="sn" id="ana-stepn">Ready</div><div class="sm" id="ana-stepm">Choose a method and press Play</div></div>
+  <div class="gc" id="ana-ga" style="min-height:240px"></div>
+  <div class="pb"><div class="pf" id="ana-pf" style="width:0%"></div></div>
+  <div style="font-size:10px;color:#888;margin-top:2px;display:flex;gap:10px">
+    <span style="color:#1D9E75">● G' edges</span><span style="color:#7F77DD">● current PNPS</span><span style="color:#5DCAA5">● reduced edge</span>
+  </div>
+</div>
+<div>
+  <div style="font-size:12px;font-weight:500;margin-bottom:4px">PNPSs detected</div>
+  <div id="ana-pps" style="margin-bottom:8px;min-height:22px"><span style="font-size:11px;color:#aaa">—</span></div>
+  <div id="ana-ntp-sec" style="display:none">
+    <div style="font-size:12px;font-weight:500;margin-bottom:4px">nodeToPNPS mapping</div>
+    <div class="infobox" id="ana-ntp">∅</div>
+  </div>
+  <div style="font-size:12px;font-weight:500;margin-bottom:4px">Step log</div>
+  <div class="slog" id="ana-log"></div>
+  <div id="ana-res" style="margin-top:8px"></div>
+</div>
+</div>
+<!-- Editor panel -->
+<div class="ep" id="ana-editor" style="display:none">
+<div class="ep-head">🎲 Random DAG
+  <span class="cl">layers</span><input type="number" id="ana-rd-nl" value="3" min="2" max="7" style="width:42px">
+  <span class="cl">npl</span><input type="number" id="ana-rd-npl" value="3" min="2" max="5" style="width:42px">
+  <span class="cl">skip</span><input type="number" id="ana-rd-ms" value="2" min="1" max="3" style="width:42px">
+  <span class="cl">ep</span><input type="range" min="10" max="90" value="55" id="ana-rd-ep" oninput="document.getElementById('ana-rd-epv').textContent=(this.value/100).toFixed(2)" style="width:70px"><span id="ana-rd-epv" style="font-family:monospace;font-size:12px">0.55</span>
+  <span class="cl">seed</span><input type="number" id="ana-rd-seed" value="42" min="0" max="9999" style="width:52px">
+  <button onclick="genRandDAG('ana')" style="background:#eaf7f1;border-color:#b0dfc7;color:#0a7c54">Generate</button>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<div>
+  <div style="font-size:11px;color:#666;margin-bottom:5px;font-weight:500">Nodes</div>
+  <div class="crow"><input type="text" id="ana-new-node" placeholder="name" style="width:70px"><button onclick="addNode('ana')">+ Add</button><select id="ana-del-node" style="flex:1;font-size:12px"></select><button onclick="removeNode('ana')">− Remove</button></div>
+  <div style="font-size:11px;color:#666;margin:5px 0;font-weight:500">Source / Sink</div>
+  <div class="crow"><span class="cl">src</span><select id="ana-src-sel" style="font-size:12px;flex:1" onchange="setSrcSnk('ana')"></select><span class="cl">snk</span><select id="ana-snk-sel" style="font-size:12px;flex:1" onchange="setSrcSnk('ana')"></select></div>
+</div>
+<div>
+  <div style="font-size:11px;color:#666;margin-bottom:5px;font-weight:500">Edges</div>
+  <div class="crow"><select id="ana-ef" style="font-size:12px;width:58px"></select><span>→</span><select id="ana-et" style="font-size:12px;width:58px"></select><input type="number" id="ana-eb" value="0.33" min="0" max="1" step="0.01" style="width:44px;font-size:12px"><input type="number" id="ana-ed" value="0.33" min="0" max="1" step="0.01" style="width:44px;font-size:12px"><input type="number" id="ana-eu" value="0.33" min="0" max="1" step="0.01" style="width:44px;font-size:12px"><button onclick="addEdge('ana')">+ Add</button></div>
+  <div class="crow"><select id="ana-del-edge" style="font-size:12px;flex:1"></select><button onclick="removeEdge('ana')">− Remove</button></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== EVALUATION ===== -->
+<div class="tp" id="tp-eval">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
+<div class="cc"><div class="ct">Reproducing Fig 6 — uncertainty sweep</div><div class="cb">Sweep u(ω<sup>B</sup><sub>E</sub>) from 0→1. All other edges fixed at (⅓,⅓,⅓,0.5). Shows impact of keeping edge B→E under each strategy and fusion operator.</div>
+<div style="display:flex;align-items:center;gap:10px;margin-top:10px">
+  <span style="font-size:13px;color:#555;white-space:nowrap">u(ω<sup>B</sup><sub>E</sub>) =</span>
+  <input type="range" min="0" max="100" value="50" step="1" id="ev-slider" oninput="updateEval()" style="flex:1">
+  <span id="ev-val" style="font-family:monospace;font-size:14px;font-weight:500;min-width:36px;text-align:right">0.50</span>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start">
+  <div class="opm" style="padding:8px"><span class="opml">Optimized u (cum)</span><span class="opmv ok" id="ev-oc">—</span></div>
+  <div class="opm" style="padding:8px"><span class="opml">Original u (cum)</span><span class="opmv" id="ev-rc">—</span></div>
+  <div class="opm" style="padding:8px"><span class="opml">Reduction (cum)</span><span class="opmv ok" id="ev-dc">—</span></div>
+  <div class="opm" style="padding:8px"><span class="opml">Reduction (avg)</span><span class="opmv" id="ev-da">—</span></div>
+</div>
+</div>
+<div class="leg">
+<div class="legi"><div class="legd" style="background:#1D9E75"></div>Optimized (cum)</div>
+<div class="legi"><div class="legd" style="background:#BA7517"></div>Original (cum)</div>
+<div class="legi"><div class="legd" style="background:#1D9E75;opacity:.5"></div>Optimized (avg) – dashed</div>
+<div class="legi"><div class="legd" style="background:#BA7517;opacity:.5"></div>Original (avg) – dashed</div>
+</div>
+<div style="position:relative;height:220px"><canvas id="ev-chart" role="img" aria-label="Uncertainty sweep chart">Optimized criteria yield lower uncertainty.</canvas></div>
+
+<hr class="sep">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+  <strong style="font-size:13px">Benchmark: Jøsang vs Optimized on random DAGs</strong>
+  <span class="cl">Layers 2–6, 10 seeds each, edge_prob=0.55</span>
+  <button onclick="runBenchmark()" id="ev-run-btn" style="background:#eaf7f1;border-color:#b0dfc7;color:#0a7c54">▶ Run benchmark</button>
+  <span id="ev-status" style="font-size:11px;color:#888"></span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div>
+  <div style="font-size:12px;color:#888;margin-bottom:4px">Retention ratio |E(G')| / |E(G)|</div>
+  <div style="position:relative;height:170px"><canvas id="ev-ret" role="img" aria-label="Retention ratio benchmark"></canvas></div>
+</div>
+<div>
+  <div style="font-size:12px;color:#888;margin-bottom:4px">Final uncertainty u(ω<sup>sink</sup><sub>src</sub>)</div>
+  <div style="position:relative;height:170px"><canvas id="ev-unc" role="img" aria-label="Final uncertainty benchmark"></canvas></div>
+</div>
+</div>
+
+</div>
+<figure id="ouattara2026">
+  <blockquote>
+    Ouattara, K. I., Petrovska, A., Krontiris, I., Dimitrakos, T., & Kargl, F. (2026).
+    <i>An Optimized Framework for DSPG Synthesis and Trust Network Analysis with Subjective Logic</i>.
+    In <i>Rules and Reasoning</i>, Springer Nature Switzerland, pp. 54–71.
+  </blockquote>
+  <figcaption>
+    DOI: <a href="https://doi.org/10.1007/978-3-032-08887-1_4">10.1007/978-3-032-08887-1_4</a>
+  </figcaption>
+</figure>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+/* ======== SL MATH ======== */
+const proj=o=>o.b+o.a*o.u;
+function dTE(r,f){const p=proj(r),b=Math.max(0,p*f.b),d=Math.max(0,p*f.d),u=Math.max(0,1-b-d);return{b,d,u,a:f.a}}
+function fCum(o1,o2){
+  const{b:b1,d:d1,u:u1,a:a1}=o1,{b:b2,d:d2,u:u2,a:a2}=o2;
+  if(u1<1e-12&&u2<1e-12)return{b:.5*b1+.5*b2,d:.5*d1+.5*d2,u:0,a:.5*(a1+a2)};
+  const den=u1+u2-u1*u2;if(den<1e-12)return fAvg(o1,o2);
+  const b=(b1*u2+b2*u1)/den,d=(d1*u2+d2*u1)/den,u=(u1*u2)/den;
+  const da=u1+u2-2*u1*u2;
+  let a=da<1e-12?.5*(a1+a2):(a1*u2+a2*u1-(a1+a2)*u1*u2)/da;
+  a=Math.min(Math.max(a,0),1);const s=b+d+u;return{b:b/s,d:d/s,u:u/s,a}
+}
+function fAvg(o1,o2){
+  const{b:b1,d:d1,u:u1,a:a1}=o1,{b:b2,d:d2,u:u2,a:a2}=o2;
+  if(u1<1e-12&&u2<1e-12)return{b:.5*(b1+b2),d:.5*(d1+d2),u:0,a:.5*(a1+a2)};
+  const den=u1+u2;if(den<1e-12)return o1;
+  const b=(b1*u2+b2*u1)/den,d=(d1*u2+d2*u1)/den,u=(2*u1*u2)/den;
+  const s=b+d+u;return{b:b/s,d:d/s,u:u/s,a:.5*(a1+a2)}
+}
+function fMany(ops,m){const fn=m==='cumulative'?fCum:fAvg;return ops.slice(1).reduce((a,o)=>fn(a,o),ops[0])}
+function chain(ops){if(!ops.length)return DEF;return ops.slice(1).reduce((a,o)=>dTE(a,o),ops[0])}
+const DEF={b:1/3,d:1/3,u:1/3,a:.5};
+
+/* ======== GRAPH UTILS ======== */
+function bAdj(edges){const a={};for(const e of edges){if(!a[e.from])a[e.from]=[];a[e.from].push(e.to)}return a}
+function desc(adj,s){const v=new Set(),q=[...(adj[s]||[])];while(q.length){const n=q.pop();if(!v.has(n)){v.add(n);(adj[n]||[]).forEach(x=>q.push(x))}}return v}
+function aPaths(edges,s,d){const adj=bAdj(edges),r=[];function dfs(n,p,vis){if(n===d){r.push([...p]);return}for(const nx of(adj[n]||[])){if(!vis.has(nx)){vis.add(nx);p.push(nx);dfs(nx,p,vis);p.pop();vis.delete(nx)}}}dfs(s,[s],new Set([s]));return r}
+function findPPS(nodes,edges){
+  const pps=[],adj=bAdj(edges),id={};
+  for(const e of edges)id[e.to]=(id[e.to]||0)+1;
+  for(const A of nodes){if((adj[A]||[]).length<2)continue;for(const B of desc(adj,A)){if((id[B]||0)<2)continue;if(aPaths(edges,A,B).length>=2)pps.push([A,B])}}
+  return pps
+}
+function cNNL(nodes,edges){
+  const nnl={};for(const n of nodes)nnl[n]=0;
+  for(const[A,B]of findPPS(nodes,edges)){const inter=new Set();for(const p of aPaths(edges,A,B))for(const n of p.slice(1,-1))inter.add(n);for(const n of inter)if(n in nnl)nnl[n]++}
+  return nnl
+}
+function segExt(path,i,j,edges){for(let k=i;k<j;k++)if(edges.some(e=>e.from===path[k]&&e.to===path[k+1]))return false;return true}
+function getBr(path,gpN,gpE){
+  const n=path.length,br=[];let i=0;
+  while(i<n-1){
+    while(i<n-1&&!gpN.has(path[i]))i++;if(i>=n-1)break;
+    if(gpE.some(e=>e.from===path[i]&&e.to===path[i+1])){i++;continue}
+    let j=i+1;while(j<n){if(gpN.has(path[j])&&segExt(path,i,j,gpE))break;j++;if(j===n)break}
+    if(j<n){br.push([i,j]);i=j}else break
+  }return br
+}
+function chkCrit(strat,gpN,gpE,A,B){
+  if(!gpN.has(A)||!gpN.has(B))return false;
+  if(!aPaths(gpE,A,B).length)return false;
+  const nnl=cNNL([...gpN],gpE),nA=nnl[A]||0,nB=nnl[B]||0;
+  if(strat==='original'){if(nA!==nB)return false;const t=nA;for(const p of aPaths(gpE,A,B))for(const v of p.slice(1,-1))if((nnl[v]||0)<t)return false}
+  else{if(Math.abs(nA-nB)>1)return false;const t=Math.max(nA,nB);for(const p of aPaths(gpE,A,B))for(const v of p.slice(1,-1))if((nnl[v]||0)<t)return false}
+  return true
+}
+function snap(gpN,gpE){return{nodes:new Set(gpN),edges:gpE.map(e=>({...e}))}}
+
+/* ======== NODE-TO-PNPS ======== */
+function buildNTP(nodes,edges){
+  const ntp={};for(const n of nodes)ntp[n]=null;
+  for(const[A,B]of findPPS(nodes,edges)){
+    const ps=aPaths(edges,A,B),pN=new Set();
+    for(const p of ps)for(const n of p)pN.add(n);
+    const info={A,B,nodes:pN};
+    const inter=new Set();for(const p of ps)for(const n of p.slice(1,-1))inter.add(n);
+    for(const n of inter){if(ntp[n]===null||pN.size<ntp[n].nodes.size)ntp[n]=info}
+  }
+  return ntp
+}
+function checkCritNTP(ntp,gpE,A,B){
+  if(!aPaths(gpE,A,B).length)return false;
+  const pA=ntp[A],pB=ntp[B];
+  if(pA!==null&&!pA.nodes.has(B))return false;
+  if(pB!==null&&!pB.nodes.has(A))return false;
+  return true
+}
+function updateNTPAdd(ntp,gpN,gpE,A,B){
+  const ps=aPaths(gpE,A,B);if(ps.length<2)return;
+  let hasNI=false;
+  outer:for(let i=0;i<ps.length;i++){const s=new Set(ps[i].slice(1,-1));for(let j=i+1;j<ps.length;j++)if(!ps[j].slice(1,-1).some(n=>s.has(n))){hasNI=true;break outer}}
+  if(!hasNI)return;
+  const pN=new Set();for(const p of ps)for(const n of p)pN.add(n);
+  const info={A,B,nodes:pN};
+  for(const p of ps)for(const n of p.slice(1,-1)){if(ntp[n]===null||pN.size<ntp[n].nodes.size)ntp[n]=info}
+}
+function updateNTPReduce(ntp,internals){for(const n of internals)delete ntp[n]}
+function findInnermostPNPS(nodes,edges,ntp){
+  const pps=findPPS([...nodes],edges);if(!pps.length)return null;
+  for(const[A,B]of pps){
+    const ps=aPaths(edges,A,B),inter=new Set();
+    for(const p of ps)for(const n of p.slice(1,-1))inter.add(n);
+    if([...inter].every(n=>{const np=ntp[n];return np===null||(np.A===A&&np.B===B)}))return[A,B]
+  }
+  let best=pps[0],bSz=Infinity;
+  for(const[A,B]of pps){const sz=new Set(aPaths(edges,A,B).flat()).size;if(sz<bSz){bSz=sz;best=[A,B]}}
+  return best
+}
+function ntpStr(ntp){const e=Object.entries(ntp).filter(([,v])=>v!==null).map(([n,v])=>`${n}→(${v.A},${v.B})`);return e.length?e.join(', '):'∅'}
+
+/* ======== SEEDED RNG + RANDOM DAG ======== */
+function mkRng(seed){let s=(seed>>>0)||1;return()=>{s=Math.imul(1664525,s)+1013904223>>>0;return s/0x100000000}}
+function randOp(rng,a=.5){const x=[rng()+.001,rng()+.001,rng()+.001],s=x[0]+x[1]+x[2];return{b:x[0]/s,d:x[1]/s,u:x[2]/s,a}}
+function randomDAG(nL=4,npl=3,ep=.5,ms=2,seed=42){
+  const rng=mkRng(seed),layers=[['S']];
+  for(let li=0;li<nL;li++){const sz=2+Math.floor(rng()*Math.max(1,npl-1));layers.push(Array.from({length:sz},(_,i)=>`L${li}_${i}`))}
+  layers.push(['T']);
+  const nodes=layers.flat(),edges=[];
+  for(let li=0;li<layers.length-1;li++)for(const u of layers[li])for(let sk=1;sk<=ms;sk++){const ti=li+sk;if(ti>=layers.length)break;for(const v of layers[ti])if(rng()<ep)edges.push({from:u,to:v,op:randOp(rng)})}
+  for(let li=1;li<layers.length;li++)for(const v of layers[li])if(!edges.some(e=>e.to===v)){const si=Math.max(0,li-1-Math.floor(rng()*ms));const sl=layers[si];edges.push({from:sl[Math.floor(rng()*sl.length)],to:v,op:randOp(rng)})}
+  for(let li=0;li<layers.length-1;li++)for(const u of layers[li])if(!edges.some(e=>e.from===u)){const ti=Math.min(layers.length-1,li+1+Math.floor(rng()*ms));const tl=layers[ti];edges.push({from:u,to:tl[Math.floor(rng()*tl.length)],op:randOp(rng)})}
+  const em={};const dedupe=[];for(const e of edges){const k=`${e.from}→${e.to}`;if(!em[k]){em[k]=1;dedupe.push(e)}}
+  const G={nodes,edges:dedupe,src:'S',snk:'T',layers};
+  autoPos(G);return G
+}
+function topoLayers(nodes,edges,src){
+  const adj=bAdj(edges),depth={};for(const n of nodes)depth[n]=-1;
+  const q=[src];depth[src]=0;
+  while(q.length){const n=q.shift();for(const m of(adj[n]||[])){if(depth[m]<depth[n]+1){depth[m]=depth[n]+1;q.push(m)}}}
+  for(const n of nodes)if(depth[n]<0)depth[n]=0;
+  const mxD=Math.max(...Object.values(depth));
+  const ls=Array.from({length:mxD+1},()=>[]);
+  for(const n of nodes)ls[depth[n]].push(n);
+  return ls
+}
+function layoutFromLayers(layers,W=480,H=300){
+  const pos={};const lh=Math.max(1,layers.length-1);
+  layers.forEach((layer,li)=>{const y=40+li*(H-80)/lh;const lw=layer.length+1;layer.forEach((n,ni)=>{pos[n]={x:W*(ni+1)/lw,y}})});
+  return pos
+}
+function autoPos(G){
+  if(!G.src||!G.nodes.length){G.pos=G.pos||{};G.nodes.forEach((n,i)=>{G.pos[n]={x:60+i*80,y:160}});return}
+  const layers=topoLayers(G.nodes,G.edges,G.src);
+  const H=Math.max(260,layers.length*90);
+  G.pos=layoutFromLayers(layers,480,H)
+}
+
+/* ======== PRESET GRAPHS ======== */
+const GR={
+  paper:{name:'Paper Fig 5a',src:'A',snk:'E',nodes:['A','B','C','D','E'],
+    edges:[{from:'A',to:'B',op:{...DEF}},{from:'A',to:'D',op:{...DEF}},{from:'B',to:'C',op:{...DEF}},{from:'B',to:'E',op:{...DEF}},{from:'C',to:'E',op:{...DEF}},{from:'D',to:'E',op:{...DEF}}],
+    pos:{A:{x:240,y:38},B:{x:114,y:142},D:{x:366,y:142},C:{x:66,y:258},E:{x:268,y:270}}},
+  diamond:{name:'Diamond+shortcut',src:'S',snk:'T',nodes:['S','A','B','C','D','T'],
+    edges:[{from:'S',to:'A',op:{...DEF}},{from:'S',to:'B',op:{...DEF}},{from:'A',to:'C',op:{...DEF}},{from:'A',to:'D',op:{...DEF}},{from:'B',to:'D',op:{...DEF}},{from:'C',to:'T',op:{...DEF}},{from:'D',to:'T',op:{...DEF}}],
+    pos:{S:{x:240,y:36},A:{x:118,y:136},B:{x:362,y:136},C:{x:62,y:248},D:{x:270,y:248},T:{x:188,y:340}}}
+};
+const AGR={
+  'opt-paper':{name:'Paper (optimized result)',src:'A',snk:'E',nodes:['A','B','C','D','E'],
+    edges:[{from:'A',to:'B',op:{...DEF}},{from:'A',to:'D',op:{...DEF}},{from:'B',to:'C',op:{...DEF}},{from:'B',to:'E',op:{...DEF}},{from:'C',to:'E',op:{...DEF}},{from:'D',to:'E',op:{...DEF}}],
+    pos:{A:{x:240,y:38},B:{x:114,y:142},D:{x:366,y:142},C:{x:66,y:258},E:{x:268,y:270}}},
+  'orig-paper':{name:'Paper (original result)',src:'A',snk:'E',nodes:['A','B','D','E'],
+    edges:[{from:'A',to:'B',op:{...DEF}},{from:'A',to:'D',op:{...DEF}},{from:'B',to:'E',op:{...DEF}},{from:'D',to:'E',op:{...DEF}}],
+    pos:{A:{x:240,y:60},B:{x:126,y:172},D:{x:354,y:172},E:{x:240,y:296}}},
+  'opt-diamond':{name:'Diamond (optimized result)',src:'S',snk:'T',nodes:['S','A','B','C','D','T'],
+    edges:[{from:'S',to:'A',op:{...DEF}},{from:'S',to:'B',op:{...DEF}},{from:'A',to:'C',op:{...DEF}},{from:'A',to:'D',op:{...DEF}},{from:'B',to:'D',op:{...DEF}},{from:'C',to:'T',op:{...DEF}},{from:'D',to:'T',op:{...DEF}}],
+    pos:{S:{x:240,y:36},A:{x:118,y:136},B:{x:362,y:136},C:{x:62,y:248},D:{x:270,y:248},T:{x:188,y:340}}}
+};
+
+/* ======== CUSTOM GRAPH STATE ======== */
+const CG={syn:null,ana:null};
+function getGraph(tab){
+  if(CG[tab])return CG[tab];
+  if(tab==='syn')return GR[document.getElementById('syn-gr')?.value||'paper']||GR.paper;
+  return AGR[document.getElementById('ana-gr')?.value||'opt-paper']||AGR['opt-paper'];
+}
+function clearCG(tab){CG[tab]=null}
+function getOrInitCG(tab){
+  if(!CG[tab]){const G=getGraph(tab);CG[tab]={nodes:[...G.nodes],edges:G.edges.map(e=>({...e})),src:G.src,snk:G.snk,pos:Object.fromEntries(Object.entries(G.pos||{}).map(([k,v])=>[k,{...v}]))}}
+  return CG[tab]
+}
+
+/* ======== GRAPH EDITOR ======== */
+function toggleEditor(tab){const el=document.getElementById(`${tab}-editor`);el.style.display=el.style.display==='none'?'block':'none';if(el.style.display==='block')refreshEditorUI(tab)}
+function refreshEditorUI(tab){
+  const G=CG[tab]||getGraph(tab);
+  const nodes=G.nodes||[],edges=G.edges||[];
+  const nOpts=nodes.map(n=>`<option value="${n}">${n}</option>`).join('');
+  ['del-node','ef','et','src-sel','snk-sel'].forEach(id=>{const el=document.getElementById(`${tab}-${id}`);if(el)el.innerHTML=nOpts});
+  const eOpts=edges.map(e=>`<option value="${e.from}→${e.to}">${e.from}→${e.to} (u=${e.op?.u?.toFixed(2)||'?'})</option>`).join('');
+  const de=document.getElementById(`${tab}-del-edge`);if(de)de.innerHTML=eOpts;
+  const ss=document.getElementById(`${tab}-src-sel`);if(ss&&G.src)ss.value=G.src;
+  const sk=document.getElementById(`${tab}-snk-sel`);if(sk&&G.snk)sk.value=G.snk;
+}
+function addNode(tab){
+  const name=document.getElementById(`${tab}-new-node`).value.trim();if(!name)return;
+  const G=getOrInitCG(tab);if(G.nodes.includes(name))return;
+  G.nodes.push(name);autoPos(G);refreshEditorUI(tab);resetTab(tab)
+}
+function removeNode(tab){
+  const name=document.getElementById(`${tab}-del-node`).value;if(!name)return;
+  const G=getOrInitCG(tab);
+  G.nodes=G.nodes.filter(n=>n!==name);G.edges=G.edges.filter(e=>e.from!==name&&e.to!==name);
+  if(G.src===name)G.src=G.nodes[0]||'';if(G.snk===name)G.snk=G.nodes[G.nodes.length-1]||'';
+  autoPos(G);refreshEditorUI(tab);resetTab(tab)
+}
+function addEdge(tab){
+  const from=document.getElementById(`${tab}-ef`).value,to=document.getElementById(`${tab}-et`).value;
+  if(!from||!to||from===to)return;
+  const b=+document.getElementById(`${tab}-eb`).value,d=+document.getElementById(`${tab}-ed`).value,u=+document.getElementById(`${tab}-eu`).value;
+  const s=b+d+u||1;const op={b:b/s,d:d/s,u:u/s,a:.5};
+  const G=getOrInitCG(tab);if(G.edges.some(e=>e.from===from&&e.to===to))return;
+  G.edges.push({from,to,op});autoPos(G);refreshEditorUI(tab);resetTab(tab)
+}
+function removeEdge(tab){
+  const key=document.getElementById(`${tab}-del-edge`).value;if(!key)return;
+  const [from,to]=key.split('→');
+  const G=getOrInitCG(tab);G.edges=G.edges.filter(e=>!(e.from===from&&e.to===to));
+  refreshEditorUI(tab);resetTab(tab)
+}
+function setSrcSnk(tab){
+  const G=getOrInitCG(tab);
+  G.src=document.getElementById(`${tab}-src-sel`).value;
+  G.snk=document.getElementById(`${tab}-snk-sel`).value;
+  autoPos(G);resetTab(tab)
+}
+function genRandDAG(tab){
+  const nL=+document.getElementById(`${tab}-rd-nl`).value||4;
+  const npl=+document.getElementById(`${tab}-rd-npl`).value||3;
+  const ms=+document.getElementById(`${tab}-rd-ms`).value||2;
+  const ep=+document.getElementById(`${tab}-rd-ep`).value/100;
+  const seed=+document.getElementById(`${tab}-rd-seed`).value||42;
+  CG[tab]=randomDAG(nL,npl,ep,ms,seed);
+  refreshEditorUI(tab);resetTab(tab)
+}
+function importFromSyn(){
+  const s=ST.syn;if(!s.steps.length)return alert('Run synthesis first.');
+  const finalStep=s.steps[s.steps.length-1];const gp=finalStep.gp;
+  const synG=getGraph('syn');
+  CG.ana={nodes:[...gp.nodes],edges:gp.edges.map(e=>({...e})),src:synG.src,snk:synG.snk,pos:{...synG.pos}};
+  autoPos(CG.ana);refreshEditorUI('ana');anaReset()
+}
+function resetTab(tab){if(tab==='syn')synReset();else anaReset()}
+
+/* ======== SYNTHESIS ALGORITHMS ======== */
+function computeSynSteps(graph,method){
+  if(method==='ntp')return synStepsNTP(graph);
+  return synStepsNNL(graph,method)
+}
+function synStepsNNL(graph,strat){
+  const{src,snk}=graph,AE=graph.edges,AN=graph.nodes,steps=[];
+  if(!AN?.length)return[{type:'error',msg:'Empty graph.',gp:{nodes:new Set(),edges:[]},hl:[],brE:[],nnl:{}}];
+  const paths=aPaths(AE,src,snk);
+  if(!paths.length)return[{type:'error',msg:`No path ${src}→${snk}.`,gp:{nodes:new Set(),edges:[]},hl:[],brE:[],nnl:{}}];
+  paths.sort((a,b)=>a.length-b.length);
+  const gpN=new Set(),gpE=[];
+  steps.push({type:'start',msg:`Found ${paths.length} path(s). Sorted by length: ${paths.map(p=>p.join('→')).join(' | ')}`,gp:{nodes:new Set(),edges:[]},hl:[],brE:[],nnl:{}});
+  const first=paths[0];
+  for(let k=0;k<first.length-1;k++){const u=first[k],v=first[k+1];gpN.add(u);gpN.add(v);const e=AE.find(e=>e.from===u&&e.to===v);if(e&&!gpE.some(x=>x.from===u&&x.to===v))gpE.push({...e,st:'gp'})}
+  steps.push({type:'init',msg:`G' ← ${first.join('→')}`,gp:snap(gpN,gpE),hl:[...first],brE:[],nnl:{...cNNL([...gpN],gpE)}});
+  for(let pi=1;pi<paths.length;pi++){
+    const path=paths[pi];
+    steps.push({type:'try',msg:`Path ${pi+1}/${paths.length}: ${path.join('→')}`,gp:snap(gpN,gpE),hl:[...path],brE:[],nnl:{...cNNL([...gpN],gpE)}});
+    let more=true;
+    while(more){
+      more=false;const brs=getBr(path,gpN,gpE);if(!brs.length)break;
+      const[bi,bj]=brs[0],A=path[bi],B=path[bj],brNd=path.slice(bi,bj+1),brEd=brNd.slice(0,-1).map((n,i)=>({from:n,to:brNd[i+1]}));
+      const nnl=cNNL([...gpN],gpE),nA=nnl[A]||0,nB=nnl[B]||0,acc=chkCrit(strat,gpN,gpE,A,B);
+      const cMsg=strat==='original'?`NNL(${A})=${nA} ${nA===nB?'=':'≠'} NNL(${B})=${nB}`:`|NNL(${A})=${nA}−NNL(${B})=${nB}|=${Math.abs(nA-nB)} ${Math.abs(nA-nB)<=1?'≤1✓':'>1✗'}`;
+      steps.push({type:acc?'accept':'reject',msg:`Branch ${A}→[${brNd.slice(1,-1).join(',')||'–'}]→${B}: ${acc?'✓ ACCEPTED':'✗ REJECTED'} (${cMsg})`,gp:snap(gpN,gpE),hl:brNd,brE:brEd,nnl:{...nnl},acc});
+      if(acc){
+        for(let k=bi;k<bj;k++){const u=path[k],v=path[k+1];gpN.add(u);gpN.add(v);const e=AE.find(e=>e.from===u&&e.to===v);if(e&&!gpE.some(x=>x.from===u&&x.to===v))gpE.push({...e,st:'gp'})}
+        steps.push({type:'added',msg:`Added ${brNd.join('→')} (${gpE.length} edges)`,gp:snap(gpN,gpE),hl:brNd,brE:brEd,nnl:{...cNNL([...gpN],gpE)}});more=true
+      }
+    }
+  }
+  steps.push({type:'done',msg:`✓ Done: ${gpE.length} edges — ${gpE.map(e=>`${e.from}→${e.to}`).join(', ')}`,gp:snap(gpN,gpE),hl:[],brE:[],nnl:{...cNNL([...gpN],gpE)},final:true});
+  return steps
+}
+function synStepsNTP(graph){
+  const{src,snk}=graph,AE=graph.edges,AN=graph.nodes,steps=[];
+  if(!AN?.length)return[{type:'error',msg:'Empty graph.',gp:{nodes:new Set(),edges:[]},hl:[],brE:[],ntpObj:{}}];
+  const paths=aPaths(AE,src,snk);
+  if(!paths.length)return[{type:'error',msg:`No path ${src}→${snk}.`,gp:{nodes:new Set(),edges:[]},hl:[],brE:[],ntpObj:{}}];
+  paths.sort((a,b)=>a.length-b.length);
+  const gpN=new Set(),gpE=[],ntp={};
+  for(const n of AN)ntp[n]=null;
+  steps.push({type:'start',msg:`Found ${paths.length} path(s). nodeToPNPS initialised ∅ for all nodes.`,gp:{nodes:new Set(),edges:[]},hl:[],brE:[],ntpObj:{...ntp}});
+  const first=paths[0];
+  for(let k=0;k<first.length-1;k++){const u=first[k],v=first[k+1];gpN.add(u);gpN.add(v);const e=AE.find(e=>e.from===u&&e.to===v);if(e&&!gpE.some(x=>x.from===u&&x.to===v))gpE.push({...e,st:'gp'})}
+  steps.push({type:'init',msg:`G' ← ${first.join('→')}. No PNPS yet → nodeToPNPS unchanged.`,gp:snap(gpN,gpE),hl:[...first],brE:[],ntpObj:{...ntp}});
+  for(let pi=1;pi<paths.length;pi++){
+    const path=paths[pi];
+    steps.push({type:'try',msg:`Path ${pi+1}/${paths.length}: ${path.join('→')}`,gp:snap(gpN,gpE),hl:[...path],brE:[],ntpObj:{...ntp}});
+    let more=true;
+    while(more){
+      more=false;const brs=getBr(path,gpN,gpE);if(!brs.length)break;
+      const[bi,bj]=brs[0],A=path[bi],B=path[bj],brNd=path.slice(bi,bj+1),brEd=brNd.slice(0,-1).map((n,i)=>({from:n,to:brNd[i+1]}));
+      const pA=ntp[A],pB=ntp[B],acc=checkCritNTP(ntp,gpE,A,B);
+      const pAs=pA?`PNPS(${pA.A},${pA.B})`:'∅',pBs=pB?`PNPS(${pB.A},${pB.B})`:'∅';
+      const chA=!pA?'free✓':(pA.nodes.has(B)?`B∈${pAs}✓`:`B∉${pAs}✗`);
+      const chB=!pB?'free✓':(pB.nodes.has(A)?`A∈${pBs}✓`:`A∉${pBs}✗`);
+      steps.push({type:acc?'accept':'reject',msg:`Branch ${A}→[${brNd.slice(1,-1).join(',')||'–'}]→${B}: ${acc?'✓ ACCEPTED':'✗ REJECTED'} | nTP[${A}]=${pAs} ${chA}; nTP[${B}]=${pBs} ${chB}`,gp:snap(gpN,gpE),hl:brNd,brE:brEd,ntpObj:{...ntp},acc});
+      if(acc){
+        for(let k=bi;k<bj;k++){const u=path[k],v=path[k+1];gpN.add(u);gpN.add(v);const e=AE.find(e=>e.from===u&&e.to===v);if(e&&!gpE.some(x=>x.from===u&&x.to===v))gpE.push({...e,st:'gp'})}
+        updateNTPAdd(ntp,gpN,gpE,A,B);
+        steps.push({type:'added',msg:`Added ${brNd.join('→')}. nodeToPNPS: {${ntpStr(ntp)}}`,gp:snap(gpN,gpE),hl:brNd,brE:brEd,ntpObj:{...ntp}});more=true
+      }
+    }
+  }
+  steps.push({type:'done',msg:`✓ Done: ${gpE.length} edges. nodeToPNPS: {${ntpStr(ntp)}}`,gp:snap(gpN,gpE),hl:[],brE:[],ntpObj:{...ntp},final:true});
+  return steps
+}
+
+/* ======== ANALYSIS ALGORITHMS ======== */
+function computeAnaSteps(graph,fusion,method){
+  if(method==='ntp')return anaStepsNTP(graph,fusion);
+  return anaStepsNNL(graph,fusion)
+}
+function anaStepsNNL(graph,fusion){
+  const{src,snk}=graph;let hN=new Set(graph.nodes),hE=graph.edges.map(e=>({...e,st:'cur'}));const steps=[];
+  steps.push({type:'start',msg:`Analysis (${fusion}, Jøsang). Input: ${graph.nodes.join(', ')}`,hN:new Set(hN),hE:[...hE],pps:[],hl:null});
+  let iter=0;
+  while(iter++<60){
+    const pps=findPPS([...hN],hE);if(!pps.length)break;
+    steps.push({type:'pps',msg:`PPSs: ${pps.map(([a,b])=>`(${a},${b})`).join(', ')} — computing edge NLs…`,hN:new Set(hN),hE:[...hE],pps:[...pps],hl:null});
+    const eNL={};for(const e of hE)eNL[`${e.from}→${e.to}`]=0;
+    const pEM={};
+    for(const[A,B]of pps){const ps=aPaths(hE,A,B),es=new Set();for(const p of ps)for(let k=0;k<p.length-1;k++)es.add(`${p[k]}→${p[k+1]}`);pEM[`${A}→${B}`]=es;for(const ek of es)eNL[ek]=(eNL[ek]||0)+1}
+    let mxNL=-1,mxPPS=null;
+    for(const[A,B]of pps){const es=pEM[`${A}→${B}`];const nl=Math.min(...[...es].map(k=>eNL[k]||0));if(nl>mxNL){mxNL=nl;mxPPS=[A,B]}}
+    const[mA,mB]=mxPPS,mpP=aPaths(hE,mA,mB),mxEK=new Set();
+    for(const p of mpP)for(let k=0;k<p.length-1;k++)mxEK.add(`${p[k]}→${p[k+1]}`);
+    steps.push({type:'maxpps',msg:`Max NL=${mxNL}: PPS(${mA},${mB}) with ${mpP.length} paths (NL recomputed from scratch)`,hN:new Set(hN),hE:[...hE],pps:[...pps],hl:{A:mA,B:mB,paths:mpP,eKeys:mxEK}});
+    const pOps=mpP.map(p=>{const ops=p.slice(0,-1).map((n,i)=>{const e=hE.find(e=>e.from===n&&e.to===p[i+1]);return e?.op||DEF});return{path:p,op:chain(ops)}});
+    const merged=fMany(pOps.map(x=>x.op),fusion);
+    steps.push({type:'reduce',msg:`Fusing ${mpP.length} paths → b=${merged.b.toFixed(3)} d=${merged.d.toFixed(3)} u=${merged.u.toFixed(3)}`,hN:new Set(hN),hE:[...hE],pps:[...pps],hl:{A:mA,B:mB,paths:mpP,eKeys:mxEK},merged});
+    const inter=new Set();for(const p of mpP)for(const n of p.slice(1,-1))inter.add(n);
+    hN=new Set([...hN].filter(n=>!inter.has(n)));hE=hE.filter(e=>!inter.has(e.from)&&!inter.has(e.to)&&!(e.from===mA&&e.to===mB));
+    hE.push({from:mA,to:mB,op:merged,st:'red'});
+    steps.push({type:'reduced',msg:`Removed {${[...inter].join(',')}}; added ${mA}→${mB}(u=${merged.u.toFixed(3)})`,hN:new Set(hN),hE:[...hE],pps:[],hl:{red:{from:mA,to:mB}}});
+  }
+  const fp=aPaths(hE,src,snk);
+  const fOp=fp.length?fMany(fp.map(p=>{const ops=p.slice(0,-1).map((n,i)=>{const e=hE.find(e=>e.from===n&&e.to===p[i+1]);return e?.op||DEF});return chain(ops)}),fusion):DEF;
+  steps.push({type:'done',msg:`✓ Final: b=${fOp.b.toFixed(4)} d=${fOp.d.toFixed(4)} u=${fOp.u.toFixed(4)} P=${(fOp.b+fOp.a*fOp.u).toFixed(4)}`,hN:new Set(hN),hE:[...hE],pps:[],hl:null,fOp});
+  return steps
+}
+function anaStepsNTP(graph,fusion){
+  const{src,snk}=graph;let hN=new Set(graph.nodes),hE=graph.edges.map(e=>({...e,st:'cur'}));const steps=[];
+  let ntp=buildNTP([...hN],hE);
+  steps.push({type:'start',msg:`Analysis (${fusion}, nodeToPNPS). nodeToPNPS: {${ntpStr(ntp)}}`,hN:new Set(hN),hE:[...hE],pps:[],hl:null,ntp:ntpStr(ntp)});
+  let iter=0;
+  while(iter++<60){
+    const pps=findPPS([...hN],hE);if(!pps.length)break;
+    steps.push({type:'pps',msg:`PNPSs: ${pps.map(([a,b])=>`(${a},${b})`).join(', ')} | nodeToPNPS: {${ntpStr(ntp)}}`,hN:new Set(hN),hE:[...hE],pps:[...pps],hl:null,ntp:ntpStr(ntp)});
+    const innermost=findInnermostPNPS([...hN],hE,ntp);if(!innermost)break;
+    const[mA,mB]=innermost,mpP=aPaths(hE,mA,mB),mxEK=new Set();
+    for(const p of mpP)for(let k=0;k<p.length-1;k++)mxEK.add(`${p[k]}→${p[k+1]}`);
+    const inter=new Set();for(const p of mpP)for(const n of p.slice(1,-1))inter.add(n);
+    steps.push({type:'maxpps',msg:`Innermost PNPS(${mA},${mB}) — intermediates {${[...inter].join(',')||'∅'}} all point here in nodeToPNPS (no NL recompute!)`,hN:new Set(hN),hE:[...hE],pps:[...pps],hl:{A:mA,B:mB,paths:mpP,eKeys:mxEK},ntp:ntpStr(ntp)});
+    const pOps=mpP.map(p=>{const ops=p.slice(0,-1).map((n,i)=>{const e=hE.find(e=>e.from===n&&e.to===p[i+1]);return e?.op||DEF});return{path:p,op:chain(ops)}});
+    const merged=fMany(pOps.map(x=>x.op),fusion);
+    steps.push({type:'reduce',msg:`Fusing ${mpP.length} paths → u=${merged.u.toFixed(3)}. Updating nodeToPNPS: remove {${[...inter].join(',')}}`,hN:new Set(hN),hE:[...hE],pps:[...pps],hl:{A:mA,B:mB,paths:mpP,eKeys:mxEK},merged,ntp:ntpStr(ntp)});
+    hN=new Set([...hN].filter(n=>!inter.has(n)));hE=hE.filter(e=>!inter.has(e.from)&&!inter.has(e.to)&&!(e.from===mA&&e.to===mB));
+    hE.push({from:mA,to:mB,op:merged,st:'red'});
+    updateNTPReduce(ntp,inter);
+    steps.push({type:'reduced',msg:`Removed {${[...inter].join(',')}}; added ${mA}→${mB}(u=${merged.u.toFixed(3)}). nodeToPNPS: {${ntpStr(ntp)}}`,hN:new Set(hN),hE:[...hE],pps:[],hl:{red:{from:mA,to:mB}},ntp:ntpStr(ntp)});
+  }
+  const fp=aPaths(hE,src,snk);
+  const fOp=fp.length?fMany(fp.map(p=>{const ops=p.slice(0,-1).map((n,i)=>{const e=hE.find(e=>e.from===n&&e.to===p[i+1]);return e?.op||DEF});return chain(ops)}),fusion):DEF;
+  steps.push({type:'done',msg:`✓ Final: b=${fOp.b.toFixed(4)} d=${fOp.d.toFixed(4)} u=${fOp.u.toFixed(4)} P=${(fOp.b+fOp.a*fOp.u).toFixed(4)}`,hN:new Set(hN),hE:[...hE],pps:[],hl:null,fOp,ntp:'∅ (complete)'});
+  return steps
+}
+
+/* ======== SVG RENDERER ======== */
+const NR=17;
+function mkDefs(id){return`<defs><marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 2L8 5L2 8" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>`}
+function ep(p1,p2,crv=0){
+  const dx=p2.x-p1.x,dy=p2.y-p1.y,dist=Math.sqrt(dx*dx+dy*dy)||1;
+  const ux=dx/dist,uy=dy/dist,sx=p1.x+NR*ux,sy=p1.y+NR*uy,ex=p2.x-21*ux,ey=p2.y-21*uy;
+  if(Math.abs(crv)<1)return`M${sx.toFixed(1)},${sy.toFixed(1)} L${ex.toFixed(1)},${ey.toFixed(1)}`;
+  const mx=(sx+ex)/2,my=(sy+ey)/2;return`M${sx.toFixed(1)},${sy.toFixed(1)} Q${(mx-uy*crv).toFixed(1)},${(my+ux*crv).toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}`
+}
+function getCrv(from,to,edges){
+  if(edges&&edges.some(e=>e.from===to&&e.to===from))return 16;
+  return 0
+}
+function synSVG(step,graph){
+  if(!graph||!graph.pos)return'<div style="padding:20px;color:#888;font-size:12px">No graph.</div>';
+  const pos=graph.pos,H=Math.max(260,Math.max(...Object.values(pos).map(p=>p.y))+50);
+  const gpN=step.gp.nodes,gpE=step.gp.edges||[];
+  const hlSet=new Set();for(let i=0;i<step.hl.length-1;i++)hlSet.add(`${step.hl[i]}→${step.hl[i+1]}`);
+  const brSet=new Set(step.brE.map(e=>`${e.from}→${e.to}`));
+  let svg=`<svg width="100%" viewBox="0 0 480 ${H}" style="display:block">${mkDefs('sa')}`;
+  for(const e of graph.edges){
+    const p1=pos[e.from],p2=pos[e.to];if(!p1||!p2)continue;
+    const k=`${e.from}→${e.to}`,inGP=gpE.some(x=>x.from===e.from&&x.to===e.to),isBr=brSet.has(k),isHL=hlSet.has(k);
+    let col,sw,op;
+    if(isBr){col='#EF9F27';sw=2.5;op=1}else if(inGP){col='#1D9E75';sw=2;op=1}else if(isHL){col='#7F77DD';sw=1.5;op=.65}else{col='#bbb';sw=1;op:.4}
+    svg+=`<path d="${ep(p1,p2,getCrv(e.from,e.to,graph.edges))}" stroke="${col}" stroke-width="${sw}" opacity="${op}" fill="none" marker-end="url(#sa)"/>`;
+  }
+  for(const n of graph.nodes){
+    const p=pos[n];if(!p)continue;
+    const inGP=gpN.has(n),isHL=step.hl.includes(n),isBr=step.brE.some(e=>e.from===n||e.to===n);
+    let fill,stroke,sw=1.5;
+    if(isBr){fill='#fff8e8';stroke='#EF9F27';sw=2}else if(inGP){fill='#eaf7f1';stroke='#1D9E75'}else if(isHL){fill='#eeedfb';stroke='#7F77DD'}else{fill='#fff';stroke='#ccc'}
+    svg+=`<circle cx="${p.x}" cy="${p.y}" r="${NR}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+    svg+=`<text x="${p.x}" y="${p.y}" text-anchor="middle" dominant-baseline="central" style="font-size:13px;font-weight:500;fill:#111">${n}</text>`;
+  }
+  svg+=`</svg>`;return svg
+}
+function anaSVG(step,origGraph){
+  if(!origGraph||!origGraph.pos)return'<div style="padding:20px;color:#888;font-size:12px">No graph.</div>';
+  const pos=origGraph.pos,H=Math.max(260,Math.max(...Object.values(pos).map(p=>p.y))+50);
+  const nodes=[...step.hN],edges=step.hE,hl=step.hl;
+  const ppsEK=hl?.eKeys||null,redE=hl?.red||null;
+  let svg=`<svg width="100%" viewBox="0 0 480 ${H}" style="display:block">${mkDefs('aa')}`;
+  for(const e of edges){
+    const p1=pos[e.from],p2=pos[e.to];if(!p1||!p2)continue;
+    const k=`${e.from}→${e.to}`,isPPS=ppsEK&&ppsEK.has(k),isRed=e.st==='red'||(redE&&redE.from===e.from&&redE.to===e.to);
+    let col,sw,op;
+    if(isRed){col='#5DCAA5';sw=3;op=1}else if(isPPS){col='#7F77DD';sw=2.5;op:.9}else{col='#1D9E75';sw=2;op:.9}
+    svg+=`<path d="${ep(p1,p2,getCrv(e.from,e.to,edges))}" stroke="${col}" stroke-width="${sw}" opacity="${op}" fill="none" marker-end="url(#aa)"/>`;
+    if(isRed&&e.op){const mx=(p1.x+p2.x)/2+12,my=(p1.y+p2.y)/2-8;svg+=`<rect x="${mx-18}" y="${my-7}" width="36" height="13" rx="4" fill="#fff" stroke="#5DCAA5" stroke-width=".8"/><text x="${mx}" y="${my}" text-anchor="middle" dominant-baseline="central" style="font-size:9px;font-family:monospace;fill:#085041">u=${e.op.u.toFixed(2)}</text>`}
+  }
+  for(const n of nodes){
+    const p=pos[n];if(!p)continue;
+    const hlA=hl?.A===n,hlB=hl?.B===n,hlR=redE&&(redE.from===n||redE.to===n);
+    let fill,stroke,sw=1.5;
+    if(hlA||hlB){fill='#eeedfb';stroke='#7F77DD';sw=2}else if(hlR){fill='#e1f5ee';stroke='#5DCAA5';sw=2}else{fill='#e1f5ee';stroke='#1D9E75'}
+    svg+=`<circle cx="${p.x}" cy="${p.y}" r="${NR}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+    svg+=`<text x="${p.x}" y="${p.y}" text-anchor="middle" dominant-baseline="central" style="font-size:13px;font-weight:500;fill:#111">${n}</text>`;
+  }
+  svg+=`</svg>`;return svg
+}
+
+/* ======== STATE + CONTROLLERS ======== */
+const ST={syn:{steps:[],idx:0,playing:false,timer:null},ana:{steps:[],idx:0,playing:false,timer:null}};
+function switchTab(t){
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-btn-'+t).classList.add('on');
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
+  document.getElementById('tp-'+t).classList.add('on');
+  if(t==='syn'&&!ST.syn.steps.length)synReset();
+  if(t==='ana'&&!ST.ana.steps.length)anaReset();
+  if(t==='eval')initEval();
+}
+function synReset(){
+  const s=ST.syn;if(s.timer){clearInterval(s.timer);s.timer=null;s.playing=false}
+  document.getElementById('syn-pbtn').textContent='▶ Play';
+  document.getElementById('syn-log').innerHTML='';document.getElementById('syn-res').innerHTML='';
+  const method=document.getElementById('syn-meth').value,graph=getGraph('syn');
+  s.steps=computeSynSteps(graph,method);s.idx=0;renderSyn(0)
+}
+function synStep(){const s=ST.syn;if(!s.steps.length)synReset();if(s.idx<s.steps.length-1)renderSyn(++s.idx)}
+function synPP(){
+  const s=ST.syn;if(!s.steps.length)synReset();
+  if(s.playing){clearInterval(s.timer);s.timer=null;s.playing=false;document.getElementById('syn-pbtn').textContent='▶ Play';return}
+  if(s.idx>=s.steps.length-1)s.idx=0;
+  s.playing=true;document.getElementById('syn-pbtn').textContent='⏸ Pause';
+  s.timer=setInterval(()=>{if(s.idx<s.steps.length-1)renderSyn(++s.idx);else{clearInterval(s.timer);s.timer=null;s.playing=false;document.getElementById('syn-pbtn').textContent='▶ Play'}},820)
+}
+function renderSyn(idx){
+  const s=ST.syn,step=s.steps[idx];if(!step)return;
+  const method=document.getElementById('syn-meth').value,graph=getGraph('syn');
+  document.getElementById('syn-stepn').textContent=`Step ${idx+1} / ${s.steps.length}`;
+  const em={start:'ℹ',init:'🟢',try:'→',accept:'✓',reject:'✗',added:'✅',done:'🏁',error:'⚠'}[step.type]||'•';
+  document.getElementById('syn-stepm').innerHTML=`<strong>${em}</strong> ${step.msg}`;
+  document.getElementById('syn-pf').style.width=`${Math.round(idx/Math.max(1,s.steps.length-1)*100)}%`;
+  document.getElementById('syn-ga').innerHTML=synSVG(step,graph);
+  if(method==='ntp'){
+    document.getElementById('syn-nnl-sec').style.display='none';
+    document.getElementById('syn-ntp-sec').style.display='block';
+    const ntp=step.ntpObj||{};
+    const entries=Object.entries(ntp).filter(([,v])=>v!==null);
+    document.getElementById('syn-ntp').innerHTML=entries.length?entries.map(([n,v])=>`<div class="nnli"><span class="nnln">${n}</span>→<span class="nnlv">PNPS(${v.A},${v.B})</span></div>`).join(''):'<span style="font-size:11px;color:#aaa">∅</span>';
+  }else{
+    document.getElementById('syn-nnl-sec').style.display='block';
+    document.getElementById('syn-ntp-sec').style.display='none';
+    const nnl=step.nnl||{};
+    document.getElementById('syn-nnl').innerHTML=Object.keys(nnl).length?Object.entries(nnl).map(([n,v])=>`<div class="nnli"><span class="nnln">${n}</span>=<span class="nnlv">${v}</span></div>`).join(''):'<span style="font-size:11px;color:#aaa">—</span>';
+  }
+  const log=document.getElementById('syn-log');
+  const cls={start:'dim',init:'ok',try:'dim',accept:'ok',reject:'no',added:'ok',done:'bld',error:'no'}[step.type]||'dim';
+  log.innerHTML+=`<div class="sle ${cls}">[${idx+1}] ${step.msg}</div>`;log.scrollTop=log.scrollHeight;
+  if(step.final)document.getElementById('syn-res').innerHTML=`<div style="background:#eaf7f1;padding:8px 10px;border-radius:7px;font-size:12px;color:#0a7c54"><strong>Synthesis complete:</strong> G' = {${step.gp.edges.map(e=>`${e.from}→${e.to}`).join(', ')}} (${step.gp.edges.length} edges)</div>`;
+}
+function anaReset(){
+  const s=ST.ana;if(s.timer){clearInterval(s.timer);s.timer=null;s.playing=false}
+  document.getElementById('ana-pbtn').textContent='▶ Play';
+  document.getElementById('ana-log').innerHTML='';document.getElementById('ana-res').innerHTML='';
+  const method=document.getElementById('ana-meth').value,fusion=document.getElementById('ana-fus').value,graph=getGraph('ana');
+  s.steps=computeAnaSteps(graph,fusion,method);s.idx=0;renderAna(0)
+}
+function anaStep(){const s=ST.ana;if(!s.steps.length)anaReset();if(s.idx<s.steps.length-1)renderAna(++s.idx)}
+function anaPP(){
+  const s=ST.ana;if(!s.steps.length)anaReset();
+  if(s.playing){clearInterval(s.timer);s.timer=null;s.playing=false;document.getElementById('ana-pbtn').textContent='▶ Play';return}
+  if(s.idx>=s.steps.length-1)s.idx=0;
+  s.playing=true;document.getElementById('ana-pbtn').textContent='⏸ Pause';
+  s.timer=setInterval(()=>{if(s.idx<s.steps.length-1)renderAna(++s.idx);else{clearInterval(s.timer);s.timer=null;s.playing=false;document.getElementById('ana-pbtn').textContent='▶ Play'}},900)
+}
+function renderAna(idx){
+  const s=ST.ana,step=s.steps[idx];if(!step)return;
+  const method=document.getElementById('ana-meth').value,graph=getGraph('ana');
+  document.getElementById('ana-stepn').textContent=`Step ${idx+1} / ${s.steps.length}`;
+  const em={start:'ℹ',pps:'🔍',maxpps:'🎯',reduce:'⊕',reduced:'✂',done:'🏁'}[step.type]||'•';
+  document.getElementById('ana-stepm').innerHTML=`<strong>${em}</strong> ${step.msg}`;
+  document.getElementById('ana-pf').style.width=`${Math.round(idx/Math.max(1,s.steps.length-1)*100)}%`;
+  document.getElementById('ana-ga').innerHTML=anaSVG(step,graph);
+  const pps=step.pps||[];
+  document.getElementById('ana-pps').innerHTML=pps.length?pps.map(([a,b])=>`<span class="pps-badge">PNPS(${a},${b})</span>`).join(''):'<span style="font-size:11px;color:#aaa">—</span>';
+  if(method==='ntp'){document.getElementById('ana-ntp-sec').style.display='block';document.getElementById('ana-ntp').textContent=step.ntp||'∅'}
+  else{document.getElementById('ana-ntp-sec').style.display='none'}
+  const log=document.getElementById('ana-log');
+  const cls={start:'dim',pps:'hi',maxpps:'hi',reduce:'ok',reduced:'ok',done:'bld'}[step.type]||'dim';
+  log.innerHTML+=`<div class="sle ${cls}">[${idx+1}] ${step.msg}</div>`;log.scrollTop=log.scrollHeight;
+  if(step.fOp){const o=step.fOp;document.getElementById('ana-res').innerHTML=`<div style="background:#eaf7f1;padding:8px 10px;border-radius:7px;font-size:12px;color:#0a7c54"><strong>Final derived opinion:</strong> b=${o.b.toFixed(4)} d=${o.d.toFixed(4)} u=${o.u.toFixed(4)} | P(x)=${(o.b+o.a*o.u).toFixed(4)}</div>`}
+}
+
+/* ======== SL OPERATORS UI ======== */
+function opCard(o){return`<div class="opm"><span class="opml">b</span><span class="opmv">${o.b.toFixed(3)}</span></div><div class="opm"><span class="opml">d</span><span class="opmv">${o.d.toFixed(3)}</span></div><div class="opm"><span class="opml">u</span><span class="opmv">${o.u.toFixed(3)}</span></div>`}
+function updateSL(){
+  const b=+document.getElementById('sl-b').value/100,d=+document.getElementById('sl-d').value/100,a=+document.getElementById('sl-a').value/100,u=Math.max(0,1-b-d);
+  document.getElementById('sl-bv').textContent=b.toFixed(2);document.getElementById('sl-dv').textContent=d.toFixed(2);document.getElementById('sl-uv').textContent=u.toFixed(2);document.getElementById('sl-av').textContent=a.toFixed(2);document.getElementById('sl-pv').textContent=(b+a*u).toFixed(2);
+  document.getElementById('sl-bar').innerHTML=`<div style="width:${b*100}%;background:#1D9E75;height:100%"></div><div style="width:${d*100}%;background:#a32d2d;height:100%"></div><div style="width:${u*100}%;background:#ccc;height:100%"></div>`;
+}
+function updateTE(){
+  const u1=+document.getElementById('te-u1').value/100,u2=+document.getElementById('te-u2').value/100;
+  document.getElementById('te-u1v').textContent=u1.toFixed(2);document.getElementById('te-u2v').textContent=u2.toFixed(2);
+  const o1={b:(1-u1)/2,d:(1-u1)/2,u:u1,a:.5},o2={b:(1-u2)/2,d:(1-u2)/2,u:u2,a:.5};
+  document.getElementById('te-res').innerHTML=opCard(dTE(o1,o2));
+}
+function updateFuse(){
+  const u1=+document.getElementById('f-u1').value/100,u2=+document.getElementById('f-u2').value/100;
+  document.getElementById('f-u1v').textContent=u1.toFixed(2);document.getElementById('f-u2v').textContent=u2.toFixed(2);
+  document.getElementById('t1u1').textContent=u1.toFixed(2);document.getElementById('t1u2').textContent=u2.toFixed(2);document.getElementById('t1min').textContent=Math.min(u1,u2).toFixed(2);
+  const o1={b:(1-u1)/2,d:(1-u1)/2,u:u1,a:.5},o2={b:(1-u2)/2,d:(1-u2)/2,u:u2,a:.5};
+  const cum=fCum(o1,o2),avg=fAvg(o1,o2);
+  document.getElementById('f-cum').innerHTML=opCard(cum);document.getElementById('f-avg').innerHTML=opCard(avg);
+  document.getElementById('t1cum').textContent=cum.u.toFixed(3);document.getElementById('t1avg').textContent=avg.u.toFixed(3);
+  const h=cum.u<=Math.min(u1,u2)+1e-9;document.getElementById('t1ok').textContent=h?'✓ Yes':'✗ No';document.getElementById('t1ok').className='opmv '+(h?'ok':'no');
+}
+
+/* ======== EVALUATION ======== */
+let evalDone=false,retChart=null,uncChart=null;
+function initEval(){
+  if(evalDone)return;evalDone=true;
+  const N=51,D={b:1/3,d:1/3,u:1/3,a:.5};
+  function fOpt(u,fn){const b=(1-u)/2,oBE={b,d:b,u,a:.5},BCE=dTE(D,D);return fn(dTE(D,fn(BCE,oBE)),dTE(D,D)).u}
+  function fOrig(fn){return fn(dTE(D,dTE(D,D)),dTE(D,D)).u}
+  const xs=Array.from({length:N},(_,i)=>i/(N-1));
+  const oC=xs.map(u=>+fOpt(u,fCum).toFixed(4)),oA=xs.map(u=>+fOpt(u,fAvg).toFixed(4));
+  const rC=+fOrig(fCum).toFixed(4),rA=+fOrig(fAvg).toFixed(4);
+  window._ev={oC,oA,rC,rA,xs};
+  new Chart(document.getElementById('ev-chart'),{type:'line',data:{labels:xs.map(x=>x.toFixed(2)),datasets:[
+    {label:'Opt cum',data:oC,borderColor:'#1D9E75',borderWidth:2,pointRadius:0,tension:.3,backgroundColor:'transparent'},
+    {label:'Orig cum',data:xs.map(()=>rC),borderColor:'#BA7517',borderWidth:2,pointRadius:0,backgroundColor:'transparent'},
+    {label:'Opt avg',data:oA,borderColor:'#1D9E75',borderWidth:1.5,pointRadius:0,borderDash:[5,3],backgroundColor:'transparent'},
+    {label:'Orig avg',data:xs.map(()=>rA),borderColor:'#BA7517',borderWidth:1.5,pointRadius:0,borderDash:[5,3],backgroundColor:'transparent'},
+    {label:'_cur',data:[],borderColor:'#555',pointRadius:7,pointBackgroundColor:'rgba(30,158,117,.25)',pointBorderColor:'#1D9E75',showLine:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:0},plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},scales:{x:{title:{display:true,text:'u(ω^B_E)',color:'#888',font:{size:11}},ticks:{maxTicksLimit:11,color:'#888',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},y:{title:{display:true,text:'u(ω^E_A)',color:'#888',font:{size:11}},min:0,max:.7,ticks:{color:'#888',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}}}}});
+  updateEval();
+  // Init empty benchmark charts
+  const bOpts={responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{display:true,labels:{font:{size:10},boxWidth:12}}},scales:{x:{title:{display:true,text:'n_layers',color:'#888',font:{size:10}},ticks:{color:'#888',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},y:{ticks:{color:'#888',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}}}};
+  retChart=new Chart(document.getElementById('ev-ret'),{type:'line',data:{labels:[],datasets:[{label:'Jøsang',data:[],borderColor:'#BA7517',borderWidth:2,pointRadius:4,backgroundColor:'transparent'},{label:'Optimized',data:[],borderColor:'#1D9E75',borderWidth:2,pointRadius:4,backgroundColor:'transparent'}]},options:{...bOpts,scales:{...bOpts.scales,y:{...bOpts.scales.y,min:0,max:1,title:{display:true,text:'retention ratio',color:'#888',font:{size:10}}}}}});
+  uncChart=new Chart(document.getElementById('ev-unc'),{type:'line',data:{labels:[],datasets:[{label:'Jøsang',data:[],borderColor:'#BA7517',borderWidth:2,pointRadius:4,backgroundColor:'transparent'},{label:'Optimized',data:[],borderColor:'#1D9E75',borderWidth:2,pointRadius:4,backgroundColor:'transparent'}]},options:{...bOpts,scales:{...bOpts.scales,y:{...bOpts.scales.y,title:{display:true,text:'final uncertainty',color:'#888',font:{size:10}}}}}});
+}
+function updateEval(){
+  const v=+document.getElementById('ev-slider').value/100;
+  document.getElementById('ev-val').textContent=v.toFixed(2);
+  if(!window._ev)return;
+  const idx=Math.round(v*50);
+  document.getElementById('ev-oc').textContent=window._ev.oC[idx].toFixed(4);
+  document.getElementById('ev-rc').textContent=window._ev.rC.toFixed(4);
+  const dc=window._ev.rC-window._ev.oC[idx],da=window._ev.rA-window._ev.oA[idx];
+  document.getElementById('ev-dc').textContent=(dc>=0?'−':'+')+Math.abs(dc).toFixed(4);document.getElementById('ev-dc').className='opmv '+(dc>=0?'ok':'no');
+  document.getElementById('ev-da').textContent=(da>=0?'−':'+')+Math.abs(da).toFixed(4);document.getElementById('ev-da').className='opmv '+(da>=0?'ok':'');
+}
+function runBenchmark(){
+  document.getElementById('ev-run-btn').disabled=true;document.getElementById('ev-status').textContent='Running…';
+  setTimeout(()=>{
+    const layerCounts=[2,3,4,5,6],nSeeds=10;
+    const jRet=[],jUnc=[],oRet=[],oUnc=[];
+    for(const nL of layerCounts){
+      let jr=0,ju=0,or_=0,ou=0,cnt=0;
+      for(let s=0;s<nSeeds;s++){
+        try{
+          const G=randomDAG(nL,3,.55,2,42+s);
+          if(!G.nodes.length||!aPaths(G.edges,G.src,G.snk).length)continue;
+          // Jøsang
+          const jSyn=synStepsNNL(G,'original');const jFin=jSyn[jSyn.length-1];
+          if(!jFin.gp.edges.length)continue;
+          const jRatio=jFin.gp.edges.length/G.edges.length;
+          const jAnaG={nodes:[...jFin.gp.nodes],edges:jFin.gp.edges.map(e=>({...e})),src:G.src,snk:G.snk,pos:G.pos};
+          const jAna=anaStepsNNL(jAnaG,'cumulative');const jAnaFin=jAna[jAna.length-1];
+          // Optimized NTP
+          const oSyn=synStepsNTP(G);const oFin=oSyn[oSyn.length-1];
+          if(!oFin.gp.edges.length)continue;
+          const oRatio=oFin.gp.edges.length/G.edges.length;
+          const oAnaG={nodes:[...oFin.gp.nodes],edges:oFin.gp.edges.map(e=>({...e})),src:G.src,snk:G.snk,pos:G.pos};
+          const oAna=anaStepsNTP(oAnaG,'cumulative');const oAnaFin=oAna[oAna.length-1];
+          jr+=jRatio;or_+=oRatio;
+          if(jAnaFin.fOp)ju+=jAnaFin.fOp.u;if(oAnaFin.fOp)ou+=oAnaFin.fOp.u;
+          cnt++;
+        }catch(e){continue}
+      }
+      if(cnt){jRet.push(+(jr/cnt).toFixed(3));oRet.push(+(or_/cnt).toFixed(3));jUnc.push(+(ju/cnt).toFixed(4));oUnc.push(+(ou/cnt).toFixed(4))}
+      else{jRet.push(null);oRet.push(null);jUnc.push(null);oUnc.push(null)}
+    }
+    retChart.data.labels=layerCounts;retChart.data.datasets[0].data=jRet;retChart.data.datasets[1].data=oRet;retChart.update();
+    uncChart.data.labels=layerCounts;uncChart.data.datasets[0].data=jUnc;uncChart.data.datasets[1].data=oUnc;uncChart.update();
+    document.getElementById('ev-run-btn').disabled=false;
+    document.getElementById('ev-status').textContent=`Done — ${layerCounts.length}×${10} random DAGs`;
+  },10)
+}
+
+/* ======== INIT ======== */
+updateSL();updateTE();updateFuse();
+</script>
+</body></html>
