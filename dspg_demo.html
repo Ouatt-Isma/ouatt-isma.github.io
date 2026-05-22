@@ -49,15 +49,15 @@ button:hover{background:#f0f0f0}
 hr.sep{margin:14px 0;border:none;border-top:1px solid #e8e7e4}
 </style></head><body>
 <div class="tabs">
-  <button class="tb on" id="tab-btn-fw" onclick="switchTab('fw')">Framework</button>
+  <button class="tb" id="tab-btn-fw" onclick="switchTab('fw')">Framework</button>
   <button class="tb" id="tab-btn-sl" onclick="switchTab('sl')">SL Operators</button>
-  <button class="tb" id="tab-btn-syn" onclick="switchTab('syn')">Synthesis</button>
+  <button class="tb on" id="tab-btn-syn" onclick="switchTab('syn')">Synthesis</button>
   <button class="tb" id="tab-btn-ana" onclick="switchTab('ana')">Analysis</button>
   <button class="tb" id="tab-btn-eval" onclick="switchTab('eval')">Evaluation</button>
 </div>
 
 <!-- ===== FRAMEWORK ===== -->
-<div class="tp on" id="tp-fw">
+<div class="tp" id="tp-fw">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
 <div>
 <div class="cc"><div class="ct">Directed Series-Parallel Graph (DSPG)</div><div class="cb">A DAG with unique source <em>s</em> and sink <em>t</em> reducible to a single edge via (i) series: remove degree-2 internal nodes; (ii) parallel: collapse multi-edges. Required structure for valid SL trust computation.</div></div>
@@ -124,18 +124,18 @@ hr.sep{margin:14px 0;border:none;border-top:1px solid #e8e7e4}
 </div>
 
 <!-- ===== SYNTHESIS ===== -->
-<div class="tp" id="tp-syn">
+<div class="tp on" id="tp-syn">
 <div class="crow">
   <span class="cl">Method</span>
   <select id="syn-meth" onchange="synReset()">
-    <option value="optimized">Optimized (NNL)</option>
+    <!-- <option value="optimized">Optimized (NNL)</option> -->
     <option value="ntp">Optimized (nodeToPNPS)</option>
     <option value="original">Original (Jøsang NNL)</option>
   </select>
   <span class="cl">Preset</span>
   <select id="syn-gr" onchange="clearCG('syn');synReset()">
-    <option value="paper">Paper Fig 5a</option>
-    <option value="diamond">Diamond+shortcut</option>
+    <option value="paper">Example 1</option>
+    <option value="diamond">Example 2</option>
   </select>
   <button onclick="toggleEditor('syn')" id="syn-ed-btn">✏ Edit / Random</button>
   <button class="playbtn" id="syn-pbtn" onclick="synPP()">▶ Play</button>
@@ -203,9 +203,9 @@ hr.sep{margin:14px 0;border:none;border-top:1px solid #e8e7e4}
   <select id="ana-fus" onchange="anaReset()"><option value="cumulative">Cumulative</option><option value="averaging">Averaging</option></select>
   <span class="cl">Preset</span>
   <select id="ana-gr" onchange="clearCG('ana');anaReset()">
-    <option value="opt-paper">Paper Fig 5a — optimized result</option>
-    <option value="orig-paper">Paper Fig 5a — original result</option>
-    <option value="opt-diamond">Diamond — optimized result</option>
+    <option value="orig-paper">Example 0</option>
+    <option value="opt-paper">Example 1</option>
+    <option value="opt-diamond">Example 2</option>
   </select>
   <button onclick="importFromSyn()" title="Use current synthesis G' as input">↗ From Synthesis</button>
   <button onclick="toggleEditor('ana')" id="ana-ed-btn">✏ Edit / Random</button>
@@ -314,6 +314,7 @@ hr.sep{margin:14px 0;border:none;border-top:1px solid #e8e7e4}
     DOI: <a href="https://doi.org/10.1007/978-3-032-08887-1_4">10.1007/978-3-032-08887-1_4</a>
   </figcaption>
 </figure>
+<p>Code: <a href="https://github.com/Ouatt-Isma/DSPG-Synthesis-and-Analysis">github</a></p>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
