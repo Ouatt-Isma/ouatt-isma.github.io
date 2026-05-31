@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trust Assessment Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg:       #f5f7fa;
+  --bg1:      #ffffff;
+  --bg2:      #eef1f6;
+  --bg3:      #e2e7ef;
+  --border:   #d8dde6;
+  --border2:  #b8c0cc;
+  --text:     #1a2233;
+  --text2:    #586478;
+  --text3:    #8a94a6;
+  --amber:    #d98e1a;
+  --amber2:   #b87c1e;
+  --teal:     #0f9588;
+  --teal2:    #086d63;
+  --red:      #d63a3a;
+  --red2:     #8c2e2e;
+  --blue:     #2c4fa8;
+  --blue2:    #1f3a7a;
+  --green:    #1e8e4d;
+  --mono:     'DM Mono', monospace;
+  --sans:     'Syne', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── Layout ── */
+.shell {
+  display: grid;
+  grid-template-rows: 56px 1fr;
+  grid-template-columns: 200px 1fr;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+header {
+  grid-column: 1 / -1;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  background: var(--bg1);
+}
+.logo-mark {
+  width: 28px; height: 28px;
+  border: 1.5px solid var(--amber);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--amber);
+  letter-spacing: .05em;
+  flex-shrink: 0;
+}
+.logo-text {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: .02em;
+}
+.logo-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text2);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-left: auto;
+}
+.header-pill {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--amber2);
+  color: var(--amber);
+  letter-spacing: .05em;
+}
+
+/* ── Sidebar ── */
+nav {
+  border-right: 1px solid var(--border);
+  background: var(--bg1);
+  padding: 20px 0;
+  overflow-y: auto;
+}
+.nav-section {
+  padding: 0 16px;
+  margin-bottom: 4px;
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-top: 20px;
+}
+.nav-section:first-child { margin-top: 0; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 12px;
+  border-left: 2px solid transparent;
+  transition: all .15s;
+  user-select: none;
+}
+.nav-item:hover { color: var(--text); background: var(--bg2); }
+.nav-item.active {
+  color: var(--amber);
+  border-left-color: var(--amber);
+  background: rgba(240,168,50,.06);
+}
+.nav-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border2);
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.nav-item.active .nav-dot { background: var(--amber); }
+.nav-badge {
+  margin-left: auto;
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--bg3);
+  color: var(--text3);
+}
+
+/* ── Main ── */
+main {
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+/* ── Panel ── */
+.panel { display: none; padding: 28px; }
+.panel.active { display: block; }
+
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-title {
+  font-family: var(--sans);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: .01em;
+  line-height: 1.2;
+}
+.panel-desc {
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 4px;
+  max-width: 600px;
+  line-height: 1.7;
+}
+.chapter-tag {
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  border: 1px solid var(--teal2);
+  color: var(--teal);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+/* ── Dataset selector ── */
+.ds-selector {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+.ds-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg1);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .15s;
+  font-family: var(--mono);
+}
+.ds-btn:hover { border-color: var(--border2); color: var(--text); }
+.ds-btn.active {
+  border-color: var(--amber);
+  background: rgba(240,168,50,.07);
+  color: var(--amber);
+}
+.ds-btn-label { font-size: 12px; font-weight: 500; }
+.ds-btn-sub { font-size: 10px; opacity: .7; }
+.cal-toggle {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+  align-items: center;
+}
+.cal-btn {
+  padding: 8px 14px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--bg1);
+  color: var(--text2);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 11px;
+  transition: all .15s;
+}
+.cal-btn:hover { border-color: var(--border2); color: var(--text); }
+.cal-btn.active { border-color: var(--teal); background: rgba(45,212,191,.07); color: var(--teal); }
+
+/* ── Metrics row ── */
+.metrics-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.metric {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  position: relative;
+  overflow: hidden;
+}
+.metric::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.metric.m-belief::before { background: var(--teal); }
+.metric.m-distrust::before { background: var(--red); }
+.metric.m-uncert::before { background: var(--amber); }
+.metric.m-ece::before { background: var(--blue); }
+.metric.m-acc::before { background: var(--green); }
+.metric-label {
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+.metric-value {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: .02em;
+  line-height: 1;
+}
+.metric-sub {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+/* ── Opinion bar ── */
+.opinion-bar-wrap { margin-bottom: 20px; }
+.opinion-bar-label {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.opinion-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--bg3);
+}
+.ob-belief { background: var(--teal); transition: width .5s ease; }
+.ob-distrust { background: var(--red); transition: width .5s ease; }
+.ob-uncert { background: var(--amber); transition: width .5s ease; }
+.opinion-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+.ol-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--text2);
+}
+.ol-dot {
+  width: 7px; height: 7px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Cards / chart wrappers ── */
+.card {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 2px rgba(20,30,50,.04);
+}
+.card-title {
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+/* ── Controls ── */
+.ctrl-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 20px;
+  margin-bottom: 18px;
+}
+.ctrl-item label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 5px;
+}
+.ctrl-row-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ctrl-row-inline input[type=range] {
+  flex: 1;
+  accent-color: var(--amber);
+  cursor: pointer;
+}
+.ctrl-val {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--amber);
+  min-width: 40px;
+  text-align: right;
+}
+select {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 6px 8px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+}
+select:focus { border-color: var(--amber); }
+
+/* ── Callout ── */
+.callout {
+  border-left: 2px solid var(--teal);
+  background: rgba(45,212,191,.05);
+  border-radius: 0 5px 5px 0;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-top: 14px;
+}
+.callout.warn { border-color: var(--amber); background: rgba(240,168,50,.05); }
+.callout.danger { border-color: var(--red); background: rgba(240,80,80,.05); }
+
+/* ── Table ── */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 11px; }
+thead th {
+  text-align: left;
+  padding: 7px 10px;
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+  font-weight: 400;
+}
+tbody td {
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(42,48,69,.6);
+  color: var(--text);
+  font-family: var(--mono);
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--bg2); }
+.badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 3px;
+  font-size: 9px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.b-trust { background: rgba(74,222,128,.1); color: var(--green); border: 1px solid rgba(74,222,128,.25); }
+.b-warn  { background: rgba(240,168,50,.1); color: var(--amber); border: 1px solid rgba(240,168,50,.25); }
+.b-dist  { background: rgba(240,80,80,.1);  color: var(--red);   border: 1px solid rgba(240,80,80,.25); }
+
+/* ── Upload / evaluate ── */
+.mode-toggle {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 22px;
+}
+.mode-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg1);
+  color: var(--text2);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-align: center;
+  transition: all .15s;
+}
+.mode-btn:hover { border-color: var(--border2); color: var(--text); }
+.mode-btn.active { border-color: var(--amber); background: rgba(240,168,50,.07); color: var(--amber); }
+
+.drop-zone {
+  border: 1px dashed var(--border2);
+  border-radius: 8px;
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+  margin-bottom: 10px;
+}
+.drop-zone:hover, .drop-zone.over { border-color: var(--amber); background: rgba(240,168,50,.04); }
+.drop-zone.done { border-color: var(--teal); border-style: solid; background: rgba(45,212,191,.04); }
+.dz-icon { font-size: 28px; margin-bottom: 8px; opacity: .5; }
+.dz-title { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
+.dz-sub { font-size: 11px; color: var(--text3); }
+.file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: rgba(45,212,191,.1);
+  border: 1px solid rgba(45,212,191,.25);
+  font-size: 11px;
+  color: var(--teal);
+}
+
+.run-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--amber);
+  background: rgba(240,168,50,.1);
+  color: var(--amber);
+  font-family: var(--mono);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .15s;
+  margin-top: 14px;
+  letter-spacing: .05em;
+}
+.run-btn:hover { background: rgba(240,168,50,.18); }
+.run-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+/* ── Progress steps ── */
+.steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.step {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg1);
+}
+.step-num {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  background: var(--bg3);
+  color: var(--text3);
+  flex-shrink: 0;
+  transition: all .2s;
+}
+.step.s-active .step-num { background: var(--amber2); color: var(--amber); }
+.step.s-done   .step-num { background: rgba(74,222,128,.15); color: var(--green); }
+.step.s-err    .step-num { background: rgba(240,80,80,.15); color: var(--red); }
+.step-body { flex: 1; }
+.step-title { font-size: 12px; color: var(--text); }
+.step-desc  { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.prog-bar { height: 3px; background: var(--bg3); border-radius: 2px; margin-top: 8px; }
+.prog-fill { height: 100%; background: var(--amber); border-radius: 2px; transition: width .35s ease; }
+
+/* ── Startup overlay ── */
+#startup {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  z-index: 100;
+  transition: opacity .35s;
+  padding: 24px;
+}
+#startup.hidden { opacity: 0; pointer-events: none; }
+.su-logo {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 40px;
+}
+.su-logo-mark {
+  width: 36px; height: 36px;
+  border: 2px solid var(--amber);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--sans); font-size: 13px; font-weight: 700;
+  color: var(--amber);
+}
+.su-logo-text { font-family: var(--sans); font-size: 20px; font-weight: 600; color: var(--text); }
+.su-logo-sub  { font-size: 11px; color: var(--text3); letter-spacing: .06em; }
+.su-card {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px 32px;
+  width: 100%; max-width: 520px;
+}
+.su-title {
+  font-family: var(--sans); font-size: 15px; font-weight: 600;
+  color: var(--text); margin-bottom: 6px;
+}
+.su-desc { font-size: 12px; color: var(--text2); line-height: 1.7; margin-bottom: 22px; }
+.su-files { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.su-file-row {
+  display: grid; grid-template-columns: 1fr auto;
+  align-items: center; gap: 10px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px 12px;
+  cursor: pointer; transition: border-color .15s;
+}
+.su-file-row:hover { border-color: var(--border2); }
+.su-file-row.loaded { border-color: var(--teal); }
+.su-file-info { display: flex; flex-direction: column; gap: 2px; }
+.su-file-key  { font-size: 11px; font-weight: 500; color: var(--amber); letter-spacing: .04em; }
+.su-file-path { font-size: 10px; color: var(--text3); }
+.su-file-status { font-size: 10px; color: var(--text3); white-space: nowrap; }
+.su-file-row.loaded .su-file-status { color: var(--teal); }
+.su-btn {
+  width: 100%; padding: 12px;
+  border-radius: 6px; border: 1px solid var(--amber);
+  background: rgba(240,168,50,.1); color: var(--amber);
+  font-family: var(--mono); font-size: 13px; cursor: pointer;
+  transition: background .15s; letter-spacing: .04em;
+}
+.su-btn:hover { background: rgba(240,168,50,.18); }
+.su-btn:disabled { opacity: .35; cursor: not-allowed; }
+.su-hint { font-size: 11px; color: var(--text3); text-align: center; margin-top: 14px; line-height: 1.6; }
+.su-err { font-size: 11px; color: var(--red); margin-top: 10px; display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-spin {
+  display: inline-block; width: 14px; height: 14px;
+  border: 1.5px solid var(--border2); border-top-color: var(--amber);
+  border-radius: 50%; animation: spin .8s linear infinite;
+  vertical-align: middle; margin-right: 6px;
+}
+
+/* ── Error ── */
+.error-box {
+  display: none;
+  padding: 12px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--red2);
+  background: rgba(240,80,80,.07);
+  color: var(--red);
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 12px;
+}
+
+/* ── Spinner inline ── */
+.spin-sm {
+  display: inline-block;
+  width: 12px; height: 12px;
+  border: 1.5px solid var(--border2);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  vertical-align: middle;
+}
+
+/* ── Column mapping ── */
+.col-map { display: grid; grid-template-columns: 120px 1fr; gap: 6px 12px; align-items: center; margin-bottom: 12px; }
+.col-map label { font-size: 10px; color: var(--text3); letter-spacing: .06em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<div id="startup">
+  <div class="su-logo">
+    <div class="su-logo-mark">SL</div>
+    <div>
+      <div class="su-logo-text">Demo</div>
+      <div class="su-logo-sub">Trust Assessment · Subjective Logic</div>
+    </div>
+  </div>
+
+  <div class="su-card">
+    <div class="su-title">Load prediction data</div>
+    <div class="su-desc">
+      Select the four CSV files from your repo. Each file must have columns
+      <code>True Label</code> and <code>Class_0_Probability … Class_9_Probability</code>.
+      Everything runs locally — no data leaves your machine.
+    </div>
+
+    <div class="su-files">
+      <div class="su-file-row" id="row-mnist-bef" onclick="pickFile('mnist_bef')">
+        <div class="su-file-info">
+          <div class="su-file-key">MNIST · before calibration</div>
+          <div class="su-file-path">MNIST_PRED / bef_100.csv</div>
+        </div>
+        <div class="su-file-status" id="st-mnist-bef">click to select</div>
+        <input type="file" accept=".csv" id="fi-mnist-bef" style="display:none"
+               onchange="onFilePicked('mnist_bef',this)">
+      </div>
+      <div class="su-file-row" id="row-mnist-aft" onclick="pickFile('mnist_aft')">
+        <div class="su-file-info">
+          <div class="su-file-key">MNIST · after calibration</div>
+          <div class="su-file-path">MNIST_PRED / aft_100.csv</div>
+        </div>
+        <div class="su-file-status" id="st-mnist-aft">click to select</div>
+        <input type="file" accept=".csv" id="fi-mnist-aft" style="display:none"
+               onchange="onFilePicked('mnist_aft',this)">
+      </div>
+      <div class="su-file-row" id="row-cifar-bef" onclick="pickFile('cifar_bef')">
+        <div class="su-file-info">
+          <div class="su-file-key">CIFAR-10 · before calibration</div>
+          <div class="su-file-path">CIFAR_PRED / bef_100.csv</div>
+        </div>
+        <div class="su-file-status" id="st-cifar-bef">click to select</div>
+        <input type="file" accept=".csv" id="fi-cifar-bef" style="display:none"
+               onchange="onFilePicked('cifar_bef',this)">
+      </div>
+      <div class="su-file-row" id="row-cifar-aft" onclick="pickFile('cifar_aft')">
+        <div class="su-file-info">
+          <div class="su-file-key">CIFAR-10 · after calibration</div>
+          <div class="su-file-path">CIFAR_PRED / aft_100.csv</div>
+        </div>
+        <div class="su-file-status" id="st-cifar-aft">click to select</div>
+        <input type="file" accept=".csv" id="fi-cifar-aft" style="display:none"
+               onchange="onFilePicked('cifar_aft',this)">
+      </div>
+    </div>
+
+    <button class="su-btn" id="su-folder" type="button" onclick="loadFromFolder()"
+            style="margin-top:14px;background:var(--bg2);color:var(--text);border:1px solid var(--border)">
+      📁  Load folder (one click)
+    </button>
+
+    <div style="margin-top:10px;display:flex;gap:6px;align-items:stretch">
+      <input id="su-url" type="text" spellcheck="false"
+             value="https://raw.githubusercontent.com/Ouatt-Isma/ouatt-isma.github.io/main/demos/data/",
+             style="flex:1;padding:9px 12px;font-family:var(--mono);font-size:12px;
+                    background:var(--bg1);color:var(--text);
+                    border:1px solid var(--border);border-radius:6px;outline:none"/>
+      <button class="su-btn" id="su-download" type="button" onclick="downloadFromUrl()"
+              style="margin:0;padding:9px 14px;background:var(--bg2);color:var(--text);
+                     border:1px solid var(--border);white-space:nowrap">
+        ⬇  Load data
+      </button>
+    </div>
+
+    <button class="su-btn" id="su-launch" disabled onclick="launchApp()">
+      Launch demo →
+    </button>
+    <div class="su-err" id="su-err"></div>
+    <div id="su-info" style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.5"></div>
+  </div>
+
+  <div class="su-hint">
+    Files are read directly in your browser · nothing is sent anywhere<br>
+    Auto-loads from <code>MNIST_PRED/</code> &amp; <code>CIFAR_PRED/</code> when served via HTTP<br>
+    On <code>file://</code> use “Load folder”, paste a remote base URL and click “Load data”, or pick files individually
+  </div>
+</div>
+
+<div class="shell">
+
+<!-- ── Header ── -->
+<header>
+  <div class="logo-mark">SL</div>
+  <div class="logo-text">Trust</div>
+  <div class="logo-sub">Trust Assessment Framework · Subjective Logic</div>
+  <div class="header-pill">PhD Demo</div>
+</header>
+
+<!-- ── Sidebar ── -->
+<nav>
+  <div class="nav-section">Overview</div>
+  <div class="nav-item active" onclick="go('overview', event)"><div class="nav-dot"></div>Trust opinion</div>
+
+  <div class="nav-section">Analysis</div>
+  <div class="nav-item" onclick="go('calibration', event)"><div class="nav-dot"></div>Calibration trust<span class="nav-badge">Ch.8</span></div>
+  <div class="nav-item" onclick="go('mvariation', event)"><div class="nav-dot"></div>M variation<span class="nav-badge">Ch.8</span></div>
+  <div class="nav-item" onclick="go('dynamic', event)"><div class="nav-dot"></div>Dynamic assess.<span class="nav-badge">Ch.8</span></div>
+
+  <div class="nav-section">Evaluate</div>
+  <div class="nav-item" onclick="go('evaluate', event)"><div class="nav-dot"></div>Your model</div>
+</nav>
+
+<!-- ── Main content ── -->
+<main>
+
+<!-- ════════════════════ OVERVIEW ════════════════════ -->
+<div class="panel active" id="p-overview">
+  <div class="panel-header">
+    <div>
+      <div class="panel-title">Trust opinion</div>
+      <div class="panel-desc">Global SL opinion ω = (belief, distrust, uncertainty) over the last checkpoint. Derived from calibration evidence across all classes — no model internals required.</div>
+    </div>
+  </div>
+
+  <div class="ds-selector">
+    <button class="ds-btn active" onclick="setDS('mnist',this)">
+      <span class="ds-btn-label">MNIST</span>
+      <span class="ds-btn-sub">10-class digit recognition</span>
+    </button>
+    <button class="ds-btn" onclick="setDS('cifar',this)">
+      <span class="ds-btn-label">CIFAR-10</span>
+      <span class="ds-btn-sub">10-class image recognition</span>
+    </button>
+    <div class="cal-toggle">
+      <button class="cal-btn active" id="ov-bef-btn" onclick="setCal('bef')">Before cal.</button>
+      <button class="cal-btn" id="ov-aft-btn" onclick="setCal('aft')">After cal.</button>
+    </div>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric m-belief"><div class="metric-label">Belief t</div><div class="metric-value" id="ov-b">—</div><div class="metric-sub">Evidence for trust</div></div>
+    <div class="metric m-distrust"><div class="metric-label">Distrust d</div><div class="metric-value" id="ov-d">—</div><div class="metric-sub">Evidence against</div></div>
+    <div class="metric m-uncert"><div class="metric-label">Uncertainty u</div><div class="metric-value" id="ov-u">—</div><div class="metric-sub">Vacuity</div></div>
+    <div class="metric m-ece"><div class="metric-label">ECE</div><div class="metric-value" id="ov-ece">—</div><div class="metric-sub">Calibration error</div></div>
+    <div class="metric m-acc"><div class="metric-label">Accuracy</div><div class="metric-value" id="ov-acc">—</div><div class="metric-sub">Top-1</div></div>
+  </div>
+
+  <div class="opinion-bar-wrap">
+    <div class="opinion-bar-label">ω composition</div>
+    <div class="opinion-bar">
+      <div class="ob-belief"  id="ov-ob" style="width:0%"></div>
+      <div class="ob-distrust" id="ov-od" style="width:0%"></div>
+      <div class="ob-uncert"  id="ov-ou" style="width:0%"></div>
+    </div>
+    <div class="opinion-legend">
+      <div class="ol-item"><div class="ol-dot" style="background:var(--teal)"></div>Belief</div>
+      <div class="ol-item"><div class="ol-dot" style="background:var(--red)"></div>Distrust</div>
+      <div class="ol-item"><div class="ol-dot" style="background:var(--amber)"></div>Uncertainty</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Reliability diagram</div>
+      <div style="position:relative;height:200px"><canvas id="ov-rel" role="img" aria-label="Reliability diagram"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Per-class opinion</div>
+      <div style="position:relative;height:200px"><canvas id="ov-class" role="img" aria-label="Per-class trust opinion"></canvas></div>
+    </div>
+  </div>
+
+  <div class="callout" id="ov-callout"></div>
+</div>
+
+<!-- ════════════════════ CALIBRATION ════════════════════ -->
+<div class="panel" id="p-calibration">
+  <div class="panel-header">
+    <div>
+      <div class="panel-title">Calibration-based trust</div>
+      <div class="panel-desc">Predicted probabilities are partitioned into M clusters. Per-cluster belief/distrust evidence is counted and fused cumulatively via the Subjective Logic cumulative belief fusion operator — without accessing model internals.</div>
+      <div class="chapter-tag">Chapter 8 · C3</div>
+    </div>
+  </div>
+
+  <div class="ds-selector">
+    <button class="ds-btn active" onclick="setDS('mnist',this,'cal')">
+      <span class="ds-btn-label">MNIST</span><span class="ds-btn-sub">handwritten digits</span>
+    </button>
+    <button class="ds-btn" onclick="setDS('cifar',this,'cal')">
+      <span class="ds-btn-label">CIFAR-10</span><span class="ds-btn-sub">natural images</span>
+    </button>
+    <div class="cal-toggle">
+      <button class="cal-btn active" id="cal-bef-btn" onclick="setCalPage('bef','cal')">Before cal.</button>
+      <button class="cal-btn" id="cal-aft-btn" onclick="setCalPage('aft','cal')">After cal.</button>
+    </div>
+  </div>
+
+  <div class="ctrl-grid">
+    <div class="ctrl-item">
+      <label>Clusters M</label>
+      <div class="ctrl-row-inline">
+        <input type="range" min="2" max="50" value="10" id="cal-M" oninput="onCalCtrl()">
+        <span class="ctrl-val" id="cal-M-val">10</span>
+      </div>
+    </div>
+    <div class="ctrl-item">
+      <label>Prior weight W</label>
+      <div class="ctrl-row-inline">
+        <input type="range" min="1" max="10000" step="0.5" value="2" id="cal-W"
+               oninput="syncW('cal')">
+        <input type="number" min="1" max="10000" step="0.5" value="2" id="cal-W-num"
+               oninput="syncWNum('cal')"
+               style="width:64px;padding:2px 5px;font-family:var(--mono);font-size:13px;
+                      font-weight:500;color:var(--amber);background:var(--bg2);
+                      border:1px solid var(--border);border-radius:4px;text-align:right">
+      </div>
+    </div>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric m-belief"><div class="metric-label">Belief t</div><div class="metric-value" id="cal-b">—</div></div>
+    <div class="metric m-distrust"><div class="metric-label">Distrust d</div><div class="metric-value" id="cal-d">—</div></div>
+    <div class="metric m-uncert"><div class="metric-label">Uncertainty u</div><div class="metric-value" id="cal-u">—</div></div>
+    <div class="metric m-ece"><div class="metric-label">ECE</div><div class="metric-value" id="cal-ece">—</div></div>
+  </div>
+
+  <div class="opinion-bar-wrap">
+    <div class="opinion-bar-label">ω composition</div>
+    <div class="opinion-bar">
+      <div class="ob-belief" id="cal-ob" style="width:0%"></div>
+      <div class="ob-distrust" id="cal-od" style="width:0%"></div>
+      <div class="ob-uncert" id="cal-ou" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Reliability diagram</div>
+      <div style="position:relative;height:200px"><canvas id="cal-rel" role="img" aria-label="Reliability diagram"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Per-cluster opinion (stacked)</div>
+      <div style="position:relative;height:200px"><canvas id="cal-cluster" role="img" aria-label="Per-cluster opinion"></canvas></div>
+    </div>
+  </div>
+  <div class="callout" id="cal-callout"></div>
+</div>
+
+<!-- ════════════════════ M VARIATION ════════════════════ -->
+<div class="panel" id="p-mvariation">
+  <div class="panel-header">
+    <div>
+      <div class="panel-title">Effect of M on the trust opinion</div>
+      <div class="panel-desc">How belief, distrust and uncertainty converge as the number of probability clusters M grows. Evaluated at the final epoch for before and after calibration.</div>
+      <div class="chapter-tag">Chapter 8 · Figure 2</div>
+    </div>
+  </div>
+
+  <div class="ds-selector">
+    <button class="ds-btn active" onclick="setDS('mnist',this,'mv')">
+      <span class="ds-btn-label">MNIST</span><span class="ds-btn-sub">handwritten digits</span>
+    </button>
+    <button class="ds-btn" onclick="setDS('cifar',this,'mv')">
+      <span class="ds-btn-label">CIFAR-10</span><span class="ds-btn-sub">natural images</span>
+    </button>
+  </div>
+
+  <div class="ctrl-grid">
+    <div class="ctrl-item">
+      <label>Prior weight W</label>
+      <div class="ctrl-row-inline">
+        <input type="range" min="1" max="10000" step="0.5" value="2" id="mv-W"
+               oninput="syncW('mv')">
+        <input type="number" min="1" max="10000" step="0.5" value="2" id="mv-W-num"
+               oninput="syncWNum('mv')"
+               style="width:64px;padding:2px 5px;font-family:var(--mono);font-size:13px;
+                      font-weight:500;color:var(--amber);background:var(--bg2);
+                      border:1px solid var(--border);border-radius:4px;text-align:right">
+      </div>
+    </div>
+
+    <!-- <div class="ctrl-item">
+      <label>Prior weight W</label>
+      <div class="ctrl-row-inline">
+        <input type="range" min="1" max="10" step="0.5" value="2" id="mv-W" oninput="onMvCtrl()">
+        <span class="ctrl-val" id="mv-W-val">2.0</span>
+      </div>
+    </div> -->
+    <div class="ctrl-item">
+      <label>M range max</label>
+      <div class="ctrl-row-inline">
+        <input type="range" min="20" max="1000" step="10" value="1000" id="mv-max" oninput="onMvCtrl()">
+        <span class="ctrl-val" id="mv-max-val">1000</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Before calibration — opinion vs M</div>
+      <div style="position:relative;height:220px"><canvas id="mv-bef" role="img" aria-label="Opinion vs M before calibration"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">After calibration — opinion vs M</div>
+      <div style="position:relative;height:220px"><canvas id="mv-aft" role="img" aria-label="Opinion vs M after calibration"></canvas></div>
+    </div>
+  </div>
+  <div class="callout" id="mv-callout"></div>
+</div>
+
+<!-- ════════════════════ DYNAMIC ════════════════════ -->
+<div class="panel" id="p-dynamic">
+  <div class="panel-header">
+    <div>
+      <div class="panel-title">Dynamic per-prediction assessment</div>
+      <div class="panel-desc">At inference time, each prediction's confidence maps to the nearest cluster representative. The pre-computed cluster opinion becomes that prediction's trust score — enabling selective abstention.</div>
+      <div class="chapter-tag">Chapter 8 · Figure 3</div>
+    </div>
+  </div>
+
+  <div class="ds-selector">
+    <button class="ds-btn active" onclick="setDS('mnist',this,'dyn')">
+      <span class="ds-btn-label">MNIST</span><span class="ds-btn-sub">handwritten digits</span>
+    </button>
+    <button class="ds-btn" onclick="setDS('cifar',this,'dyn')">
+      <span class="ds-btn-label">CIFAR-10</span><span class="ds-btn-sub">natural images</span>
+    </button>
+    <div class="cal-toggle">
+      <button class="cal-btn active" id="dyn-bef-btn" onclick="setCalPage('bef','dyn')">Before cal.</button>
+      <button class="cal-btn" id="dyn-aft-btn" onclick="setCalPage('aft','dyn')">After cal.</button>
+    </div>
+  </div>
+
+  <div class="ctrl-grid">
+    <div class="ctrl-item">
+      <label>Clusters M</label>
+      <div class="ctrl-row-inline">
+        <input type="range" min="2" max="50" value="10" id="dyn-M" oninput="onDynCtrl()">
+        <span class="ctrl-val" id="dyn-M-val">10</span>
+      </div>
+    </div>
+
+    <div class="ctrl-item">
+      <label>Prior weight W</label>
+      <div class="ctrl-row-inline">
+        <input type="range" min="1" max="10000" step="0.5" value="2" id="dyn-W"
+               oninput="syncW('dyn')">
+        <input type="number" min="1" max="10000" step="0.5" value="2" id="dyn-W-num"
+               oninput="syncWNum('dyn')"
+               style="width:64px;padding:2px 5px;font-family:var(--mono);font-size:13px;
+                      font-weight:500;color:var(--amber);background:var(--bg2);
+                      border:1px solid var(--border);border-radius:4px;text-align:right">
+      </div>
+    </div>
+
+    <!-- <div class="ctrl-item">
+      <label>Prior weight W</label>
+      <div class="ctrl-row-inline">
+        <input type="range" min="1" max="10" step="0.5" value="2" id="dyn-W" oninput="onDynCtrl()">
+        <span class="ctrl-val" id="dyn-W-val">2.0</span>
+      </div>
+    </div> -->
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric m-belief"><div class="metric-label">Mean belief — correct</div><div class="metric-value" id="dyn-bc">—</div></div>
+    <div class="metric m-distrust"><div class="metric-label">Mean belief — wrong</div><div class="metric-value" id="dyn-bw">—</div></div>
+    <div class="metric m-uncert"><div class="metric-label">Separability Δ</div><div class="metric-value" id="dyn-sep">—</div></div>
+  </div>
+
+  <!-- Plot A: confidence distribution -->
+  <div class="card">
+    <div class="card-title">Distribution of predicted confidence</div>
+    <div style="position:relative;height:190px"><canvas id="dyn-confhist" role="img" aria-label="Confidence distribution"></canvas></div>
+  </div>
+
+  <!-- Plot B: belief distribution -->
+  <div class="card">
+    <div class="card-title">Distribution of trust belief — correct vs incorrect</div>
+    <div style="position:relative;height:190px"><canvas id="dyn-beliefhist" role="img" aria-label="Belief distribution"></canvas></div>
+  </div>
+
+  <!-- Plot C: mean opinion per confidence bin -->
+  <div class="card">
+    <div class="card-title">Mean SL opinion per confidence bin</div>
+    <div style="position:relative;height:190px"><canvas id="dyn-binopinion" role="img" aria-label="Mean opinion per confidence bin"></canvas></div>
+  </div>
+
+  <div class="callout" id="dyn-callout"></div>
+</div>
+
+<!-- ════════════════════ EVALUATE ════════════════════ -->
+<div class="panel" id="p-evaluate">
+  <div class="panel-header">
+    <div>
+      <div class="panel-title">Evaluate your model</div>
+      <div class="panel-desc">Upload a predictions CSV or a raw dataset + ONNX model. The full SL calibration trust pipeline runs in-browser — no data leaves your device.</div>
+    </div>
+  </div>
+
+  <div class="mode-toggle">
+    <div class="mode-btn active" id="m-csv-btn" onclick="setEvalMode('csv')">Predictions CSV</div>
+    <div class="mode-btn" id="m-model-btn" onclick="setEvalMode('model')">Model + Dataset</div>
+  </div>
+
+  <!-- CSV mode -->
+  <div id="ev-csv">
+    <div class="callout" style="margin-bottom:14px">
+      Expected columns: <code>True Label</code>, <code>Class_0_Probability</code>, <code>Class_1_Probability</code>, … <code>Class_N_Probability</code>
+    </div>
+    <div class="drop-zone" id="csv-dz" onclick="document.getElementById('csv-fi').click()"
+      ondragover="event.preventDefault();this.classList.add('over')"
+      ondragleave="this.classList.remove('over')"
+      ondrop="dzDrop(event,'csv')">
+      <div class="dz-icon">⬆</div>
+      <div class="dz-title">Drop predictions CSV or click to browse</div>
+      <div id="csv-chip" style="display:none" class="file-chip">✓ <span id="csv-fname"></span></div>
+    </div>
+    <input type="file" id="csv-fi" accept=".csv" style="display:none" onchange="onCSVFile(this.files[0])">
+
+    <div class="ctrl-grid" style="margin-top:14px">
+      <div class="ctrl-item">
+        <label>Clusters M</label>
+        <div class="ctrl-row-inline">
+          <input type="range" min="2" max="50" value="10" id="ev-M" oninput="document.getElementById('ev-M-val').textContent=this.value">
+          <span class="ctrl-val" id="ev-M-val">10</span>
+        </div>
+      </div>
+      <div class="ctrl-item">
+        <label>Prior weight W</label>
+        <div class="ctrl-row-inline">
+          <input type="range" min="1" max="10000" step="0.5" value="2" id="ev-W"
+                 oninput="syncW('ev')">
+          <input type="number" min="1" max="10000" step="0.5" value="2" id="ev-W-num"
+                 oninput="syncWNum('ev')"
+                 style="width:64px;padding:2px 5px;font-family:var(--mono);font-size:13px;
+                        font-weight:500;color:var(--amber);background:var(--bg2);
+                        border:1px solid var(--border);border-radius:4px;text-align:right">
+        </div>
+      </div>
+    </div>
+    <button class="run-btn" id="ev-csv-run" disabled onclick="runCSV()">Run trust analysis →</button>
+  </div>
+
+  <!-- Model mode -->
+  <div id="ev-model" style="display:none">
+    <div class="callout warn" style="margin-bottom:14px">
+      Export your model to ONNX first: PyTorch → <code>torch.onnx.export()</code> · sklearn → <code>skl2onnx</code> · Keras → <code>tf2onnx</code>
+    </div>
+    <div class="drop-zone" id="mdl-dz" onclick="document.getElementById('mdl-fi').click()"
+      ondragover="event.preventDefault();this.classList.add('over')"
+      ondragleave="this.classList.remove('over')"
+      ondrop="dzDrop(event,'model')">
+      <div class="dz-icon">⬡</div>
+      <div class="dz-title">Drop .onnx model file</div>
+      <div class="dz-sub">Runs entirely in-browser via ONNX Runtime Web</div>
+      <div id="mdl-chip" style="display:none" class="file-chip">✓ <span id="mdl-fname"></span></div>
+    </div>
+    <input type="file" id="mdl-fi" accept=".onnx" style="display:none" onchange="onModelFile(this.files[0])">
+
+    <div id="mdl-info" style="display:none;margin:10px 0">
+      <div class="metrics-row">
+        <div class="metric"><div class="metric-label">Input</div><div class="metric-value" style="font-size:14px" id="mdl-in">—</div></div>
+        <div class="metric"><div class="metric-label">Output</div><div class="metric-value" style="font-size:14px" id="mdl-out">—</div></div>
+      </div>
+    </div>
+
+    <div class="drop-zone" id="dat-dz" onclick="document.getElementById('dat-fi').click()"
+      ondragover="event.preventDefault();this.classList.add('over')"
+      ondragleave="this.classList.remove('over')"
+      ondrop="dzDrop(event,'data')">
+      <div class="dz-icon">⊞</div>
+      <div class="dz-title">Drop dataset CSV (features + label column)</div>
+      <div class="dz-sub">Numeric features · headers required</div>
+      <div id="dat-chip" style="display:none" class="file-chip">✓ <span id="dat-fname"></span></div>
+    </div>
+    <input type="file" id="dat-fi" accept=".csv" style="display:none" onchange="onDataFile(this.files[0])">
+
+    <div id="col-map-sec" style="display:none;margin-top:12px">
+      <div class="col-map">
+        <label>Label column</label>
+        <select id="label-sel" onchange="updateFeatInfo()"></select>
+      </div>
+      <div id="feat-info" class="callout" style="margin-bottom:8px"></div>
+      <div class="col-map">
+        <label>Softmax</label>
+        <select id="smx-sel">
+          <option value="auto">Auto-detect</option>
+          <option value="yes">Apply softmax (logits)</option>
+          <option value="no">Skip (already probs)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="ctrl-grid" style="margin-top:14px">
+      <div class="ctrl-item">
+        <label>Clusters M</label>
+        <div class="ctrl-row-inline">
+          <input type="range" min="2" max="50" value="10" id="evm-M" oninput="document.getElementById('evm-M-val').textContent=this.value">
+          <span class="ctrl-val" id="evm-M-val">10</span>
+        </div>
+      </div>
+      <div class="ctrl-item">
+        <label>Prior weight W</label>
+        <div class="ctrl-row-inline">
+          <input type="range" min="1" max="10000" step="0.5" value="2" id="evm-W"
+                 oninput="syncW('evm')">
+          <input type="number" min="1" max="10000" step="0.5" value="2" id="evm-W-num"
+                 oninput="syncWNum('evm')"
+                 style="width:64px;padding:2px 5px;font-family:var(--mono);font-size:13px;
+                        font-weight:500;color:var(--amber);background:var(--bg2);
+                        border:1px solid var(--border);border-radius:4px;text-align:right">
+        </div>
+      </div>
+    </div>
+    <button class="run-btn" id="ev-mdl-run" disabled onclick="runModel()">Run inference + trust analysis →</button>
+  </div>
+
+  <!-- Progress -->
+  <div id="ev-progress" style="display:none;margin-top:20px">
+    <div class="steps">
+      <div class="step s-active" id="stp1"><div class="step-num" id="stp1-n">1</div><div class="step-body"><div class="step-title">Loading data</div><div class="step-desc" id="stp1-d">Parsing CSV…</div></div></div>
+      <div class="step" id="stp2"><div class="step-num" id="stp2-n">2</div><div class="step-body"><div class="step-title">Inference</div><div class="step-desc" id="stp2-d">Waiting…</div></div></div>
+      <div class="step" id="stp3"><div class="step-num" id="stp3-n">3</div><div class="step-body"><div class="step-title">SL trust computation</div><div class="step-desc" id="stp3-d">Waiting…</div></div></div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+  </div>
+
+  <div class="error-box" id="ev-err"></div>
+
+  <!-- Results -->
+  <div id="ev-results" style="display:none;margin-top:22px">
+    <div style="border-top:1px solid var(--border);padding-top:20px;margin-bottom:18px">
+      <div class="panel-title" style="font-size:15px;margin-bottom:4px">Results</div>
+    </div>
+
+    <div class="metrics-row">
+      <div class="metric"><div class="metric-label">Samples</div><div class="metric-value" id="evr-n">—</div></div>
+      <div class="metric"><div class="metric-label">Classes</div><div class="metric-value" id="evr-c">—</div></div>
+      <div class="metric m-acc"><div class="metric-label">Accuracy</div><div class="metric-value" id="evr-acc">—</div></div>
+      <div class="metric m-ece"><div class="metric-label">ECE</div><div class="metric-value" id="evr-ece">—</div></div>
+      <div class="metric m-belief"><div class="metric-label">Belief</div><div class="metric-value" id="evr-b">—</div></div>
+      <div class="metric m-distrust"><div class="metric-label">Distrust</div><div class="metric-value" id="evr-d">—</div></div>
+      <div class="metric m-uncert"><div class="metric-label">Uncertainty</div><div class="metric-value" id="evr-u">—</div></div>
+    </div>
+
+    <div class="opinion-bar-wrap">
+      <div class="opinion-bar-label">Global ω</div>
+      <div class="opinion-bar">
+        <div class="ob-belief" id="evr-ob" style="width:0%"></div>
+        <div class="ob-distrust" id="evr-od" style="width:0%"></div>
+        <div class="ob-uncert" id="evr-ou" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card"><div class="card-title">Reliability diagram</div><div style="position:relative;height:200px"><canvas id="evr-rel" role="img" aria-label="Reliability diagram"></canvas></div></div>
+      <div class="card"><div class="card-title">Per-class opinion</div><div style="position:relative;height:200px"><canvas id="evr-class" role="img" aria-label="Per-class opinion"></canvas></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><div class="card-title">Predicted-probability distribution — correct vs incorrect</div><div style="position:relative;height:200px"><canvas id="evr-confhist" role="img" aria-label="Confidence proportion"></canvas></div></div>
+      <div class="card"><div class="card-title">Belief distribution — correct vs incorrect</div><div style="position:relative;height:200px"><canvas id="evr-dyn" role="img" aria-label="Belief distribution"></canvas></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Per-class breakdown</div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Class</th><th>Samples</th><th>Accuracy</th><th>Belief</th><th>Distrust</th><th>Uncertainty</th><th>Verdict</th></tr></thead>
+        <tbody id="evr-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <div class="callout" id="evr-callout"></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- ── ONNX Runtime ── -->
+<script>
+const ortScript = document.createElement('script');
+ortScript.src = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.18.0/dist/ort.min.js';
+ortScript.onload = () => {
+  ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.18.0/dist/';
+  window._ortReady = true;
+};
+document.head.appendChild(ortScript);
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA & STATE
+// ═══════════════════════════════════════════════════════
+const DATA = {}; // keyed: mnist_bef, mnist_aft, cifar_bef, cifar_aft
+let DS = 'mnist', CAL = 'bef';
+const PAGE_DS   = { overview: 'mnist', calibration: 'mnist', mvariation: 'mnist', dynamic: 'mnist' };
+const PAGE_CAL  = { overview: 'bef', calibration: 'bef', dynamic: 'bef' };
+const charts = {};
+
+// ── Chart defaults ──
+Chart.defaults.color = '#4a5268';
+Chart.defaults.borderColor = '#2a3045';
+Chart.defaults.font.family = "'DM Mono', monospace";
+Chart.defaults.font.size = 10;
+
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+// ═══════════════════════════════════════════════════════
+// SL CORE
+// Mirrors analysis.py exactly:
+//   • uniform [0,1] clusters, rep_i = half + i*step (rounded to 6 dp)
+//   • per-class evidence: r = Σ t_i,  s = Σ round(|t_i − n_i·rep_i|)
+//   • per-class opinion via BPQ ev2tdu(r,s,W)  (W = prior weight, default 2)
+//   • GLOBAL opinion = CUMULATIVE fusion across the per-class opinions
+//     (this matches compute_global_opinion in analysis.py, which is what
+//      produced the dissertation figures — not the averaging fusion the
+//      prose mentions)
+//   • dynamic per-prediction: nearest cluster representative lookup
+// Implementation note: clustering is done with a single O(C·N) pass per M
+// (histogramming) instead of O(C·M·N) filtering, so M up to 1000 stays fast.
+// ═══════════════════════════════════════════════════════
+function makeReps(M) {
+  const s = 1/M, h = s/2;
+  return Array.from({length:M}, (_, i) => +(h + i*s).toFixed(6));
+}
+
+function argmax(a) {
+  let mi = 0, mv = a[0];
+  for (let k = 1; k < a.length; k++) if (a[k] > mv) { mv = a[k]; mi = k; }
+  return mi;
+}
+
+function ev2tdu(r, s, W=2) {
+  const D = r + s + W;
+  return { t: r/D, d: s/D, u: W/D };
+}
+
+function cumFuse(o1, o2) {
+  const k = o1.u + o2.u - o1.u * o2.u;
+  if (k < 1e-10) return { t:(o1.t+o2.t)/2, d:(o1.d+o2.d)/2, u:0 };
+  return {
+    t: Math.min(1, (o1.t*o2.u + o2.t*o1.u) / k),
+    d: Math.min(1, (o1.d*o2.u + o2.d*o1.u) / k),
+    u: Math.max(0, (o1.u * o2.u) / k)
+  };
+}
+
+// Pre-computed cluster boundaries that match analysis.py EXACTLY:
+//   rep_i = round(half + i*step, 6)
+//   bin i contains p iff rp_i - half <= p < rp_i + half
+// Using rounded reps means rp+half is sometimes slightly below 1.0 (e.g. M=3
+// where 1/3 is non-terminating), so probabilities extremely close to 1.0 can
+// fall outside every bin — same behaviour as Python's per-rep mask.
+function makeBoundaries(M) {
+  const step = 1/M, half = step/2;
+  const lo = new Float64Array(M), hi = new Float64Array(M);
+  for (let i = 0; i < M; i++) {
+    const rp = +(half + i*step).toFixed(6);
+    lo[i] = rp - half;
+    hi[i] = rp + half;
+  }
+  return { lo, hi };
+}
+
+// Binary search: find i such that lo[i] <= p < hi[i]; -1 if none.
+function findBin(p, lo, hi, M) {
+  let l = 0, r = M - 1;
+  while (l <= r) {
+    const m = (l + r) >> 1;
+    if (p < lo[m]) r = m - 1;
+    else if (p >= hi[m]) l = m + 1;
+    else return m;
+  }
+  return -1;
+}
+
+// Single-pass per-class cluster counts (n_i, t_i), bit-exact with the
+// (arr_p >= rp-half) & (arr_p < rp+half) mask in analysis.py.
+function classClusterStats(rows, classIdx, M) {
+  const ni = new Array(M).fill(0), ti = new Array(M).fill(0);
+  const { lo, hi } = makeBoundaries(M);
+  for (let j = 0; j < rows.length; j++) {
+    const idx = findBin(rows[j].probs[classIdx], lo, hi, M);
+    if (idx < 0) continue;
+    ni[idx]++;
+    if (rows[j].label === classIdx) ti[idx]++;
+  }
+  return { ni, ti };
+}
+
+function classEvidence(rows, classIdx, M) {
+  const { ni, ti } = classClusterStats(rows, classIdx, M);
+  const step = 1/M, half = step/2;
+  let r = 0, s = 0;
+  for (let i = 0; i < M; i++) {
+    const rp = +(half + i*step).toFixed(6);
+    r += ti[i];
+    s += Math.round(Math.abs(ti[i] - ni[i]*rp));   // round per cluster, then sum
+  }
+  return { r, s };
+}
+
+function computeClassOpinion(rows, classIdx, M, W) {
+  const { r, s } = classEvidence(rows, classIdx, M);
+  return ev2tdu(r, s, W);
+}
+
+function computeGlobalOpinion(rows, M, W) {
+  if (!rows || !rows.length) return {t:0,d:0,u:1};
+  const nC = rows[0].probs.length;
+  let fused = null;
+  for (let c = 0; c < nC; c++) {
+    const op = computeClassOpinion(rows, c, M, W);   // cumulative-over-clusters
+    fused = fused ? cumFuse(fused, op) : op;          // cumulative-over-classes
+  }
+  return fused || {t:0,d:0,u:1};
+}
+
+function computeECE(rows, nBins=10) {
+  const n = rows.length;
+  const edges = Array.from({length:nBins+1}, (_,i) => i/nBins);
+  let ece = 0;
+  const binCnt = new Array(nBins).fill(0);
+  const binAccSum = new Array(nBins).fill(0);
+  const binConfSum = new Array(nBins).fill(0);
+  for (let j = 0; j < n; j++) {
+    const probs = rows[j].probs;
+    const pred = argmax(probs);
+    const conf = probs[pred];
+    // bin: conf > edge[i] && conf <= edge[i+1]  (matches analysis.py)
+    let i = Math.ceil(conf * nBins) - 1;
+    if (i < 0) i = 0; if (i >= nBins) i = nBins - 1;
+    binCnt[i]++;
+    binConfSum[i] += conf;
+    if (pred === rows[j].label) binAccSum[i]++;
+  }
+  for (let i = 0; i < nBins; i++) {
+    if (!binCnt[i]) continue;
+    const ba = binAccSum[i] / binCnt[i];
+    const bc = binConfSum[i] / binCnt[i];
+    ece += (binCnt[i]/n) * Math.abs(ba - bc);
+  }
+  return ece;
+}
+
+// Per-cluster opinions (fused across classes, for the stacked cluster chart).
+function clusterStacked(rows, M, W) {
+  const nC = rows[0].probs.length, step = 1/M, half = step/2;
+  const stats = [];
+  for (let c = 0; c < nC; c++) stats.push(classClusterStats(rows, c, M));
+  const reps=[], B=[], D=[], U=[];
+  for (let i = 0; i < M; i++) {
+    const rp = +(half + i*step).toFixed(6); reps.push(rp);
+    let fb = null;
+    for (let c = 0; c < nC; c++) {
+      const ni = stats[c].ni[i], ti = stats[c].ti[i];
+      const op = ev2tdu(ti, Math.round(Math.abs(ti - ni*rp)), W);
+      fb = fb ? cumFuse(fb, op) : op;
+    }
+    fb = fb || {t:0,d:0,u:1};
+    B.push(+fb.t.toFixed(3)); D.push(+fb.d.toFixed(3)); U.push(+fb.u.toFixed(3));
+  }
+  return { reps, B, D, U };
+}
+
+// Lookup table lut[class][clusterIdx] -> opinion (cluster-level, per class).
+function buildLookup(rows, M, W) {
+  const nC = rows[0].probs.length, step = 1/M, half = step/2;
+  const lut = [];
+  for (let c = 0; c < nC; c++) {
+    const { ni, ti } = classClusterStats(rows, c, M);
+    lut[c] = [];
+    for (let i = 0; i < M; i++) {
+      const rp = +(half + i*step).toFixed(6);
+      lut[c][i] = ev2tdu(ti[i], Math.round(Math.abs(ti[i] - ni[i]*rp)), W);
+    }
+  }
+  return lut;
+}
+
+// Decision-conditional lookup: for each (class c, cluster i) count ONLY
+// samples whose argmax class IS c and whose top probability falls in bin i.
+// This makes the per-prediction assessment reflect the trust of the actual
+// decision at the actual decision confidence (rather than the one-vs-rest
+// reliability that mixes in non-decision probabilities of class c).
+function buildLookupDecision(rows, M, W) {
+  const nC = rows[0].probs.length, step = 1/M, half = step/2;
+  const ni = Array.from({length:nC}, () => new Array(M).fill(0));
+  const ti = Array.from({length:nC}, () => new Array(M).fill(0));
+  for (let j = 0; j < rows.length; j++) {
+    const r = rows[j];
+    const predC = argmax(r.probs);
+    const conf = r.probs[predC];
+    let i = Math.floor(conf / step);
+    if (i < 0) i = 0; if (i >= M) i = M - 1;       // include conf == 1.0
+    ni[predC][i]++;
+    if (r.label === predC) ti[predC][i]++;
+  }
+  const lut = [];
+  for (let c = 0; c < nC; c++) {
+    lut[c] = [];
+    for (let i = 0; i < M; i++) {
+      const rp = +(half + i*step).toFixed(6);
+      lut[c][i] = ev2tdu(ti[c][i], Math.round(Math.abs(ti[c][i] - ni[c][i]*rp)), W);
+    }
+  }
+  return lut;
+}
+
+function computePerPredictionTrust(rows, M, W) {
+  const lut = buildLookupDecision(rows, M, W);
+  const step = 1/M;
+  const beliefs=[], disbeliefs=[], uncertainties=[], confidences=[], corrects=[];
+  for (const r of rows) {
+    const predC = argmax(r.probs);
+    const conf = r.probs[predC];
+    let i = Math.floor(conf / step);
+    if (i < 0) i = 0; if (i >= M) i = M - 1;
+    const op = lut[predC][i] || {t:0,d:0,u:1};
+    beliefs.push(op.t);
+    disbeliefs.push(op.d);
+    uncertainties.push(op.u);
+    confidences.push(conf);
+    corrects.push(predC === r.label);
+  }
+  return { beliefs, disbeliefs, uncertainties, confidences, corrects };
+}
+
+// ═══════════════════════════════════════════════════════
+// CHART HELPERS
+// ═══════════════════════════════════════════════════════
+function reliabilityData(rows, nBins=10) {
+  const edges = Array.from({length:nBins+1}, (_,i) => i/nBins);
+  const confs = rows.map(r => Math.max(...r.probs));
+  const preds = rows.map(r => r.probs.indexOf(Math.max(...r.probs)));
+  return Array.from({length:nBins}, (_,i) => {
+    const idx = rows.map((_,j)=>j).filter(j => confs[j]>edges[i] && confs[j]<=edges[i+1]);
+    if (!idx.length) return null;
+    return {
+      x: +(idx.reduce((s,j)=>s+confs[j],0)/idx.length).toFixed(4),
+      y: +(idx.filter(j=>preds[j]===rows[j].label).length/idx.length).toFixed(4)
+    };
+  }).filter(Boolean);
+}
+
+function mkRelChart(canvasId, rows) {
+  destroyChart(canvasId);
+  const pts = reliabilityData(rows);
+  const perfLine = [{x:0,y:0},{x:1,y:1}];
+  charts[canvasId] = new Chart(document.getElementById(canvasId), {
+    type: 'scatter',
+    data: { datasets: [
+      { label:'Perfect', data:perfLine, type:'line', borderColor:'#3a4560', borderDash:[4,3], pointRadius:0, borderWidth:1 },
+      { label:'Model', data:pts, type:'line', borderColor:'#2dd4bf', backgroundColor:'rgba(45,212,191,.1)', pointRadius:4, pointBackgroundColor:'#2dd4bf', tension:.2, fill:true, borderWidth:1.5 }
+    ]},
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales: { x:{min:0,max:1, title:{display:true,text:'Confidence',color:'#4a5268'}},
+                y:{min:0,max:1, title:{display:true,text:'Accuracy',color:'#4a5268'}} } }
+  });
+}
+
+function mkClassChart(canvasId, rows, M, W) {
+  destroyChart(canvasId);
+  const nC = rows[0].probs.length;
+  const ops = Array.from({length:nC}, (_,c) => computeClassOpinion(rows, c, M, W));
+  charts[canvasId] = new Chart(document.getElementById(canvasId), {
+    type: 'bar',
+    data: { labels: ops.map((_,i)=>`C${i}`),
+      datasets: [
+        { label:'Belief',     data:ops.map(o=>+o.t.toFixed(3)), backgroundColor:'rgba(45,212,191,.7)',  stack:'s' },
+        { label:'Distrust',   data:ops.map(o=>+o.d.toFixed(3)), backgroundColor:'rgba(240,80,80,.7)',   stack:'s' },
+        { label:'Uncertainty',data:ops.map(o=>+o.u.toFixed(3)), backgroundColor:'rgba(240,168,50,.7)', stack:'s' },
+      ]},
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales: { x:{stacked:true, ticks:{maxRotation:0}}, y:{stacked:true,min:0,max:1} } }
+  });
+}
+
+function mkClusterChart(canvasId, rows, M, W) {
+  destroyChart(canvasId);
+  const { reps, B, D, U } = clusterStacked(rows, M, W);
+  charts[canvasId] = new Chart(document.getElementById(canvasId), {
+    type:'bar',
+    data:{ labels:reps.map(r=>r.toFixed(2)),
+      datasets:[
+        {label:'Belief',     data:B, backgroundColor:'rgba(45,212,191,.7)',  stack:'s'},
+        {label:'Distrust',   data:D, backgroundColor:'rgba(240,80,80,.7)',   stack:'s'},
+        {label:'Uncertainty',data:U, backgroundColor:'rgba(240,168,50,.65)', stack:'s'},
+      ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ x:{stacked:true, ticks:{maxTicksLimit:10,maxRotation:45}}, y:{stacked:true,min:0,max:1} } }
+  });
+}
+
+function mkMvChart(canvasId, rows, W, mValues) {
+  destroyChart(canvasId);
+  const bs=[], ds=[], us=[];
+  for (const m of mValues) {
+    const op = computeGlobalOpinion(rows, m, W);
+    bs.push(+op.t.toFixed(4));
+    ds.push(+op.d.toFixed(4));
+    us.push(+op.u.toFixed(4));
+  }
+  charts[canvasId] = new Chart(document.getElementById(canvasId), {
+    type:'line',
+    data:{ labels:mValues.map(String),
+      datasets:[
+        {label:'Belief',      data:bs, borderColor:'#4682b4', pointBackgroundColor:'#4682b4', pointStyle:'circle',   pointRadius:4, tension:0, fill:false, borderWidth:1.8},
+        {label:'Disbelief',   data:ds, borderColor:'#b22222', pointBackgroundColor:'#b22222', pointStyle:'rect',     pointRadius:4, tension:0, fill:false, borderWidth:1.8, borderDash:[6,3]},
+        {label:'Uncertainty', data:us, borderColor:'#2e8b57', pointBackgroundColor:'#2e8b57', pointStyle:'triangle', pointRadius:4, tension:0, fill:false, borderWidth:1.8, borderDash:[2,3]},
+      ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:true, labels:{usePointStyle:true, boxWidth:8, color:'#4a5268'}} },
+      scales:{ x:{ type:'category', title:{display:true,text:'Number of clusters M',color:'#4a5268'},
+                   ticks:{ autoSkip:false, maxRotation:45, minRotation:45 } },
+               y:{ min:0, max:1, grid:{color:'rgba(0,0,0,.06)'},
+                   title:{display:true,text:'Opinion component',color:'#4a5268'} } } }
+  });
+}
+
+// Bin counts of correct / incorrect over [0,1] using nBins bins.
+function binnedCounts(vals, correctMask, nBins) {
+  const total = new Array(nBins).fill(0);
+  const corr  = new Array(nBins).fill(0);
+  for (let j = 0; j < vals.length; j++) {
+    let i = Math.floor(vals[j] * nBins);
+    if (i < 0) i = 0; if (i >= nBins) i = nBins - 1;
+    total[i]++; if (correctMask[j]) corr[i]++;
+  }
+  const incorr = total.map((t, i) => t - corr[i]);
+  return { total, corr, incorr };
+}
+
+// Distribution panel: total bar height = log(1+count), split by correct/incorrect
+// proportion. Matches _stacked_bar(use_log=True) in analysis.py.
+function mkLogCountHist(canvasId, vals, correctMask, xlabel, nBins) {
+  destroyChart(canvasId);
+  const edges = Array.from({length:nBins},(_,i)=>(i/nBins + 0.5/nBins).toFixed(2));
+  const { total, corr, incorr } = binnedCounts(vals, correctMask, nBins);
+  const h = total.map(t => Math.log1p(t));
+  const hCor = h.map((hi,i)=> total[i] ? hi*corr[i]/total[i] : 0);
+  const hInc = h.map((hi,i)=> total[i] ? hi*incorr[i]/total[i] : 0);
+  charts[canvasId] = new Chart(document.getElementById(canvasId), {
+    type:'bar',
+    data:{ labels:edges,
+      datasets:[
+        {label:'Correct',   data:hCor, backgroundColor:'rgba(45,212,191,.75)', stack:'s', _raw:corr},
+        {label:'Incorrect', data:hInc, backgroundColor:'rgba(240,80,80,.75)',  stack:'s', _raw:incorr},
+      ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false},
+        tooltip:{ callbacks:{ label:(ctx)=>`${ctx.dataset.label}: ${ctx.dataset._raw[ctx.dataIndex]}` } } },
+      scales:{ x:{stacked:true, title:{display:true,text:xlabel,color:'#4a5268'}},
+               y:{stacked:true, title:{display:true,text:'log(1 + count)',color:'#4a5268'}} } }
+  });
+}
+
+// Proportion panel: each populated bin = height 1, split correct/incorrect.
+// Matches _stacked_bar(use_log=False) in analysis.py — shows accuracy rising
+// monotonically with trust belief.
+function mkProportionHist(canvasId, vals, correctMask, xlabel, nBins) {
+  destroyChart(canvasId);
+  const edges = Array.from({length:nBins},(_,i)=>(i/nBins + 0.5/nBins).toFixed(2));
+  const { total, corr, incorr } = binnedCounts(vals, correctMask, nBins);
+  const pCor = total.map((t,i)=> t ? corr[i]/t : 0);
+  const pInc = total.map((t,i)=> t ? incorr[i]/t : 0);
+  charts[canvasId] = new Chart(document.getElementById(canvasId), {
+    type:'bar',
+    data:{ labels:edges,
+      datasets:[
+        {label:'Correct',   data:pCor, backgroundColor:'rgba(45,212,191,.75)', stack:'s', _raw:corr},
+        {label:'Incorrect', data:pInc, backgroundColor:'rgba(240,80,80,.75)',  stack:'s', _raw:incorr},
+      ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false},
+        tooltip:{ callbacks:{
+          label:(ctx)=>`${ctx.dataset.label}: ${(ctx.parsed.y*100).toFixed(0)}% (${ctx.dataset._raw[ctx.dataIndex]})` } } },
+      scales:{ x:{stacked:true, title:{display:true,text:xlabel,color:'#4a5268'}},
+               y:{stacked:true, min:0, max:1, title:{display:true,text:'Proportion within bin',color:'#4a5268'}} } }
+  });
+}
+
+function mkBinOpinionChart(canvasId, beliefs, disbeliefs, uncertainties, confidences, nBins=10) {
+  destroyChart(canvasId);
+  const edges=Array.from({length:nBins+1},(_,i)=>i/nBins);
+  const centres=Array.from({length:nBins},(_,i)=>((edges[i]+edges[i+1])/2).toFixed(2));
+  const mn = (arr,mask) => { const v=arr.filter((_,i)=>mask[i]); return v.length?v.reduce((a,b)=>a+b,0)/v.length:null; };
+  const mB=[], mD=[], mU=[];
+  for(let i=0;i<nBins;i++){
+    const mask=confidences.map(c=>c>edges[i]&&c<=edges[i+1]);
+    mB.push(mn(beliefs,mask)); mD.push(mn(disbeliefs,mask)); mU.push(mn(uncertainties,mask));
+  }
+  charts[canvasId] = new Chart(document.getElementById(canvasId), {
+    type:'line',
+    data:{ labels:centres,
+      datasets:[
+        {label:'Belief',      data:mB, borderColor:'#2dd4bf', pointRadius:4, pointBackgroundColor:'#2dd4bf', tension:.25, fill:false, borderWidth:1.8},
+        {label:'Distrust',    data:mD, borderColor:'#f05050', pointRadius:4, pointBackgroundColor:'#f05050', tension:.25, fill:false, borderWidth:1.8, borderDash:[5,3]},
+        {label:'Uncertainty', data:mU, borderColor:'#f0a832', pointRadius:4, pointBackgroundColor:'#f0a832', tension:.25, fill:false, borderWidth:1.8, borderDash:[2,4]},
+      ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ x:{title:{display:true,text:'Predicted confidence',color:'#4a5268'}},
+               y:{min:0,max:1, title:{display:true,text:'Mean opinion component',color:'#4a5268'}} } }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// PANEL RENDERERS
+// ═══════════════════════════════════════════════════════
+function renderOverview() {
+  const ds = PAGE_DS.overview, cal = PAGE_CAL.overview;
+  const rows = DATA[`${ds}_${cal}`];
+  if (!rows) return;
+  const M=10, W=2;
+  const op = computeGlobalOpinion(rows, M, W);
+  const ece = computeECE(rows);
+  const preds = rows.map(r=>r.probs.indexOf(Math.max(...r.probs)));
+  const acc = preds.filter((p,i)=>p===rows[i].label).length/rows.length;
+  document.getElementById('ov-b').textContent   = op.t.toFixed(3);
+  document.getElementById('ov-d').textContent   = op.d.toFixed(3);
+  document.getElementById('ov-u').textContent   = op.u.toFixed(3);
+  document.getElementById('ov-ece').textContent = ece.toFixed(4);
+  document.getElementById('ov-acc').textContent = (acc*100).toFixed(1)+'%';
+  document.getElementById('ov-ob').style.width  = (op.t*100).toFixed(1)+'%';
+  document.getElementById('ov-od').style.width  = (op.d*100).toFixed(1)+'%';
+  document.getElementById('ov-ou').style.width  = (op.u*100).toFixed(1)+'%';
+  mkRelChart('ov-rel', rows);
+  mkClassChart('ov-class', rows, M, W);
+  const msg = op.t>0.65
+    ? `Strong trust: belief=${op.t.toFixed(3)}, ECE=${ece.toFixed(4)}. Confidence closely tracks accuracy — the SL framework assigns high evidential support. Low uncertainty confirms the evidence base is abundant.`
+    : op.d>0.3
+    ? `High distrust: distrust=${op.d.toFixed(3)}, ECE=${ece.toFixed(4)}. The model is systematically overconfident — its predicted probabilities exceed empirical accuracy across bins. Temperature scaling or Platt calibration may reduce distrust.`
+    : `Uncertain verdict: uncertainty=${op.u.toFixed(3)}. Evidence is sparse or conflicting. More evaluation data, or a finer cluster resolution (larger M), may sharpen the opinion.`;
+  document.getElementById('ov-callout').textContent = msg;
+}
+
+function renderCalibration() {
+  const ds = PAGE_DS.calibration, cal = PAGE_CAL.calibration;
+  const rows = DATA[`${ds}_${cal}`];
+  if (!rows) return;
+  const M = +document.getElementById('cal-M').value;
+  const W = +document.getElementById('cal-W').value;
+  const op = computeGlobalOpinion(rows, M, W);
+  const ece = computeECE(rows);
+  document.getElementById('cal-b').textContent   = op.t.toFixed(3);
+  document.getElementById('cal-d').textContent   = op.d.toFixed(3);
+  document.getElementById('cal-u').textContent   = op.u.toFixed(3);
+  document.getElementById('cal-ece').textContent = ece.toFixed(4);
+  document.getElementById('cal-ob').style.width  = (op.t*100).toFixed(1)+'%';
+  document.getElementById('cal-od').style.width  = (op.d*100).toFixed(1)+'%';
+  document.getElementById('cal-ou').style.width  = (op.u*100).toFixed(1)+'%';
+  mkRelChart('cal-rel', rows);
+  mkClusterChart('cal-cluster', rows, M, W);
+  document.getElementById('cal-callout').textContent =
+    `M=${M} clusters, W=${W} prior weight. ${op.d>0.3?'Elevated distrust indicates overconfidence — the model claims more certainty than it earns.':op.u>0.3?'High uncertainty: some clusters are too sparse to yield decisive evidence. Increasing M or sample size may help.':'Belief dominates — calibration evidence strongly supports trust in this split.'}`;
+}
+
+function renderMVariation() {
+  const ds = PAGE_DS.mvariation;
+  const W = +document.getElementById('mv-W').value;
+  const mMax = +document.getElementById('mv-max').value;
+  // Dissertation M sweep (analysis.py default), capped at the slider max.
+  const FULL = [2,3,5,8,10,15,20,30,50,75,100,150,200,300,400,500,1000];
+  const mVals = FULL.filter(v=>v<=mMax);
+  if(!mVals.length || mVals[mVals.length-1]!==mMax) mVals.push(mMax);
+  mkMvChart('mv-bef', DATA[`${ds}_bef`], W, mVals);
+  mkMvChart('mv-aft', DATA[`${ds}_aft`], W, mVals);
+  document.getElementById('mv-callout').textContent =
+    `Well-calibrated models give opinions that stabilise early and at high belief (rising sharply then plateauing). Miscalibrated models oscillate at small M and settle with belief consistently below disbelief — the oscillation at small M is itself a diagnostic of miscalibration. Uncertainty (green) stays near 0 thanks to the large number of predictions. W=${W} sets how quickly evidence overcomes the prior.`;
+}
+
+function renderDynamic() {
+  const ds = PAGE_DS.dynamic, cal = PAGE_CAL.dynamic;
+  const rows = DATA[`${ds}_${cal}`];
+  if (!rows) return;
+  const M = +document.getElementById('dyn-M').value;
+  const W = +document.getElementById('dyn-W').value;
+  const { beliefs, disbeliefs, uncertainties, confidences, corrects } = computePerPredictionTrust(rows, M, W);
+  const bC = beliefs.filter((_,i)=>corrects[i]);
+  const bW = beliefs.filter((_,i)=>!corrects[i]);
+  const mBC = bC.length ? (bC.reduce((a,b)=>a+b,0)/bC.length).toFixed(3) : '—';
+  const mBW = bW.length ? (bW.reduce((a,b)=>a+b,0)/bW.length).toFixed(3) : '—';
+  const sep = (bC.length&&bW.length) ? (mBC-mBW).toFixed(3) : '—';
+  document.getElementById('dyn-bc').textContent = mBC;
+  document.getElementById('dyn-bw').textContent = mBW;
+  document.getElementById('dyn-sep').textContent = sep;
+  mkLogCountHist('dyn-confhist',  confidences, corrects, 'Predicted confidence', M);
+  mkProportionHist('dyn-beliefhist', beliefs,   corrects, 'Trust belief b', M);
+  mkBinOpinionChart('dyn-binopinion', beliefs, disbeliefs, uncertainties, confidences, M);
+  document.getElementById('dyn-callout').textContent =
+    sep > 0.05
+    ? `Good separability (Δ=${sep}): belief reliably distinguishes correct from incorrect predictions. Trust-based selective abstention — rejecting low-belief predictions — should improve deployed accuracy.`
+    : `Low separability (Δ=${sep}): belief scores overlap between correct and incorrect predictions. This is typical of overconfident models where wrong predictions still carry high confidence. Recalibration before trust filtering is recommended.`;
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION & DATASET SELECTION
+// ═══════════════════════════════════════════════════════
+// The HTML uses short page codes (cal/mv/dyn) for the per-page selectors,
+// but the renderers and the PAGE_DS/PAGE_CAL state use full names. This map
+// bridges the two so the dataset and before/after toggles actually re-render.
+const PAGE_FULL = { '':'overview', overview:'overview',
+                    cal:'calibration', calibration:'calibration',
+                    mv:'mvariation',  mvariation:'mvariation',
+                    dyn:'dynamic',    dynamic:'dynamic' };
+
+function renderPage(p) {
+  if (p==='overview')    renderOverview();
+  else if (p==='calibration') renderCalibration();
+  else if (p==='mvariation')  renderMVariation();
+  else if (p==='dynamic')     renderDynamic();
+}
+
+function go(page, ev) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(`p-${page}`).classList.add('active');
+  (ev && ev.currentTarget ? ev.currentTarget : event.currentTarget).classList.add('active');
+  renderPage(page);
+}
+
+function setDS(ds, btn, page='') {
+  const p = PAGE_FULL[page] || 'overview';
+  PAGE_DS[p] = ds;
+  btn.closest('.ds-selector').querySelectorAll('.ds-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPage(p);
+}
+
+function setCal(cal) {
+  PAGE_CAL.overview = cal;
+  document.getElementById('ov-bef-btn').classList.toggle('active', cal==='bef');
+  document.getElementById('ov-aft-btn').classList.toggle('active', cal==='aft');
+  renderOverview();
+}
+
+function setCalPage(cal, pageShort) {
+  const p = PAGE_FULL[pageShort];
+  PAGE_CAL[p] = cal;
+  // button ids use the short code prefix (cal-bef-btn, dyn-bef-btn)
+  document.getElementById(`${pageShort}-bef-btn`).classList.toggle('active', cal==='bef');
+  document.getElementById(`${pageShort}-aft-btn`).classList.toggle('active', cal==='aft');
+  renderPage(p);
+}
+
+function syncW(prefix) {
+  const v = document.getElementById(prefix+'-W').value;
+  document.getElementById(prefix+'-W-num').value = parseFloat(v).toFixed(1);
+  if (prefix === 'cal') renderCalibration();
+  else if (prefix === 'dyn') renderDynamic();
+  else if (prefix === 'mv') renderMVariation();
+  else if (prefix === 'ev' || prefix === 'evm') reRenderEval(prefix);
+}
+function syncWNum(prefix) {
+  const num = document.getElementById(prefix+'-W-num');
+  let v = parseFloat(num.value);
+  if (isNaN(v)) return;
+  v = Math.max(1, Math.min(10000, v));
+  document.getElementById(prefix+'-W').value = v;
+  if (prefix === 'cal') renderCalibration();
+  else if (prefix === 'dyn') renderDynamic();
+  else if (prefix === 'mv') renderMVariation();
+  else if (prefix === 'ev' || prefix === 'evm') reRenderEval(prefix);
+}
+
+
+
+function onCalCtrl() {
+  syncW('cal');
+  document.getElementById('cal-M-val').textContent = document.getElementById('cal-M').value;
+}
+function onMvCtrl() {
+  syncW('mv');
+  document.getElementById('mv-max-val').textContent = document.getElementById('mv-max').value;
+
+}
+function onDynCtrl() {
+  syncW('dyn');
+  document.getElementById('dyn-M-val').textContent = document.getElementById('dyn-M').value;
+}
+
+// ═══════════════════════════════════════════════════════
+// EVALUATE TAB
+// ═══════════════════════════════════════════════════════
+function setEvalMode(m) {
+  const isM = m==='model';
+  document.getElementById('ev-csv').style.display   = isM?'none':'block';
+  document.getElementById('ev-model').style.display = isM?'block':'none';
+  document.getElementById('m-csv-btn').classList.toggle('active',!isM);
+  document.getElementById('m-model-btn').classList.toggle('active',isM);
+  document.getElementById('ev-results').style.display='none';
+  document.getElementById('ev-progress').style.display='none';
+  document.getElementById('ev-err').style.display='none';
+}
+
+let _csvRaw='', _ortSession=null, _dataRows=null, _dataHdrs=null, _lastEvalRows=null;
+
+function dzDrop(e,type){
+  e.preventDefault();
+  document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('over'));
+  const f=e.dataTransfer.files[0]; if(!f)return;
+  if(type==='csv')onCSVFile(f);
+  else if(type==='model')onModelFile(f);
+  else if(type==='data')onDataFile(f);
+}
+function onCSVFile(f){
+  if(!f)return;
+  document.getElementById('csv-fname').textContent=f.name;
+  document.getElementById('csv-chip').style.display='inline-flex';
+  document.getElementById('csv-dz').classList.add('done');
+  const r=new FileReader(); r.onload=e=>{_csvRaw=e.target.result;document.getElementById('ev-csv-run').disabled=false;}; r.readAsText(f);
+}
+function onModelFile(f){
+  if(!f||!f.name.endsWith('.onnx')){showEvErr('Please upload a .onnx file.');return;}
+  document.getElementById('mdl-fname').textContent=f.name;
+  document.getElementById('mdl-chip').style.display='inline-flex';
+  document.getElementById('mdl-dz').classList.add('done');
+  const r=new FileReader();
+  r.onload=async e=>{
+    try{
+      _ortSession=await ort.InferenceSession.create(e.target.result);
+      const inp=_ortSession.inputNames[0];
+      document.getElementById('mdl-in').textContent=inp;
+      document.getElementById('mdl-out').textContent=_ortSession.outputNames[0];
+      document.getElementById('mdl-info').style.display='block';
+      checkMdlReady();
+    }catch(err){showEvErr('ONNX load failed: '+err.message);}
+  };
+  r.readAsArrayBuffer(f);
+}
+function onDataFile(f){
+  if(!f)return;
+  document.getElementById('dat-fname').textContent=f.name;
+  document.getElementById('dat-chip').style.display='inline-flex';
+  document.getElementById('dat-dz').classList.add('done');
+  const r=new FileReader();
+  r.onload=e=>{
+    const lines=e.target.result.trim().split('\n');
+    _dataHdrs=lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,''));
+    _dataRows=lines.slice(1).filter(l=>l.trim()).map(l=>l.split(',').map(v=>v.trim().replace(/^"|"$/g,'')));
+    const sel=document.getElementById('label-sel');
+    sel.innerHTML=_dataHdrs.map((h,i)=>`<option value="${i}">${h}</option>`).join('');
+    const ai=_dataHdrs.findIndex(h=>/label|class|target|y$/i.test(h));
+    sel.value=ai>=0?ai:_dataHdrs.length-1;
+    updateFeatInfo(); sel.onchange=updateFeatInfo;
+    document.getElementById('col-map-sec').style.display='block';
+    checkMdlReady();
+  };
+  r.readAsText(f);
+}
+function updateFeatInfo(){
+  const li=+document.getElementById('label-sel').value;
+  const feats=_dataHdrs.filter((_,i)=>i!==li);
+  document.getElementById('feat-info').textContent=`${feats.length} feature columns → model input. Label: "${_dataHdrs[li]}"`;
+}
+function checkMdlReady(){document.getElementById('ev-mdl-run').disabled=!(_ortSession&&_dataRows);}
+
+function showEvErr(msg){
+  const e=document.getElementById('ev-err'); e.style.display='block'; e.innerHTML=msg;
+  document.getElementById('ev-progress').style.display='none';
+}
+function setStep(n,state,desc){
+  const el=document.getElementById(`stp${n}`);
+  const nm=document.getElementById(`stp${n}-n`);
+  el.className='step s-'+state;
+  nm.textContent=state==='done'?'✓':state==='err'?'✕':n;
+  if(desc)document.getElementById(`stp${n}-d`).textContent=desc;
+}
+function setProg(pct){document.getElementById('prog').style.width=pct+'%';}
+
+function parseCSVtoRows(text){
+  // Unified with the startup parser (index-based, BOM/CRLF tolerant).
+  return parseCSVRows(text);
+}
+
+function runCSV(){
+  document.getElementById('ev-err').style.display='none';
+  document.getElementById('ev-results').style.display='none';
+  document.getElementById('ev-progress').style.display='block';
+  setStep(1,'active','Parsing CSV…'); setProg(10);
+  try{
+    const rows=parseCSVtoRows(_csvRaw);
+    setStep(1,'done',`${rows.length} samples, ${rows[0].probs.length} classes`);
+    setStep(2,'done','Probabilities loaded from CSV');
+    setStep(3,'active','Computing SL opinions…'); setProg(80);
+    const M=+document.getElementById('ev-M').value, W=+document.getElementById('ev-W').value;
+    setTimeout(()=>{ renderEvalResults(rows,M,W); setProg(100); setStep(3,'done','Complete'); }, 60);
+  }catch(err){setStep(1,'err','Failed');showEvErr(err.message);}
+}
+
+async function runModel(){
+  document.getElementById('ev-err').style.display='none';
+  document.getElementById('ev-results').style.display='none';
+  document.getElementById('ev-progress').style.display='block';
+  const li=+document.getElementById('label-sel').value;
+  const featIdx=_dataHdrs.map((_,i)=>i).filter(i=>i!==li);
+  const smx=document.getElementById('smx-sel').value;
+  const inputName=_ortSession.inputNames[0];
+  const allRows=[];
+  const bsz=32; const total=_dataRows.length;
+  setStep(1,'done','Model and dataset loaded');
+  setStep(2,'active','Running inference…'); setProg(5);
+  try{
+    for(let s=0;s<total;s+=bsz){
+      const batch=_dataRows.slice(s,Math.min(s+bsz,total));
+      const nF=featIdx.length;
+      const flat=new Float32Array(batch.length*nF);
+      for(let r=0;r<batch.length;r++) for(let f=0;f<nF;f++) flat[r*nF+f]=parseFloat(batch[r][featIdx[f]])||0;
+      const tensor=new ort.Tensor('float32',flat,[batch.length,nF]);
+      const out=await _ortSession.run({[inputName]:tensor});
+      const outData=Array.from(out[_ortSession.outputNames[0]].data);
+      const outDims=out[_ortSession.outputNames[0]].dims;
+      const nC=outDims[outDims.length-1];
+      for(let r=0;r<batch.length;r++){
+        let logits=Array.from(outData.slice(r*nC,(r+1)*nC));
+        let probs;
+        if(smx==='yes'||(smx==='auto'&&(logits.some(v=>v<0)||logits.reduce((a,b)=>a+b,0)>1.05))){
+          const mx=Math.max(...logits); const e=logits.map(x=>Math.exp(x-mx)); const s=e.reduce((a,b)=>a+b,0);
+          probs=e.map(x=>x/s);
+        } else { probs=logits; }
+        allRows.push({label:parseInt(batch[r][li])||0, probs});
+      }
+      setProg(Math.min(90,Math.round((s+batch.length)/total*85)));
+      setStep(2,'active',`${s+batch.length}/${total} samples`);
+      await new Promise(r=>setTimeout(r,0));
+    }
+    setStep(2,'done','Inference complete');
+    setStep(3,'active','Computing SL opinions…'); setProg(93);
+    const M=+document.getElementById('evm-M').value, W=+document.getElementById('evm-W').value;
+    await new Promise(r=>setTimeout(r,40));
+    renderEvalResults(allRows,M,W); setProg(100); setStep(3,'done','Complete');
+  }catch(err){setStep(2,'err','Failed');showEvErr('Inference error: '+err.message);}
+}
+
+function reRenderEval(prefix) {
+  if (!_lastEvalRows || document.getElementById('ev-results').style.display === 'none') return;
+  const M = +document.getElementById(prefix + '-M').value;
+  const W = +document.getElementById(prefix + '-W').value;
+  renderEvalResults(_lastEvalRows, M, W);
+}
+
+function renderEvalResults(rows, M, W){
+  _lastEvalRows = rows;
+  const n=rows.length, nC=rows[0].probs.length;
+  const preds=rows.map(r=>r.probs.indexOf(Math.max(...r.probs)));
+  const acc=preds.filter((p,i)=>p===rows[i].label).length/n;
+  const ece=computeECE(rows);
+  const gop=computeGlobalOpinion(rows,M,W);
+  const classOps=Array.from({length:nC},(_,c)=>computeClassOpinion(rows,c,M,W));
+  document.getElementById('evr-n').textContent=n.toLocaleString();
+  document.getElementById('evr-c').textContent=nC;
+  document.getElementById('evr-acc').textContent=(acc*100).toFixed(1)+'%';
+  document.getElementById('evr-ece').textContent=ece.toFixed(4);
+  document.getElementById('evr-b').textContent=gop.t.toFixed(3);
+  document.getElementById('evr-d').textContent=gop.d.toFixed(3);
+  document.getElementById('evr-u').textContent=gop.u.toFixed(3);
+  document.getElementById('evr-ob').style.width=(gop.t*100).toFixed(1)+'%';
+  document.getElementById('evr-od').style.width=(gop.d*100).toFixed(1)+'%';
+  document.getElementById('evr-ou').style.width=(gop.u*100).toFixed(1)+'%';
+  mkRelChart('evr-rel',rows);
+  mkClassChart('evr-class',rows,M,W);
+  const {beliefs,disbeliefs,uncertainties,confidences,corrects}=computePerPredictionTrust(rows,M,W);
+  mkProportionHist('evr-confhist',confidences,corrects,'Predicted probability',M);
+  mkProportionHist('evr-dyn',beliefs,corrects,'Trust belief b',M);
+  const tbody=document.getElementById('evr-tbody');
+  tbody.innerHTML='';
+  for(let c=0;c<nC;c++){
+    const op=classOps[c];
+    const cnt=rows.filter(r=>r.label===c).length;
+    const cacc=cnt?(preds.filter((p,i)=>p===c&&rows[i].label===c).length/cnt*100).toFixed(1)+'%':'—';
+    const v=op.t>0.5?'<span class="badge b-trust">Trusted</span>':op.d>0.5?'<span class="badge b-dist">Distrusted</span>':'<span class="badge b-warn">Uncertain</span>';
+    tbody.innerHTML+=`<tr><td>${c}</td><td>${cnt}</td><td>${cacc}</td><td>${op.t.toFixed(3)}</td><td>${op.d.toFixed(3)}</td><td>${op.u.toFixed(3)}</td><td>${v}</td></tr>`;
+  }
+  document.getElementById('evr-callout').textContent=
+    gop.t>0.65?`Global trust: ω=(${gop.t.toFixed(3)}, ${gop.d.toFixed(3)}, ${gop.u.toFixed(3)}). Accuracy ${(acc*100).toFixed(1)}%, ECE ${ece.toFixed(4)}. The model earns strong trust — confidence closely matches empirical accuracy.`
+    :gop.d>0.3?`Global trust: ω=(${gop.t.toFixed(3)}, ${gop.d.toFixed(3)}, ${gop.u.toFixed(3)}). High distrust signals overconfidence. Temperature scaling or isotonic regression may lower ECE (${ece.toFixed(4)}) and raise belief.`
+    :`Global trust: ω=(${gop.t.toFixed(3)}, ${gop.d.toFixed(3)}, ${gop.u.toFixed(3)}). High vacuity — evidence is insufficient for a decisive verdict. More evaluation data or a smaller M may help.`;
+  document.getElementById('ev-results').style.display='block';
+}
+
+// ═══════════════════════════════════════════════════════
+// DATA LOADING — file picker (no CORS issues with file://)
+// ═══════════════════════════════════════════════════════
+const LOADED = {};   // tracks which keys are ready
+const KEYS = ['mnist_bef','mnist_aft','cifar_bef','cifar_aft'];
+
+function pickFile(key) {
+  document.getElementById('fi-' + key.replace('_','-')).click();
+}
+
+function parseCSVRows(text) {
+  text = text.replace(/^\uFEFF/, '');               // strip BOM if present
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) throw new Error('CSV has no data rows');
+  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,''));
+  // locate the true-label column (tolerant of spacing / casing)
+  let li = headers.findIndex(h => /^true[\s_]*label$/i.test(h));
+  if (li === -1) li = headers.findIndex(h => /^(label|target|y)$/i.test(h));
+  if (li === -1) throw new Error('"True Label" column not found');
+  // map each probability column to its EXPLICIT class index so that
+  // probs[k] is always P(class k), independent of column order.
+  const probCols = [];
+  headers.forEach((h, i) => {
+    const m = h.match(/^Class[\s_]?(\d+)[\s_]?Prob(?:ability)?$/i);
+    if (m) probCols.push({ cls: +m[1], col: i });
+  });
+  if (!probCols.length) throw new Error('No Class_N_Probability columns found');
+  const nC = Math.max(...probCols.map(p => p.cls)) + 1;
+  const rows = [];
+  for (let r = 1; r < lines.length; r++) {
+    if (!lines[r].trim()) continue;
+    const v = lines[r].split(',').map(x => x.trim().replace(/^"|"$/g,''));
+    const label = parseInt(v[li], 10);
+    if (isNaN(label)) continue;
+    const probs = new Array(nC).fill(0);
+    let ok = true;
+    for (const { cls, col } of probCols) {
+      const p = parseFloat(v[col]);
+      if (isNaN(p)) { ok = false; break; }
+      probs[cls] = p;
+    }
+    if (ok) rows.push({ label, probs });
+  }
+  if (!rows.length) throw new Error('No valid data rows parsed');
+  return rows;
+}
+
+function onFilePicked(key, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const dashKey = key.replace('_', '-');
+  const statusEl = document.getElementById('st-' + dashKey);
+  const rowEl    = document.getElementById('row-' + dashKey);
+  statusEl.innerHTML = '<span class="loading-spin"></span>reading…';
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const rows = parseCSVRows(e.target.result);
+      DATA[key] = rows;
+      LOADED[key] = true;
+      statusEl.textContent = '✓ ' + rows.length.toLocaleString() + ' rows';
+      rowEl.classList.add('loaded');
+      document.getElementById('su-err').style.display = 'none';
+      // enable launch once all four loaded
+      if (KEYS.every(k => LOADED[k])) {
+        document.getElementById('su-launch').disabled = false;
+      }
+    } catch(err) {
+      statusEl.textContent = '✗ error';
+      rowEl.classList.remove('loaded');
+      const errEl = document.getElementById('su-err');
+      errEl.style.display = 'block';
+      errEl.textContent = file.name + ': ' + err.message;
+    }
+  };
+  reader.readAsText(file);
+}
+
+function launchApp() {
+  const su = document.getElementById('startup');
+  su.classList.add('hidden');
+  setTimeout(() => { su.style.display = 'none'; }, 380);
+  renderOverview();
+}
+
+// ─── Auto-fetch over HTTP (silently skipped on file://) ───
+// When the page is served via http(s), we try the standard MNIST_PRED /
+// CIFAR_PRED paths used by analysis.py. When opened via file:// Chrome
+// blocks fetch with CORS, so we don't even try — instead we offer the
+// folder picker and per-file pickers.
+const AUTO_PATHS = {
+  mnist_bef: ['MNIST_PRED/bef_100.csv', 'data/MNIST_PRED/bef_100.csv'],
+  mnist_aft: ['MNIST_PRED/aft_100.csv', 'data/MNIST_PRED/aft_100.csv'],
+  cifar_bef: ['CIFAR_PRED/bef_100.csv', 'data/CIFAR_PRED/bef_100.csv', 'CIFAR10_PRED/bef_100.csv'],
+  cifar_aft: ['CIFAR_PRED/aft_100.csv', 'data/CIFAR_PRED/aft_100.csv', 'CIFAR10_PRED/aft_100.csv'],
+};
+
+function setStatus(k, html) {
+  const el = document.getElementById('st-' + k.replace('_','-'));
+  if (el) el.innerHTML = html;
+}
+function markLoaded(k, rows) {
+  DATA[k] = rows; LOADED[k] = true;
+  setStatus(k, '✓ ' + rows.length.toLocaleString() + ' rows');
+  document.getElementById('row-' + k.replace('_','-')).classList.add('loaded');
+  if (KEYS.every(x => LOADED[x])) {
+    document.getElementById('su-launch').disabled = false;
+    setTimeout(launchApp, 500);
+  }
+}
+function showInfo(html) {
+  const el = document.getElementById('su-info');
+  if (el) el.innerHTML = html;
+}
+
+async function tryHttpAutoLoad() {
+  if (location.protocol === 'file:') {
+    // Don't attempt fetch on file:// — Chrome blocks it with a noisy CORS
+    // error. Tell the user the cleaner options instead.
+    if (window.showDirectoryPicker) {
+      showInfo('Opened via <code>file://</code> — click <b>Load folder</b> above to load all four CSVs in one click, or pick them individually below.');
+    } else {
+      showInfo('Opened via <code>file://</code>. Your browser doesn’t expose the folder picker, so pick the four files individually below — or serve this folder via <code>python -m http.server</code> to enable one-shot auto-load.');
+    }
+    return;
+  }
+  for (const k of KEYS) {
+    if (LOADED[k]) continue;
+    setStatus(k, '<span class="loading-spin"></span>auto-fetching…');
+    let text = null;
+    for (const p of AUTO_PATHS[k]) {
+      try {
+        const resp = await fetch(p, { cache: 'no-store' });
+        if (resp.ok) { text = await resp.text(); break; }
+      } catch (_) {}
+    }
+    if (text === null) { setStatus(k, 'click to select'); continue; }
+    try { markLoaded(k, parseCSVRows(text)); }
+    catch (err) { setStatus(k, '✗ parse error'); }
+  }
+}
+
+// ─── Folder picker (Chromium-only File System Access API) ───
+// Walks the chosen folder tree and locates the four CSVs by their parent
+// directory + filename, disambiguating bef_100.csv between MNIST_PRED/ and
+// CIFAR_PRED/.
+async function walkDir(dir, prefix='') {
+  const out = [];
+  for await (const [name, h] of dir.entries()) {
+    const path = prefix ? prefix + '/' + name : name;
+    if (h.kind === 'file') out.push({ path, name, handle: h });
+    else if (h.kind === 'directory') {
+      const sub = await walkDir(h, path);
+      out.push(...sub);
+    }
+  }
+  return out;
+}
+
+const FOLDER_PATTERNS = {
+  mnist_bef: /(?:^|[\/\\])mnist[^\/\\]*[\/\\](?:bef|before)[^\/\\]*\.csv$|(?:^|[\/\\])mnist[_-]?bef[^\/\\]*\.csv$/i,
+  mnist_aft: /(?:^|[\/\\])mnist[^\/\\]*[\/\\](?:aft|after)[^\/\\]*\.csv$|(?:^|[\/\\])mnist[_-]?aft[^\/\\]*\.csv$/i,
+  cifar_bef: /(?:^|[\/\\])cifar[^\/\\]*[\/\\](?:bef|before)[^\/\\]*\.csv$|(?:^|[\/\\])cifar[_-]?bef[^\/\\]*\.csv$/i,
+  cifar_aft: /(?:^|[\/\\])cifar[^\/\\]*[\/\\](?:aft|after)[^\/\\]*\.csv$|(?:^|[\/\\])cifar[_-]?aft[^\/\\]*\.csv$/i,
+};
+
+async function loadFromFolder() {
+  if (!window.showDirectoryPicker) {
+    showInfo('Folder picking isn’t supported in this browser (Firefox/Safari). Use the per-file pickers below, or serve via <code>python -m http.server</code>.');
+    return;
+  }
+  let dir;
+  try { dir = await window.showDirectoryPicker(); }
+  catch (e) { return; }   // user cancelled
+
+  let files;
+  try { files = await walkDir(dir); }
+  catch (e) { showInfo('Could not read folder: ' + e.message); return; }
+
+  // First pass: try to match each key against patterns including the parent dir.
+  const used = new Set();
+  const matched = {};
+  for (const k of KEYS) {
+    const re = FOLDER_PATTERNS[k];
+    const m = files.find(f => !used.has(f.path) && re.test(f.path));
+    if (m) { matched[k] = m; used.add(m.path); }
+  }
+
+  // Second pass: anything still unmatched? try filename-only fuzzy match
+  // (e.g. the user picked just MNIST_PRED/ — then no “mnist” in the path).
+  for (const k of KEYS) {
+    if (matched[k]) continue;
+    const wantBef = k.endsWith('_bef');
+    const wantMnist = k.startsWith('mnist');
+    const cand = files.filter(f => !used.has(f.path)
+      && /\.csv$/i.test(f.name)
+      && (wantBef ? /bef|before/i.test(f.name) : /aft|after/i.test(f.name)));
+    // if the folder name itself hints at the dataset, prefer that
+    let pick = cand.find(f => (wantMnist ? /mnist/i : /cifar/i).test(f.path));
+    if (!pick) pick = cand[0];
+    if (pick) { matched[k] = pick; used.add(pick.path); }
+  }
+
+  let any = false;
+  for (const k of KEYS) {
+    if (LOADED[k] || !matched[k]) continue;
+    any = true;
+    setStatus(k, '<span class="loading-spin"></span>reading ' + matched[k].path + '…');
+    try {
+      const file = await matched[k].handle.getFile();
+      const text = await file.text();
+      markLoaded(k, parseCSVRows(text));
+    } catch (err) {
+      setStatus(k, '✗ ' + (err.message || 'read error').slice(0, 60));
+    }
+  }
+  if (!any && KEYS.some(k => !LOADED[k])) {
+    showInfo('No matching CSVs found in that folder. Expected files like <code>MNIST_PRED/bef_100.csv</code>, or filenames containing <code>mnist/cifar</code> and <code>bef/aft</code>.');
+  }
+}
+
+// ─── Download from a remote base URL ───
+// Fetches the four CSVs from <base>/MNIST_PRED/{bef|aft}_100.csv etc.
+// Works from file:// as long as the remote host serves CORS (GitHub raw,
+// jsDelivr, S3 with CORS, etc. all do). The URL is remembered locally.
+const REMOTE_SUFFIXES = {
+  mnist_bef: ['MNIST_PRED/bef_100.csv', 'data/MNIST_PRED/bef_100.csv', 'mnist_bef.csv'],
+  mnist_aft: ['MNIST_PRED/aft_100.csv', 'data/MNIST_PRED/aft_100.csv', 'mnist_aft.csv'],
+  cifar_bef: ['CIFAR_PRED/bef_100.csv', 'data/CIFAR_PRED/bef_100.csv', 'CIFAR10_PRED/bef_100.csv', 'cifar_bef.csv'],
+  cifar_aft: ['CIFAR_PRED/aft_100.csv', 'data/CIFAR_PRED/aft_100.csv', 'CIFAR10_PRED/aft_100.csv', 'cifar_aft.csv'],
+};
+
+function normaliseBaseUrl(u) {
+  u = (u || '').trim();
+  if (!u) return '';
+  // github.com/USER/REPO/tree/BRANCH/PATH  →  raw.githubusercontent.com/USER/REPO/BRANCH/PATH
+  const m = u.match(/^https?:\/\/github\.com\/([^\/]+)\/([^\/]+)\/(?:tree|blob)\/([^\/]+)(\/.*)?$/i);
+  if (m) u = `https://raw.githubusercontent.com/${m[1]}/${m[2]}/${m[3]}${m[4] || ''}`;
+  if (!/\/$/.test(u)) u += '/';
+  return u;
+}
+
+async function downloadFromUrl() {
+  const input = document.getElementById('su-url');
+  const base = normaliseBaseUrl(input.value);
+  if (!base) {
+    showInfo('Paste the base URL of the folder that contains <code>MNIST_PRED/</code> and <code>CIFAR_PRED/</code>. For a GitHub repo, you can paste either the <code>github.com/.../tree/BRANCH/</code> URL or the <code>raw.githubusercontent.com/...</code> one.');
+    input.focus();
+    return;
+  }
+  try { localStorage.setItem('tbb_remote_base', base); } catch (_) {}
+  input.value = base;
+
+  const btn = document.getElementById('su-download');
+  btn.disabled = true; const oldLabel = btn.textContent; btn.textContent = '⏳  downloading…';
+  let okCount = 0, failed = [];
+  for (const k of KEYS) {
+    if (LOADED[k]) { okCount++; continue; }
+    setStatus(k, '<span class="loading-spin"></span>downloading…');
+    let text = null, lastErr = '';
+    for (const suf of REMOTE_SUFFIXES[k]) {
+      const url = base + suf;
+      try {
+        const resp = await fetch(url, { cache: 'no-store', mode: 'cors' });
+        if (resp.ok) { text = await resp.text(); break; }
+        lastErr = 'HTTP ' + resp.status;
+      } catch (e) { lastErr = e.message || 'fetch failed'; }
+    }
+    if (text === null) {
+      setStatus(k, '✗ not found');
+      failed.push(k + ' (' + lastErr + ')');
+      continue;
+    }
+    try { markLoaded(k, parseCSVRows(text)); okCount++; }
+    catch (err) { setStatus(k, '✗ parse error'); failed.push(k + ' (parse)'); }
+  }
+  btn.disabled = false; btn.textContent = oldLabel;
+  if (failed.length) {
+    showInfo('Some files failed: ' + failed.map(s => '<code>' + s + '</code>').join(', ')
+      + '<br>Verify the base URL is correct and that the host allows CORS. For GitHub, use the <code>raw.githubusercontent.com</code> form (auto-rewritten from <code>github.com/.../tree/...</code>).');
+  } else {
+    showInfo('');
+  }
+}
+
+// Restore persisted base URL into the input on load.
+(function restoreRemote() {
+  try {
+    const saved = localStorage.getItem('tbb_remote_base');
+    if (saved) {
+      const el = document.getElementById('su-url');
+      if (el) el.value = saved;
+    }
+  } catch (_) {}
+})();
+
+// Kick off HTTP auto-fetch (no-op on file://).
+tryHttpAutoLoad();
+</script>
+</body>
+</html>
