@@ -752,7 +752,7 @@ tbody tr:hover td { background: var(--bg2); }
 <header>
   <div class="logo-mark">SL</div>
   <div class="logo-text">Trust</div>
-  <div class="logo-sub">Trust Assessment Framework · Subjective Logic</div>
+  <div class="logo-sub">Evidential Based Trust Assessment Framework · Subjective Logic</div>
   <div class="header-pill">PhD Demo</div>
 </header>
 
@@ -791,9 +791,15 @@ tbody tr:hover td { background: var(--bg2); }
       <span class="ds-btn-label">CIFAR-10</span>
       <span class="ds-btn-sub">10-class image recognition</span>
     </button>
-    <div class="cal-toggle">
-      <button class="cal-btn active" id="ov-bef-btn" onclick="setCal('bef')">Before cal.</button>
-      <button class="cal-btn" id="ov-aft-btn" onclick="setCal('aft')">After cal.</button>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <div class="cal-toggle" style="margin-left:0">
+        <button class="cal-btn active scope-all-btn" onclick="setScope('all')">All data</button>
+        <button class="cal-btn scope-dec-btn" onclick="setScope('decision')">Decision label</button>
+      </div>
+      <div class="cal-toggle" style="margin-left:0">
+        <button class="cal-btn active" id="ov-bef-btn" onclick="setCal('bef')">Before cal.</button>
+        <button class="cal-btn" id="ov-aft-btn" onclick="setCal('aft')">After cal.</button>
+      </div>
     </div>
   </div>
 
@@ -850,9 +856,15 @@ tbody tr:hover td { background: var(--bg2); }
     <button class="ds-btn" onclick="setDS('cifar',this,'cal')">
       <span class="ds-btn-label">CIFAR-10</span><span class="ds-btn-sub">natural images</span>
     </button>
-    <div class="cal-toggle">
-      <button class="cal-btn active" id="cal-bef-btn" onclick="setCalPage('bef','cal')">Before cal.</button>
-      <button class="cal-btn" id="cal-aft-btn" onclick="setCalPage('aft','cal')">After cal.</button>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <div class="cal-toggle" style="margin-left:0">
+        <button class="cal-btn active scope-all-btn" onclick="setScope('all')">All data</button>
+        <button class="cal-btn scope-dec-btn" onclick="setScope('decision')">Decision label</button>
+      </div>
+      <div class="cal-toggle" style="margin-left:0">
+        <button class="cal-btn active" id="cal-bef-btn" onclick="setCalPage('bef','cal')">Before cal.</button>
+        <button class="cal-btn" id="cal-aft-btn" onclick="setCalPage('aft','cal')">After cal.</button>
+      </div>
     </div>
   </div>
 
@@ -924,6 +936,10 @@ tbody tr:hover td { background: var(--bg2); }
     <button class="ds-btn" onclick="setDS('cifar',this,'mv')">
       <span class="ds-btn-label">CIFAR-10</span><span class="ds-btn-sub">natural images</span>
     </button>
+    <div class="cal-toggle">
+      <button class="cal-btn active scope-all-btn" onclick="setScope('all')">All data</button>
+      <button class="cal-btn scope-dec-btn" onclick="setScope('decision')">Decision label</button>
+    </div>
   </div>
 
   <div class="ctrl-grid">
@@ -986,9 +1002,15 @@ tbody tr:hover td { background: var(--bg2); }
     <button class="ds-btn" onclick="setDS('cifar',this,'dyn')">
       <span class="ds-btn-label">CIFAR-10</span><span class="ds-btn-sub">natural images</span>
     </button>
-    <div class="cal-toggle">
-      <button class="cal-btn active" id="dyn-bef-btn" onclick="setCalPage('bef','dyn')">Before cal.</button>
-      <button class="cal-btn" id="dyn-aft-btn" onclick="setCalPage('aft','dyn')">After cal.</button>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <div class="cal-toggle" style="margin-left:0">
+        <button class="cal-btn active scope-all-btn" onclick="setScope('all')">All data</button>
+        <button class="cal-btn scope-dec-btn" onclick="setScope('decision')">Decision label</button>
+      </div>
+      <div class="cal-toggle" style="margin-left:0">
+        <button class="cal-btn active" id="dyn-bef-btn" onclick="setCalPage('bef','dyn')">Before cal.</button>
+        <button class="cal-btn" id="dyn-aft-btn" onclick="setCalPage('aft','dyn')">After cal.</button>
+      </div>
     </div>
   </div>
 
@@ -1062,6 +1084,14 @@ tbody tr:hover td { background: var(--bg2); }
   <div class="mode-toggle">
     <div class="mode-btn active" id="m-csv-btn" onclick="setEvalMode('csv')">Predictions CSV</div>
     <div class="mode-btn" id="m-model-btn" onclick="setEvalMode('model')">Model + Dataset</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
+    <span style="font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase">Data scope</span>
+    <div class="cal-toggle" style="margin-left:0">
+      <button class="cal-btn active scope-all-btn" onclick="setScope('all')">All data</button>
+      <button class="cal-btn scope-dec-btn" onclick="setScope('decision')">Decision label</button>
+    </div>
   </div>
 
   <!-- CSV mode -->
@@ -1258,6 +1288,7 @@ let DS = 'mnist', CAL = 'bef';
 const PAGE_DS   = { overview: 'mnist', calibration: 'mnist', mvariation: 'mnist', dynamic: 'mnist' };
 const PAGE_CAL  = { overview: 'bef', calibration: 'bef', dynamic: 'bef' };
 const charts = {};
+let DATA_SCOPE = 'all'; // 'all' | 'decision'
 
 // ── Chart defaults ──
 Chart.defaults.color = '#4a5268';
@@ -1488,6 +1519,101 @@ function computePerPredictionTrust(rows, M, W) {
   return { beliefs, disbeliefs, uncertainties, confidences, corrects };
 }
 
+// ── Decision-label variants ──
+// For each class c only count samples where argmax(probs) === c (the model's
+// actual decision), so every sample contributes to exactly one class and
+// low-probability clusters (e.g. 0.05) remain empty rather than being
+// filled with non-decision class-c probabilities from unrelated predictions.
+function classClusterStatsDecision(rows, classIdx, M) {
+  const ni = new Array(M).fill(0), ti = new Array(M).fill(0);
+  const { lo, hi } = makeBoundaries(M);
+  for (let j = 0; j < rows.length; j++) {
+    const r = rows[j];
+    if (argmax(r.probs) !== classIdx) continue;
+    const idx = findBin(r.probs[classIdx], lo, hi, M);
+    if (idx < 0) continue;
+    ni[idx]++;
+    if (r.label === classIdx) ti[idx]++;
+  }
+  return { ni, ti };
+}
+
+function computeClassOpinionDecision(rows, classIdx, M, W) {
+  const { ni, ti } = classClusterStatsDecision(rows, classIdx, M);
+  const step = 1/M, half = step/2;
+  let r = 0, s = 0;
+  for (let i = 0; i < M; i++) {
+    const rp = +(half + i*step).toFixed(6);
+    r += ti[i];
+    s += Math.round(Math.abs(ti[i] - ni[i]*rp));
+  }
+  return ev2tdu(r, s, W);
+}
+
+function computeGlobalOpinionDecision(rows, M, W) {
+  if (!rows || !rows.length) return {t:0,d:0,u:1};
+  const nC = rows[0].probs.length;
+  let fused = null;
+  for (let c = 0; c < nC; c++) {
+    const op = computeClassOpinionDecision(rows, c, M, W);
+    fused = fused ? cumFuse(fused, op) : op;
+  }
+  return fused || {t:0,d:0,u:1};
+}
+
+function clusterStackedDecision(rows, M, W) {
+  const nC = rows[0].probs.length, step = 1/M, half = step/2;
+  const stats = [];
+  for (let c = 0; c < nC; c++) stats.push(classClusterStatsDecision(rows, c, M));
+  const reps=[], B=[], D=[], U=[];
+  for (let i = 0; i < M; i++) {
+    const rp = +(half + i*step).toFixed(6); reps.push(rp);
+    let fb = null;
+    for (let c = 0; c < nC; c++) {
+      const ni = stats[c].ni[i], ti = stats[c].ti[i];
+      const op = ev2tdu(ti, Math.round(Math.abs(ti - ni*rp)), W);
+      fb = fb ? cumFuse(fb, op) : op;
+    }
+    fb = fb || {t:0,d:0,u:1};
+    B.push(+fb.t.toFixed(3)); D.push(+fb.d.toFixed(3)); U.push(+fb.u.toFixed(3));
+  }
+  return { reps, B, D, U };
+}
+
+// All-data variant of per-prediction trust uses buildLookup (one-vs-rest),
+// while the existing computePerPredictionTrust uses buildLookupDecision.
+function computePerPredictionTrustAllData(rows, M, W) {
+  const lut = buildLookup(rows, M, W);
+  const { lo, hi } = makeBoundaries(M);
+  const beliefs=[], disbeliefs=[], uncertainties=[], confidences=[], corrects=[];
+  for (const r of rows) {
+    const predC = argmax(r.probs);
+    const conf = r.probs[predC];
+    const idx = findBin(conf, lo, hi, M);
+    const op = (idx >= 0 ? lut[predC][idx] : null) || {t:0,d:0,u:1};
+    beliefs.push(op.t);
+    disbeliefs.push(op.d);
+    uncertainties.push(op.u);
+    confidences.push(conf);
+    corrects.push(predC === r.label);
+  }
+  return { beliefs, disbeliefs, uncertainties, confidences, corrects };
+}
+
+// ── Scope dispatchers ──
+function getGlobalOpinion(rows, M, W) {
+  return DATA_SCOPE === 'decision' ? computeGlobalOpinionDecision(rows, M, W) : computeGlobalOpinion(rows, M, W);
+}
+function getClassOpinion(rows, classIdx, M, W) {
+  return DATA_SCOPE === 'decision' ? computeClassOpinionDecision(rows, classIdx, M, W) : computeClassOpinion(rows, classIdx, M, W);
+}
+function getClusterStacked(rows, M, W) {
+  return DATA_SCOPE === 'decision' ? clusterStackedDecision(rows, M, W) : clusterStacked(rows, M, W);
+}
+function getPerPredictionTrust(rows, M, W) {
+  return DATA_SCOPE === 'decision' ? computePerPredictionTrust(rows, M, W) : computePerPredictionTrustAllData(rows, M, W);
+}
+
 // ═══════════════════════════════════════════════════════
 // CHART HELPERS
 // ═══════════════════════════════════════════════════════
@@ -1524,7 +1650,7 @@ function mkRelChart(canvasId, rows) {
 function mkClassChart(canvasId, rows, M, W) {
   destroyChart(canvasId);
   const nC = rows[0].probs.length;
-  const ops = Array.from({length:nC}, (_,c) => computeClassOpinion(rows, c, M, W));
+  const ops = Array.from({length:nC}, (_,c) => getClassOpinion(rows, c, M, W));
   charts[canvasId] = new Chart(document.getElementById(canvasId), {
     type: 'bar',
     data: { labels: ops.map((_,i)=>`C${i}`),
@@ -1540,7 +1666,7 @@ function mkClassChart(canvasId, rows, M, W) {
 
 function mkClusterChart(canvasId, rows, M, W) {
   destroyChart(canvasId);
-  const { reps, B, D, U } = clusterStacked(rows, M, W);
+  const { reps, B, D, U } = getClusterStacked(rows, M, W);
   charts[canvasId] = new Chart(document.getElementById(canvasId), {
     type:'bar',
     data:{ labels:reps.map(r=>r.toFixed(2)),
@@ -1558,7 +1684,7 @@ function mkMvChart(canvasId, rows, W, mValues) {
   destroyChart(canvasId);
   const bs=[], ds=[], us=[];
   for (const m of mValues) {
-    const op = computeGlobalOpinion(rows, m, W);
+    const op = getGlobalOpinion(rows, m, W);
     bs.push(+op.t.toFixed(4));
     ds.push(+op.d.toFixed(4));
     us.push(+op.u.toFixed(4));
@@ -1674,7 +1800,7 @@ function renderOverview() {
   const rows = DATA[`${ds}_${cal}`];
   if (!rows) return;
   const M=10, W=2;
-  const op = computeGlobalOpinion(rows, M, W);
+  const op = getGlobalOpinion(rows, M, W);
   const ece = computeECE(rows);
   const preds = rows.map(r=>r.probs.indexOf(Math.max(...r.probs)));
   const acc = preds.filter((p,i)=>p===rows[i].label).length/rows.length;
@@ -1702,7 +1828,7 @@ function renderCalibration() {
   if (!rows) return;
   const M = +document.getElementById('cal-M').value;
   const W = +document.getElementById('cal-W').value;
-  const op = computeGlobalOpinion(rows, M, W);
+  const op = getGlobalOpinion(rows, M, W);
   const ece = computeECE(rows);
   document.getElementById('cal-b').textContent   = op.t.toFixed(3);
   document.getElementById('cal-d').textContent   = op.d.toFixed(3);
@@ -1737,7 +1863,7 @@ function renderDynamic() {
   if (!rows) return;
   const M = +document.getElementById('dyn-M').value;
   const W = +document.getElementById('dyn-W').value;
-  const { beliefs, disbeliefs, uncertainties, confidences, corrects } = computePerPredictionTrust(rows, M, W);
+  const { beliefs, disbeliefs, uncertainties, confidences, corrects } = getPerPredictionTrust(rows, M, W);
   const bC = beliefs.filter((_,i)=>corrects[i]);
   const bW = beliefs.filter((_,i)=>!corrects[i]);
   const mBC = bC.length ? (bC.reduce((a,b)=>a+b,0)/bC.length).toFixed(3) : '—';
@@ -1826,6 +1952,18 @@ function syncWNum(prefix) {
 }
 
 
+
+function setScope(scope) {
+  DATA_SCOPE = scope;
+  document.querySelectorAll('.scope-all-btn').forEach(b => b.classList.toggle('active', scope === 'all'));
+  document.querySelectorAll('.scope-dec-btn').forEach(b => b.classList.toggle('active', scope === 'decision'));
+  const active = document.querySelector('.panel.active');
+  if (active) renderPage(active.id.replace('p-', ''));
+  if (_lastEvalRows && document.getElementById('ev-results').style.display !== 'none') {
+    const prefix = document.getElementById('ev-csv').style.display !== 'none' ? 'ev' : 'evm';
+    renderEvalResults(_lastEvalRows, +document.getElementById(prefix+'-M').value, +document.getElementById(prefix+'-W').value);
+  }
+}
 
 function onCalCtrl() {
   syncW('cal');
@@ -2007,8 +2145,8 @@ function renderEvalResults(rows, M, W){
   const preds=rows.map(r=>r.probs.indexOf(Math.max(...r.probs)));
   const acc=preds.filter((p,i)=>p===rows[i].label).length/n;
   const ece=computeECE(rows);
-  const gop=computeGlobalOpinion(rows,M,W);
-  const classOps=Array.from({length:nC},(_,c)=>computeClassOpinion(rows,c,M,W));
+  const gop=getGlobalOpinion(rows,M,W);
+  const classOps=Array.from({length:nC},(_,c)=>getClassOpinion(rows,c,M,W));
   document.getElementById('evr-n').textContent=n.toLocaleString();
   document.getElementById('evr-c').textContent=nC;
   document.getElementById('evr-acc').textContent=(acc*100).toFixed(1)+'%';
@@ -2021,7 +2159,7 @@ function renderEvalResults(rows, M, W){
   document.getElementById('evr-ou').style.width=(gop.u*100).toFixed(1)+'%';
   mkRelChart('evr-rel',rows);
   mkClassChart('evr-class',rows,M,W);
-  const {beliefs,disbeliefs,uncertainties,confidences,corrects}=computePerPredictionTrust(rows,M,W);
+  const {beliefs,disbeliefs,uncertainties,confidences,corrects}=getPerPredictionTrust(rows,M,W);
   mkProportionHist('evr-confhist',confidences,corrects,'Predicted probability',M);
   mkProportionHist('evr-dyn',beliefs,corrects,'Trust belief b',M);
   const tbody=document.getElementById('evr-tbody');
