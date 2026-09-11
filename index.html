@@ -5,270 +5,506 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Koffi Ismael Ouattara</title>
 <meta name="description" content="Koffi Ismael Ouattara. PhD researcher in AI security: evals, AI failure modes, guardrails and agent safety. Huawei Technologies and Ulm University.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #ffffff;
-    --text: #1a1a1a;
-    --muted: #5f5f5f;
-    --link: #0b57d0;
-    --rule: #d9d9d9;
+    --bg: #fbfaf8;
+    --side: #f3f0ea;
+    --surface: #ffffff;
+    --text: #1c1c20;
+    --muted: #66666e;
+    --accent: #a8451f;
+    --accent-soft: #f6e7df;
+    --rule: #e6e2da;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #141414;
-      --text: #e8e8e8;
-      --muted: #a3a3a3;
-      --link: #8ab4f8;
-      --rule: #3a3a3a;
+      --bg: #131417;
+      --side: #191a1e;
+      --surface: #1d1e23;
+      --text: #e8e8ec;
+      --muted: #9c9ca6;
+      --accent: #e58a5f;
+      --accent-soft: #3a271d;
+      --rule: #2c2d34;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
     }
   }
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
     margin: 0;
-    padding: 40px 16px 64px;
     background: var(--bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-family: var(--sans);
     font-size: 16px;
-    line-height: 1.55;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
   }
-  main { max-width: 720px; margin: 0 auto; }
-  h1 { font-size: 1.7rem; font-weight: 600; margin: 0 0 4px; }
-  h2 {
-    font-size: 1.15rem;
-    font-weight: 600;
-    margin: 40px 0 12px;
-    padding-bottom: 6px;
+  a { color: var(--accent); }
+  p { margin: 0 0 14px; }
+
+  .layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 100vh; }
+
+  /* Sidebar */
+  .side {
+    background: var(--side);
+    border-right: 1px solid var(--rule);
+    padding: 44px 32px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .photo {
+    width: 120px; height: 120px;
+    object-fit: cover;
+    border-radius: 16px;
+    display: block;
+    margin-bottom: 20px;
+  }
+  .side h1 { font-family: var(--serif); font-size: 1.55rem; line-height: 1.2; margin: 0 0 8px; font-weight: 600; }
+  .tagline { margin: 0 0 16px; color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+  .status { font-size: 0.85rem; color: var(--muted); margin: 0 0 24px; line-height: 1.6; }
+  .status strong { color: var(--text); font-weight: 500; }
+  nav ul { list-style: none; padding: 0; margin: 0 0 28px; }
+  nav a {
+    display: block;
+    padding: 5px 0;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+  nav a:hover { color: var(--accent); }
+  .side-links { list-style: none; padding: 0; margin: 0; font-size: 0.9rem; }
+  .side-links li { margin-bottom: 6px; }
+  .side-links a { text-decoration: none; }
+  .side-links a:hover { text-decoration: underline; }
+
+  /* Main */
+  main { padding: 56px 56px 80px; max-width: 880px; }
+  section { margin-bottom: 60px; scroll-margin-top: 24px; }
+  h2 { font-family: var(--serif); font-size: 1.6rem; font-weight: 600; margin: 0 0 20px; letter-spacing: -0.01em; }
+  h3 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 30px 0 10px; font-weight: 600; }
+  h3:first-of-type { margin-top: 0; }
+  .lead { font-family: var(--serif); font-size: 1.9rem; line-height: 1.25; margin: 0 0 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .intro p { font-size: 1.05rem; }
+
+  /* Result tiles */
+  .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+  }
+  .figure { font-family: var(--serif); font-size: 2rem; color: var(--accent); line-height: 1.1; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+  .tile-title { font-weight: 600; margin-bottom: 6px; }
+  .tile p { color: var(--muted); font-size: 0.93rem; margin: 0 0 10px; }
+  .tile .meta { font-size: 0.85rem; margin: 0; }
+
+  /* Demo cards */
+  .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .card {
+    display: block;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { border-color: var(--accent); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); }
+  .card img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top;
+    display: block;
     border-bottom: 1px solid var(--rule);
+    background: var(--side);
   }
-  h3 { font-size: 1rem; font-weight: 600; margin: 20px 0 8px; }
-  p { margin: 0 0 12px; }
-  a { color: var(--link); }
-  .muted { color: var(--muted); }
-  .links a { margin-right: 16px; white-space: nowrap; }
-  ul { padding-left: 20px; margin: 0 0 12px; }
-  li { margin-bottom: 8px; }
-  ul.works { list-style: none; padding-left: 0; }
-  ul.works > li { margin-bottom: 16px; }
-  ul.works ul { margin-top: 6px; margin-bottom: 0; }
-  ul.works ul li { margin-bottom: 4px; }
-  .title { font-weight: 600; }
-  .summary { margin-top: 4px; }
-  .row { display: grid; grid-template-columns: 6.5em 1fr; column-gap: 12px; }
-  .date { color: var(--muted); }
-  dl { margin: 0 0 12px; }
-  dt { font-weight: 600; margin-top: 8px; }
-  dd { margin: 0; }
-  @media (max-width: 480px) {
-    .row { display: block; }
+  .card-body { padding: 14px 16px 16px; }
+  .card-title { font-weight: 600; margin-bottom: 4px; }
+  .card-body p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+  .card-cta { display: inline-block; margin-top: 8px; font-size: 0.88rem; color: var(--accent); }
+
+  /* Publications */
+  .pubs { list-style: none; padding: 0; margin: 0; }
+  .pubs li { padding: 14px 0; border-top: 1px solid var(--rule); }
+  .pubs li:first-child { border-top: 0; padding-top: 0; }
+  .pub-title { font-weight: 600; }
+  .pub-meta { color: var(--muted); font-size: 0.92rem; margin-top: 2px; }
+  .pub-summary { font-size: 0.93rem; margin-top: 6px; }
+
+  /* Timeline */
+  .timeline { list-style: none; padding: 0; margin: 0; }
+  .timeline > li { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 18px 0; border-top: 1px solid var(--rule); }
+  .timeline > li:first-child { border-top: 0; padding-top: 0; }
+  .when { color: var(--muted); font-size: 0.9rem; padding-top: 3px; font-variant-numeric: tabular-nums; }
+  .role { font-weight: 600; }
+  .org { color: var(--muted); font-size: 0.93rem; }
+  .timeline ul { margin: 8px 0 0; padding-left: 18px; }
+  .timeline ul li { margin-bottom: 5px; font-size: 0.95rem; }
+  .note { font-size: 0.93rem; margin-top: 4px; }
+
+  /* Skills */
+  .skills { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 28px; margin: 0; }
+  .skills dt { font-weight: 600; margin-bottom: 2px; }
+  .skills dd { margin: 0; color: var(--muted); font-size: 0.93rem; }
+
+  /* Contact */
+  .contact-list { list-style: none; padding: 0; margin: 0 0 14px; }
+  .contact-list li { margin-bottom: 6px; }
+  .contact-list span { display: inline-block; min-width: 5.5em; color: var(--muted); font-size: 0.9rem; }
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--rule); padding-top: 20px; margin-top: 8px; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .side { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--rule); padding: 28px 20px 20px; }
+    .side-top { display: flex; gap: 16px; align-items: center; margin-bottom: 14px; }
+    .photo { width: 72px; height: 72px; margin: 0; flex-shrink: 0; }
+    .side h1 { margin-bottom: 4px; }
+    .tagline { margin: 0; }
+    nav ul { display: flex; flex-wrap: wrap; gap: 2px 18px; margin-bottom: 18px; }
+    main { padding: 36px 20px 60px; }
+    .tiles, .cards, .skills { grid-template-columns: 1fr; }
+    .timeline > li { grid-template-columns: 1fr; gap: 2px; }
+    .lead { font-size: 1.45rem; }
+    .intro p { font-size: 1rem; }
   }
 </style>
 </head>
 <body>
+<div class="layout">
+
+<aside class="side">
+  <div class="side-top">
+    <img class="photo" src="assets/images/dsc03934-510x531.jpg" alt="Portrait of Koffi Ismael Ouattara">
+    <div>
+      <h1>Koffi Ismael Ouattara</h1>
+      <p class="tagline">PhD researcher in AI security. Evals, AI failure modes, guardrails and agent safety.</p>
+    </div>
+  </div>
+  <p class="status">
+    <strong>Huawei Technologies and Ulm University</strong><br>
+    Thesis submitted, defence November 2026<br>
+    Paris, open to London
+  </p>
+  <nav aria-label="Sections">
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#results">Selected results</a></li>
+      <li><a href="#demos">Demos</a></li>
+      <li><a href="#publications">Publications</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+  <ul class="side-links">
+    <li><a href="mailto:ouattaraismael1999@gmail.com">ouattaraismael1999@gmail.com</a></li>
+    <li><a href="https://github.com/Ouatt-Isma">github.com/Ouatt-Isma</a></li>
+    <li><a href="https://www.linkedin.com/in/koffi-ismael-ouattara-96291817a/">LinkedIn</a></li>
+  </ul>
+</aside>
+
 <main>
 
-<h1>Koffi Ismael Ouattara</h1>
-<p>PhD researcher in AI security. Evals, AI failure modes, guardrails and agent safety.</p>
-<p class="links">
-  <a href="mailto:ouattaraismael1999@gmail.com">ouattaraismael1999@gmail.com</a>
-  <a href="https://github.com/Ouatt-Isma">GitHub</a>
-  <a href="https://www.linkedin.com/in/koffi-ismael-ouattara-96291817a/">LinkedIn</a>
-</p>
+<section id="about" class="intro">
+  <h2 class="lead">I build the evals and tooling that show where AI systems fail, and ship them.</h2>
+  <p>
+    PhD researcher in AI security at Huawei Technologies and Ulm University (thesis submitted, defence November 2026). I shipped a deployed runtime failure monitor (PaTAS), inference-time policy enforcement for agents, and a sole-authored audit of how the field reports uncertainty. Before the PhD: Mithril Security, Nokia Bell Labs and INRIA; École Polytechnique and Télécom Paris.
+  </p>
+  <p>
+    Looking for a research engineering role owning benchmarks for guardrails and agentic safety. Paris-based, open to London.
+  </p>
+</section>
 
-<p>
-  PhD researcher in AI security (thesis submitted, defence November 2026) who builds the evals and tooling that show where AI systems fail, and ships them. Shipped a deployed runtime failure monitor (PaTAS), inference-time policy enforcement for agents, and a sole-authored audit of how the field reports uncertainty. Before the PhD: Mithril Security, Nokia Bell Labs and INRIA; École Polytechnique and Télécom Paris.
-</p>
-<p>
-  Looking for a research engineering role owning benchmarks for guardrails and agentic safety. Paris-based, open to London.
-</p>
-
-<h2 id="skills">Skills</h2>
-<dl>
-  <dt>Evals and benchmarks</dt>
-  <dd>Benchmark design, pre-registered protocols, reproducing and stress-testing published results, human-judgement floors, calibration and uncertainty metrics, bootstrap confidence intervals, minimum detectable effects.</dd>
-  <dt>Guardrails and agents</dt>
-  <dd>Inference-time policy enforcement, neuro-symbolic rules, unsafe-behaviour detection, multi-agent trust evaluation, agentic workflows.</dd>
-  <dt>Adversarial ML</dt>
-  <dd>Prompt-injection evaluation, backdoor and poisoning defence, adversarial inputs, model extraction, membership inference, threat modelling.</dd>
-  <dt>Monitoring</dt>
-  <dd>Runtime failure monitoring, drift and out-of-distribution detection, latency-aware evaluation, dataset-bias auditing.</dd>
-  <dt>Engineering</dt>
-  <dd>Python, PyTorch, HuggingFace Transformers, NumPy, GPU pipelines, Git, Docker, full-stack web and mobile, reproducible research code.</dd>
-</dl>
-
-<h2 id="experience">Experience</h2>
-<ul class="works">
-  <li class="row">
-    <span class="date">2023–2026</span>
-    <div>
-      <div class="title">PhD Researcher, AI Failure Modes, Evaluation and Agent Safety. Huawei Technologies and Ulm University, Paris / Munich.</div>
-      <ul>
-        <li>Built and deployed PaTAS, a runtime monitor for anomalous model behaviour, adversarial inputs and drift: detects backdoored inputs at AUROC 1.00 with no trigger knowledge, matches softmax on clean data, under 0.1 ms per batch. <a href="demos/patas_simulator.html">Demo</a></li>
-        <li>Extended the same parameter-level attribution into a backdoor defence that needs no retraining, no clean reference set and no trigger knowledge: attack success 99.08% to 0.10% for 0.15 points of clean accuracy (submitted to SaTML).</li>
-        <li>Sole-authored a benchmark-grade audit of uncertainty reporting: exact theory of when learned estimates can be trusted, measured against 511,000 human judgements (CIFAR-10H) with pre-registered predictions and bootstrap confidence intervals.</li>
-        <li>Showed in that audit that a standard estimator choice fabricates a trend of exactly the claimed shape, and surveyed 50 recent papers with an audited protocol: 22 of 38 compare their estimate to nothing.</li>
-        <li>Developed inference-time policy enforcement for AI agents: logical rules combined with neural learning to detect and block unsafe behaviour; co-authored an evidence-based trust evaluation for deceptive agents in multi-agent systems.</li>
-        <li>Built LLM failure-mode evaluation pipelines: calibration of transformer models under distribution shift and adversarial conditions, prompt-injection evaluation.</li>
-        <li>Published a methodology for auditing training-dataset bias, the data-quality side of any eval that must survive changing product data.</li>
-        <li>Coordinated evaluation research across 3 EU HORIZON projects (CONNECT, CASTOR, DUCA) with 6+ institutions; open-source contribution to go-taf.</li>
-      </ul>
+<section id="results">
+  <h2>Selected results</h2>
+  <div class="tiles">
+    <div class="tile">
+      <div class="figure">99.08% → 0.10%</div>
+      <div class="tile-title">Backdoor removed without retraining</div>
+      <p>Attack success after removing the parameters an untrusted source shaped, for 0.15 points of clean accuracy. No clean reference set, no trigger knowledge.</p>
+      <p class="meta">Provenance Is Enough. Submitted to IEEE SaTML 2027.</p>
     </div>
-  </li>
-  <li class="row">
-    <span class="date">2022–2023</span>
-    <div>
-      <div class="title">Machine Learning / Security Engineer. Mithril Security, Paris.</div>
-      <ul>
-        <li>Attacked deployed ML services (model extraction, membership inference) and turned the findings into production defences validated by attack/defence evaluation.</li>
-        <li>Built privacy-preserving inference pipelines on Intel SGX enclaves.</li>
-      </ul>
+    <div class="tile">
+      <div class="figure">AUROC 1.00</div>
+      <div class="tile-title">PaTAS runtime failure monitor</div>
+      <p>Detects backdoored inputs with no trigger knowledge, matches softmax on clean data, under 0.1 ms per batch. Deployed.</p>
+      <p class="meta"><a href="https://arxiv.org/abs/2511.20586">arXiv:2511.20586</a> · <a href="demos/patas_simulator.html">Demo</a></p>
     </div>
-  </li>
-  <li class="row">
-    <span class="date">2022</span>
-    <div>
-      <div class="title">Research Intern, Anomaly Detection at Scale. Nokia Bell Labs, Nozay.</div>
-      <ul>
-        <li>Graph neural networks for anomaly detection on live 5G telemetry; co-invented a distributed detection system granted as US patent US20240121678A1.</li>
-      </ul>
+    <div class="tile">
+      <div class="figure">511,000 judgements</div>
+      <div class="tile-title">Uncertainty measured against a real floor</div>
+      <p>Learned aleatoric uncertainty compared with a measured noise floor on CIFAR-10H, with pre-registered predictions and bootstrap confidence intervals.</p>
+      <p class="meta">Position paper, sole author. arXiv preprint, 2026.</p>
     </div>
-  </li>
-  <li class="row">
-    <span class="date">2021</span>
-    <div>
-      <div class="title">Research Intern, Formal Verification of Security Architectures. INRIA, Rennes.</div>
-      <ul>
-        <li>Meta-model of cryptographic architectures for formal compliance verification.</li>
-      </ul>
+    <div class="tile">
+      <div class="figure">22 of 38</div>
+      <div class="tile-title">Papers that compare their estimate to nothing</div>
+      <p>Audited survey of 50 recent papers: of the 38 that report a learned aleatoric estimate, 22 compare it to nothing and 5 to any real floor.</p>
+      <p class="meta">Same paper.</p>
     </div>
-  </li>
-  <li class="row">
-    <span class="date">2025–present</span>
+  </div>
+</section>
+
+<section id="demos">
+  <h2>Demos</h2>
+  <p>Interactive pages that run entirely in the browser.</p>
+  <div class="cards">
+    <a class="card" href="demos/patas_simulator.html">
+      <img src="assets/images/demos/patas-simulator.jpg" alt="Screenshot of the PaTAS simulator" loading="lazy">
+      <div class="card-body">
+        <div class="card-title">PaTAS simulator</div>
+        <p>Trust propagation through a neural network with Subjective Logic, step by step.</p>
+        <span class="card-cta">Open demo</span>
+      </div>
+    </a>
+    <a class="card" href="demos/calibration_demo.html">
+      <img src="assets/images/demos/calibration-demo.jpg" alt="Screenshot of the calibration assessment demo" loading="lazy">
+      <div class="card-body">
+        <div class="card-title">Calibration assessment</div>
+        <p>Neural network calibration expressed as a Subjective Logic opinion, on MNIST and CIFAR-10 predictions.</p>
+        <span class="card-cta">Open demo</span>
+      </div>
+    </a>
+    <a class="card" href="demos/dspg_demo.html">
+      <img src="assets/images/demos/dspg-demo.jpg" alt="Screenshot of the DSPG synthesis demo" loading="lazy">
+      <div class="card-body">
+        <div class="card-title">DSPG synthesis</div>
+        <p>Directed series-parallel graph synthesis and trust inference on trust networks.</p>
+        <span class="card-cta">Open demo</span>
+      </div>
+    </a>
+    <a class="card" href="demos/food-platform-simulator.html">
+      <img src="assets/images/demos/food-platform-simulator.jpg" alt="Screenshot of the dynamic pricing and recommendation simulator" loading="lazy">
+      <div class="card-body">
+        <div class="card-title">Dynamic pricing and recommendation simulator</div>
+        <p>Reinforcement learning against food waste on delivery platforms. École Polytechnique project, 2020.</p>
+        <span class="card-cta">Open demo</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section id="publications">
+  <h2>Publications and patent</h2>
+
+  <h3>Preprints and papers under review</h3>
+  <ul class="pubs">
+    <li>
+      <div class="pub-title">Position: Learned Aleatoric Uncertainty Should Never Be Reported Without a Measured Noise Floor</div>
+      <div class="pub-meta">K. I. Ouattara (sole author). arXiv preprint, 2026.</div>
+      <div class="pub-summary">A learned aleatoric estimate is the true noise floor plus the model's own error, of unknown magnitude and, in classification, unknown sign. Gives an exact decomposition of that gap, measures it on CIFAR-10H against 511,000 human judgements with pre-registered predictions and bootstrap confidence intervals, shows that a standard estimator choice fabricates a trend of exactly the claimed shape, and surveys 50 recent papers: 22 of 38 compare their estimate to nothing.</div>
+    </li>
+    <li>
+      <div class="pub-title">Provenance Is Enough: Removing Backdoors From the Parameters an Untrusted Source Shaped</div>
+      <div class="pub-meta">K. I. Ouattara et al. Submitted to IEEE SaTML 2027.</div>
+      <div class="pub-summary">Attributes every parameter of a trained network to the training sources that shaped it, weighted by their share of its gradient, and removes the parameters an untrusted source formed. Drives a patch backdoor's attack success from 99.08% to 0.10% for 0.15 points of clean accuracy, with no retraining, no clean reference set and no knowledge of the trigger.</div>
+    </li>
+    <li>
+      <div class="pub-title">Where Uncertainty Lives: Exact Per-Layer Attribution of Aleatoric and Epistemic Variance, and the Trade-off It Reveals</div>
+      <div class="pub-meta">K. I. Ouattara et al. Submitted to ICLR 2027.</div>
+    </li>
+    <li>
+      <div class="pub-title">PaTAS: A Framework for Trust Propagation in Neural Networks Using Subjective Logic</div>
+      <div class="pub-meta">K. I. Ouattara et al. arXiv preprint, 2025. <a href="https://arxiv.org/abs/2511.20586">arXiv:2511.20586</a> · <a href="demos/patas_simulator.html">Demo</a></div>
+    </li>
+    <li>
+      <div class="pub-title">Subjective Heads for Frozen Foundation Models</div>
+      <div class="pub-meta">K. I. Ouattara et al. In progress. Post-hoc uncertainty heads, abstention frontiers, adversarially robust fusion.</div>
+    </li>
+  </ul>
+
+  <h3>Published</h3>
+  <ul class="pubs">
+    <li>
+      <div class="pub-title">Quantifying Calibration Error in Neural Networks Through Evidence-Based Theory</div>
+      <div class="pub-meta">K. I. Ouattara, I. Krontiris, T. Dimitrakos, F. Kargl. FUSION 2025. <a href="demos/calibration_demo.html">Demo</a></div>
+    </li>
+    <li>
+      <div class="pub-title">Assessing Trustworthiness of AI Training Dataset Using Subjective Logic: A Use Case on Bias</div>
+      <div class="pub-meta">K. I. Ouattara, I. Krontiris, T. Dimitrakos, F. Kargl. BIAS Workshop, ECML/PKDD 2025. <a href="https://doi.org/10.1007/978-3-032-19096-3_17">DOI</a></div>
+    </li>
+    <li>
+      <div class="pub-title">Quantifying Dataset Trustworthiness from Labeling Bias Using Subjective Logic</div>
+      <div class="pub-meta">K. I. Ouattara, I. Krontiris, T. Dimitrakos, F. Kargl. TRUST-AI Workshop, ECAI 2025. <a href="https://ceur-ws.org/Vol-4132/">CEUR-WS Vol. 4132</a></div>
+    </li>
+    <li>
+      <div class="pub-title">An Optimized Framework for DSPG Synthesis and Trust Network Analysis with Subjective Logic</div>
+      <div class="pub-meta">K. I. Ouattara, A. Petrovska, I. Krontiris, T. Dimitrakos, F. Kargl. RuleML+RR 2025. <a href="demos/dspg_demo.html">Demo</a></div>
+    </li>
+    <li>
+      <div class="pub-title">Actions Speak Louder Than Words: Evidence-Based Trust Level Evaluation in Multi-Agent Systems</div>
+      <div class="pub-meta">N. Fotos, K. I. Ouattara, D. S. Karas, I. Krontiris, W. Meng, T. Giannetsos. ICICS 2025 (26% acceptance).</div>
+    </li>
+    <li>
+      <div class="pub-title">On Subjective Logic Trust Discount for Referral Paths</div>
+      <div class="pub-meta">K. I. Ouattara, A. Petrovska, A. Hermann, N. Trkulja, T. Dimitrakos, F. Kargl. FUSION 2024. <a href="https://doi.org/10.23919/FUSION59988.2024.10706345">DOI</a></div>
+    </li>
+    <li>
+      <div class="pub-title">Detecting Fake Base Stations Using Knowledge Graphs and ML-Based Techniques</div>
+      <div class="pub-meta">S. Kriaa, A. Feki, S. Papillon, T. Chene, I. Ouattara. IEEE VCC 2023. <a href="https://doi.org/10.1109/VCC60689.2023.10474891">DOI</a></div>
+    </li>
+  </ul>
+
+  <h3>Patent</h3>
+  <ul class="pubs">
+    <li>
+      <div class="pub-title">Distributed Machine Learning Solution for Rogue Base Station Detection</div>
+      <div class="pub-meta">K. I. Ouattara, S. Papillon, A. Feki, K. A. Pantelidou. US Patent US20240121678A1, granted. <a href="https://patents.google.com/patent/US20240121678A1/en">Google Patents</a></div>
+    </li>
+  </ul>
+</section>
+
+<section id="experience">
+  <h2>Experience</h2>
+  <ul class="timeline">
+    <li>
+      <div class="when">2023–2026</div>
+      <div>
+        <div class="role">PhD Researcher, AI Failure Modes, Evaluation and Agent Safety</div>
+        <div class="org">Huawei Technologies and Ulm University, Paris / Munich</div>
+        <ul>
+          <li>Built and deployed PaTAS, a runtime monitor for anomalous model behaviour, adversarial inputs and drift: detects backdoored inputs at AUROC 1.00 with no trigger knowledge, matches softmax on clean data, under 0.1 ms per batch.</li>
+          <li>Extended the same parameter-level attribution into a backdoor defence that needs no retraining, no clean reference set and no trigger knowledge: attack success 99.08% to 0.10% for 0.15 points of clean accuracy (submitted to SaTML).</li>
+          <li>Sole-authored a benchmark-grade audit of uncertainty reporting: exact theory of when learned estimates can be trusted, measured against 511,000 human judgements (CIFAR-10H) with pre-registered predictions and bootstrap confidence intervals.</li>
+          <li>Showed in that audit that a standard estimator choice fabricates a trend of exactly the claimed shape, and surveyed 50 recent papers with an audited protocol: 22 of 38 compare their estimate to nothing.</li>
+          <li>Developed inference-time policy enforcement for AI agents: logical rules combined with neural learning to detect and block unsafe behaviour; co-authored an evidence-based trust evaluation for deceptive agents in multi-agent systems.</li>
+          <li>Built LLM failure-mode evaluation pipelines: calibration of transformer models under distribution shift and adversarial conditions, prompt-injection evaluation.</li>
+          <li>Published a methodology for auditing training-dataset bias, the data-quality side of any eval that must survive changing product data.</li>
+          <li>Coordinated evaluation research across 3 EU HORIZON projects (CONNECT, CASTOR, DUCA) with 6+ institutions; open-source contribution to go-taf.</li>
+        </ul>
+      </div>
+    </li>
+    <li>
+      <div class="when">2022–2023</div>
+      <div>
+        <div class="role">Machine Learning / Security Engineer</div>
+        <div class="org">Mithril Security, Paris</div>
+        <ul>
+          <li>Attacked deployed ML services (model extraction, membership inference) and turned the findings into production defences validated by attack/defence evaluation.</li>
+          <li>Built privacy-preserving inference pipelines on Intel SGX enclaves.</li>
+        </ul>
+      </div>
+    </li>
+    <li>
+      <div class="when">2022</div>
+      <div>
+        <div class="role">Research Intern, Anomaly Detection at Scale</div>
+        <div class="org">Nokia Bell Labs, Nozay</div>
+        <ul>
+          <li>Graph neural networks for anomaly detection on live 5G telemetry; co-invented a distributed detection system granted as US patent US20240121678A1.</li>
+        </ul>
+      </div>
+    </li>
+    <li>
+      <div class="when">2021</div>
+      <div>
+        <div class="role">Research Intern, Formal Verification of Security Architectures</div>
+        <div class="org">INRIA, Rennes</div>
+        <ul>
+          <li>Meta-model of cryptographic architectures for formal compliance verification.</li>
+        </ul>
+      </div>
+    </li>
+    <li>
+      <div class="when">2025–present</div>
+      <div>
+        <div class="role">Founder and Developer, <a href="https://playinvest-hd.com">PlayInvest-HD</a></div>
+        <div class="org">Web, Android and iOS</div>
+        <ul>
+          <li>Built and launched a live investing-education platform: virtual portfolio over global assets (BRVM, Europe, US, crypto), quizzes that unlock funds, leagues, a past-performance simulator and a learning module. Web app plus native apps on Google Play and the App Store; 10k+ active players.</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<section id="education">
+  <h2>Education</h2>
+  <ul class="timeline">
+    <li>
+      <div class="when">2023–2026</div>
+      <div>
+        <div class="role">PhD in AI Security</div>
+        <div class="org">Ulm University, industrial PhD with Huawei Technologies</div>
+        <div class="note">Thesis submitted, defence November 2026. Trust assessment and propagation in neural networks: uncertainty quantification, calibration, robustness, multi-agent systems.</div>
+      </div>
+    </li>
+    <li>
+      <div class="when">2021–2023</div>
+      <div>
+        <div class="role">Engineering Degree and MSc, Cybersecurity and Machine Learning</div>
+        <div class="org">Télécom Paris, Institut Polytechnique de Paris</div>
+      </div>
+    </li>
+    <li>
+      <div class="when">2018–2022</div>
+      <div>
+        <div class="role">Cycle Ingénieur Polytechnicien</div>
+        <div class="org">École Polytechnique</div>
+        <div class="note">The Polytechnique cycle includes final specialisation years at a partner school, completed at Télécom Paris; the two programmes overlap by design.</div>
+      </div>
+    </li>
+  </ul>
+  <p class="note" style="margin-top:16px">Academic service: peer reviewer, TRUST-AI workshop at ECAI 2025. Security practice: 45 Root-Me challenges, mainly cryptanalysis and reverse engineering.</p>
+</section>
+
+<section id="skills">
+  <h2>Skills</h2>
+  <dl class="skills">
     <div>
-      <div class="title">Founder and Developer, <a href="https://playinvest-hd.com">PlayInvest-HD</a>. Web, Android and iOS.</div>
-      <ul>
-        <li>Built and launched a live investing-education platform: virtual portfolio over global assets (BRVM, Europe, US, crypto), quizzes that unlock funds, leagues, a past-performance simulator and a learning module. Web app plus native apps on Google Play and the App Store; 10k+ active players.</li>
-      </ul>
+      <dt>Evals and benchmarks</dt>
+      <dd>Benchmark design, pre-registered protocols, reproducing and stress-testing published results, human-judgement floors, calibration and uncertainty metrics, bootstrap confidence intervals, minimum detectable effects.</dd>
     </div>
-  </li>
-</ul>
-
-<h2 id="education">Education</h2>
-<ul class="works">
-  <li class="row">
-    <span class="date">2023–2026</span>
     <div>
-      <div class="title">PhD in AI Security, Ulm University. Industrial PhD with Huawei Technologies.</div>
-      <div>Thesis submitted, defence November 2026. Trust assessment and propagation in neural networks: uncertainty quantification, calibration, robustness, multi-agent systems.</div>
+      <dt>Guardrails and agents</dt>
+      <dd>Inference-time policy enforcement, neuro-symbolic rules, unsafe-behaviour detection, multi-agent trust evaluation, agentic workflows.</dd>
     </div>
-  </li>
-  <li class="row">
-    <span class="date">2021–2023</span>
     <div>
-      <div class="title">Engineering Degree and MSc, Cybersecurity and Machine Learning. Télécom Paris, Institut Polytechnique de Paris.</div>
+      <dt>Adversarial ML</dt>
+      <dd>Prompt-injection evaluation, backdoor and poisoning defence, adversarial inputs, model extraction, membership inference, threat modelling.</dd>
     </div>
-  </li>
-  <li class="row">
-    <span class="date">2018–2022</span>
     <div>
-      <div class="title">Cycle Ingénieur Polytechnicien, École Polytechnique.</div>
-      <div>The Polytechnique cycle includes final specialisation years at a partner school, completed at Télécom Paris; the two programmes overlap by design.</div>
+      <dt>Monitoring</dt>
+      <dd>Runtime failure monitoring, drift and out-of-distribution detection, latency-aware evaluation, dataset-bias auditing.</dd>
     </div>
-  </li>
-</ul>
-<p>Academic service: peer reviewer, TRUST-AI workshop at ECAI 2025. Security practice: 45 Root-Me challenges, mainly cryptanalysis and reverse engineering.</p>
+    <div>
+      <dt>Engineering</dt>
+      <dd>Python, PyTorch, HuggingFace Transformers, NumPy, GPU pipelines, Git, Docker, full-stack web and mobile, reproducible research code.</dd>
+    </div>
+    <div>
+      <dt>Languages</dt>
+      <dd>English (fluent), French (native), Mandarin Chinese (A1), Spanish (A1).</dd>
+    </div>
+  </dl>
+</section>
 
-<h2 id="publications">Publications and patent</h2>
-
-<h3>Preprints and papers under review</h3>
-<ul class="works">
-  <li>
-    <div class="title">Position: Learned Aleatoric Uncertainty Should Never Be Reported Without a Measured Noise Floor</div>
-    <div>K. I. Ouattara (sole author). arXiv preprint, 2026.</div>
-    <div class="summary muted">A learned aleatoric estimate is the true noise floor plus the model's own error, of unknown magnitude and, in classification, unknown sign. Gives an exact decomposition of that gap, measures it on CIFAR-10H against 511,000 human judgements with pre-registered predictions and bootstrap confidence intervals, shows that a standard estimator choice fabricates a trend of exactly the claimed shape, and surveys 50 recent papers: 22 of 38 compare their estimate to nothing.</div>
-  </li>
-  <li>
-    <div class="title">Provenance Is Enough: Removing Backdoors From the Parameters an Untrusted Source Shaped</div>
-    <div>K. I. Ouattara et al. Submitted to IEEE SaTML 2027.</div>
-    <div class="summary muted">Attributes every parameter of a trained network to the training sources that shaped it, weighted by their share of its gradient, and removes the parameters an untrusted source formed. Drives a patch backdoor's attack success from 99.08% to 0.10% for 0.15 points of clean accuracy, with no retraining, no clean reference set and no knowledge of the trigger.</div>
-  </li>
-  <li>
-    <div class="title">Where Uncertainty Lives: Exact Per-Layer Attribution of Aleatoric and Epistemic Variance, and the Trade-off It Reveals</div>
-    <div>K. I. Ouattara et al. Submitted to ICLR 2027.</div>
-  </li>
-  <li>
-    <div class="title">PaTAS: A Framework for Trust Propagation in Neural Networks Using Subjective Logic</div>
-    <div>K. I. Ouattara et al. arXiv preprint, 2025. <a href="https://arxiv.org/abs/2511.20586">arXiv:2511.20586</a>. <a href="demos/patas_simulator.html">Demo</a></div>
-  </li>
-  <li>
-    <div class="title">Subjective Heads for Frozen Foundation Models</div>
-    <div>K. I. Ouattara et al. In progress. Post-hoc uncertainty heads, abstention frontiers, adversarially robust fusion.</div>
-  </li>
-</ul>
-
-<h3>Published</h3>
-<ul class="works">
-  <li>
-    <div class="title">Quantifying Calibration Error in Neural Networks Through Evidence-Based Theory</div>
-    <div>K. I. Ouattara, I. Krontiris, T. Dimitrakos, F. Kargl. FUSION 2025. <a href="demos/calibration_demo.html">Demo</a></div>
-  </li>
-  <li>
-    <div class="title">Assessing Trustworthiness of AI Training Dataset Using Subjective Logic: A Use Case on Bias</div>
-    <div>K. I. Ouattara, I. Krontiris, T. Dimitrakos, F. Kargl. BIAS Workshop, ECML/PKDD 2025. <a href="https://doi.org/10.1007/978-3-032-19096-3_17">DOI</a></div>
-  </li>
-  <li>
-    <div class="title">Quantifying Dataset Trustworthiness from Labeling Bias Using Subjective Logic</div>
-    <div>K. I. Ouattara, I. Krontiris, T. Dimitrakos, F. Kargl. TRUST-AI Workshop, ECAI 2025. <a href="https://ceur-ws.org/Vol-4132/">CEUR-WS Vol. 4132</a></div>
-  </li>
-  <li>
-    <div class="title">An Optimized Framework for DSPG Synthesis and Trust Network Analysis with Subjective Logic</div>
-    <div>K. I. Ouattara, A. Petrovska, I. Krontiris, T. Dimitrakos, F. Kargl. RuleML+RR 2025. <a href="demos/dspg_demo.html">Demo</a></div>
-  </li>
-  <li>
-    <div class="title">Actions Speak Louder Than Words: Evidence-Based Trust Level Evaluation in Multi-Agent Systems</div>
-    <div>N. Fotos, K. I. Ouattara, D. S. Karas, I. Krontiris, W. Meng, T. Giannetsos. ICICS 2025 (26% acceptance).</div>
-  </li>
-  <li>
-    <div class="title">On Subjective Logic Trust Discount for Referral Paths</div>
-    <div>K. I. Ouattara, A. Petrovska, A. Hermann, N. Trkulja, T. Dimitrakos, F. Kargl. FUSION 2024. <a href="https://doi.org/10.23919/FUSION59988.2024.10706345">DOI</a></div>
-  </li>
-  <li>
-    <div class="title">Detecting Fake Base Stations Using Knowledge Graphs and ML-Based Techniques</div>
-    <div>S. Kriaa, A. Feki, S. Papillon, T. Chene, I. Ouattara. IEEE VCC 2023. <a href="https://doi.org/10.1109/VCC60689.2023.10474891">DOI</a></div>
-  </li>
-</ul>
-
-<h3>Patent</h3>
-<ul class="works">
-  <li>
-    <div class="title">Distributed Machine Learning Solution for Rogue Base Station Detection</div>
-    <div>K. I. Ouattara, S. Papillon, A. Feki, K. A. Pantelidou. US Patent US20240121678A1, granted. <a href="https://patents.google.com/patent/US20240121678A1/en">Google Patents</a></div>
-  </li>
-</ul>
-
-<h2 id="demos">Demos</h2>
-<ul>
-  <li><a href="demos/patas_simulator.html">PaTAS simulator</a>: trust propagation through a neural network with Subjective Logic.</li>
-  <li><a href="demos/calibration_demo.html">Calibration assessment</a>: neural network calibration expressed as a Subjective Logic opinion.</li>
-  <li><a href="demos/dspg_demo.html">DSPG synthesis</a>: directed series-parallel graph synthesis and trust inference on trust networks.</li>
-  <li><a href="demos/food-platform-simulator.html">Dynamic pricing and recommendation simulator</a>: reinforcement learning against food waste on delivery platforms (École Polytechnique project, 2020).</li>
-</ul>
-
-<h2 id="projects">Other projects</h2>
-<ul>
-  <li>AMON.AI: retrieval-augmented question answering over construction project documentation (Python, LLM, vector database).</li>
-  <li><a href="https://faos.fr">faos.fr</a>: platform for a business accelerator agency (WordPress, PHP, MySQL).</li>
-</ul>
-
-<h2 id="contact">Contact</h2>
-<p class="links">
-  <a href="mailto:ouattaraismael1999@gmail.com">ouattaraismael1999@gmail.com</a>
-  <a href="https://github.com/Ouatt-Isma">GitHub</a>
-  <a href="https://www.linkedin.com/in/koffi-ismael-ouattara-96291817a/">LinkedIn</a>
-</p>
-<p>Languages: English (fluent), French (native), Mandarin Chinese (A1), Spanish (A1).</p>
-<p class="muted">Paris. Last updated September 2026.</p>
+<section id="contact">
+  <h2>Contact</h2>
+  <ul class="contact-list">
+    <li><span>Email</span> <a href="mailto:ouattaraismael1999@gmail.com">ouattaraismael1999@gmail.com</a></li>
+    <li><span>GitHub</span> <a href="https://github.com/Ouatt-Isma">github.com/Ouatt-Isma</a></li>
+    <li><span>LinkedIn</span> <a href="https://www.linkedin.com/in/koffi-ismael-ouattara-96291817a/">koffi-ismael-ouattara</a></li>
+  </ul>
+  <p>Other projects: AMON.AI, retrieval-augmented question answering over construction project documentation; <a href="https://faos.fr">faos.fr</a>, platform for a business accelerator agency.</p>
+  <footer>© 2026 Koffi Ismael Ouattara · Paris · Last updated September 2026</footer>
+</section>
 
 </main>
+</div>
 </body>
 </html>
