@@ -1,1461 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Koffi Ismael Ouattara — AI Security Researcher</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Koffi Ismael Ouattara</title>
+<meta name="description" content="Koffi Ismael Ouattara. PhD candidate in AI security at Ulm University and Huawei. Trustworthy machine learning, uncertainty quantification, backdoor defences, Subjective Logic.">
 <style>
   :root {
-    --bg: #0a0d12;
-    --surface: #111620;
-    --surface2: #161c28;
-    --border: #1e2636;
-    --accent: #e8633a;
-    --accent2: #f09a5c;
-    --text: #dce3ef;
-    --muted: #6b7a96;
-    --faint: #2a3348;
-    --mono: 'DM Mono', monospace;
-    --serif: 'DM Serif Display', serif;
-    --sans: 'DM Sans', sans-serif;
-  }
-
-  [data-theme="light"] {
-    --bg: #f5f3ef;
-    --surface: #edeae4;
-    --surface2: #e4e0d8;
-    --border: #d0ccc3;
-    --accent: #c94f24;
-    --accent2: #e07a3a;
+    --bg: #ffffff;
     --text: #1a1a1a;
-    --muted: #6b6560;
-    --faint: #ccc8c0;
+    --muted: #5f5f5f;
+    --link: #0b57d0;
+    --rule: #d9d9d9;
   }
-
-  /* ── THEME TOGGLE ── */
-  #theme-toggle {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    cursor: pointer;
-    width: 34px;
-    height: 34px;
-    border-radius: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
-    flex-shrink: 0;
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141414;
+      --text: #e8e8e8;
+      --muted: #a3a3a3;
+      --link: #8ab4f8;
+      --rule: #3a3a3a;
+    }
   }
-
-  #theme-toggle:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  #theme-toggle svg {
-    transition: transform 0.4s ease;
-  }
-
-  #theme-toggle:hover svg {
-    transform: rotate(20deg);
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
-
+  * { box-sizing: border-box; }
   body {
+    margin: 0;
+    padding: 40px 16px 64px;
     background: var(--bg);
     color: var(--text);
-    font-family: var(--sans);
-    font-size: 15px;
-    line-height: 1.7;
-    overflow-x: hidden;
-    transition: background 0.3s, color 0.3s;
-  }
-
-  /* ── NOISE TEXTURE OVERLAY ── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 1000;
-    opacity: 0.4;
-  }
-
-  /* ── NAV ── */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 48px;
-    background: rgba(10, 13, 18, 0.85);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
-    transition: background 0.3s, border-color 0.3s;
-  }
-
-  [data-theme="light"] nav {
-    background: rgba(245, 243, 239, 0.88);
-  }
-
-  .nav-logo {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--accent);
-    letter-spacing: 0.08em;
-    text-decoration: none;
-  }
-
-  .nav-links {
-    display: flex;
-    gap: 32px;
-    list-style: none;
-  }
-
-  .nav-links a {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .nav-links a:hover { color: var(--text); }
-
-  .nav-cv {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--accent) !important;
-    border: 1px solid var(--accent);
-    padding: 6px 14px;
-    border-radius: 3px;
-    text-decoration: none;
-    transition: background 0.2s, color 0.2s;
-  }
-
-  .nav-cv:hover {
-    background: var(--accent);
-    color: var(--bg) !important;
-  }
-
-  /* ── HERO ── */
-  #hero {
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    padding: 120px 48px 80px;
-    gap: 60px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero-bg-glow {
-    position: absolute;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(232,99,58,0.12) 0%, transparent 70%);
-    top: 50%; right: -100px;
-    transform: translateY(-50%);
-    pointer-events: none;
-  }
-
-  .hero-tag {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--accent);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    opacity: 0;
-    animation: fadeUp 0.7s ease 0.1s forwards;
-  }
-
-  .hero-tag::before {
-    content: '';
-    width: 32px; height: 1px;
-    background: var(--accent);
-  }
-
-  h1 {
-    font-family: var(--serif);
-    font-size: clamp(42px, 5vw, 72px);
-    line-height: 1.05;
-    font-weight: 400;
-    color: var(--text);
-    opacity: 0;
-    animation: fadeUp 0.7s ease 0.2s forwards;
-  }
-
-  h1 em {
-    color: var(--accent);
-    font-style: italic;
-  }
-
-  .hero-sub {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     font-size: 16px;
-    color: var(--muted);
-    margin-top: 20px;
-    max-width: 500px;
-    opacity: 0;
-    animation: fadeUp 0.7s ease 0.35s forwards;
+    line-height: 1.55;
   }
-
-  .hero-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 28px;
-    opacity: 0;
-    animation: fadeUp 0.7s ease 0.45s forwards;
-  }
-
-  .tag {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    padding: 5px 10px;
-    border: 1px solid var(--faint);
-    border-radius: 2px;
-    color: var(--muted);
-    background: var(--surface);
-  }
-
-  .hero-ctas {
-    display: flex;
-    gap: 14px;
-    margin-top: 36px;
-    opacity: 0;
-    animation: fadeUp 0.7s ease 0.55s forwards;
-  }
-
-  .btn-primary {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    background: var(--accent);
-    color: var(--bg);
-    border: none;
-    padding: 12px 24px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: opacity 0.2s, transform 0.2s;
-    display: inline-block;
-  }
-
-  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
-
-  .btn-secondary {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    background: transparent;
-    color: var(--text);
-    border: 1px solid var(--border);
-    padding: 12px 24px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: border-color 0.2s, color 0.2s;
-    display: inline-block;
-  }
-
-  .btn-secondary:hover { border-color: var(--text); }
-
-  /* Hero right: stat cards */
-  .hero-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    opacity: 0;
-    animation: fadeUp 0.7s ease 0.6s forwards;
-  }
-
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 24px 20px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.3s, transform 0.3s;
-  }
-
-  .stat-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-3px);
-  }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--accent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s;
-  }
-
-  .stat-card:hover::before { transform: scaleX(1); }
-
-  .stat-num {
-    font-family: var(--serif);
-    font-size: 42px;
-    color: var(--accent);
-    line-height: 1;
-  }
-
-  .stat-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-top: 6px;
-  }
-
-  /* ── SECTIONS ── */
-  section {
-    padding: 100px 48px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .section-label {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--accent);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  .section-label::after {
-    content: '';
-    flex: 1;
-    max-width: 60px;
-    height: 1px;
-    background: var(--accent);
-    opacity: 0.5;
-  }
-
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 1.7rem; font-weight: 600; margin: 0 0 4px; }
   h2 {
-    font-family: var(--serif);
-    font-size: clamp(32px, 4vw, 52px);
-    font-weight: 400;
-    color: var(--text);
-    line-height: 1.1;
-    margin-bottom: 48px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 40px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--rule);
   }
-
-  /* ── ABOUT ── */
-  #about .about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: start;
-  }
-
-  .about-text p {
-    color: var(--muted);
-    margin-bottom: 16px;
-    font-size: 15px;
-    line-height: 1.8;
-  }
-
-  .about-text p strong {
-    color: var(--text);
-  }
-
-  .skills-group {
-    margin-bottom: 24px;
-  }
-
-  .skills-group-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 10px;
-  }
-
-  .skill-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .chip {
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 4px 10px;
-    background: var(--surface2);
-    border: 1px solid var(--faint);
-    color: var(--text);
-    border-radius: 2px;
-  }
-
-  /* ── EXPERIENCE ── */
-  #experience { background: none; }
-  #experience > div { max-width: 900px; margin: 0 auto;}
-
-  .exp-item {
-    display: grid;
-    grid-template-columns: 180px 1fr;
-    gap: 32px;
-    padding: 32px 0;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-  }
-
-  .exp-item::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 2px;
-    background: var(--faint);
-  }
-
-  .exp-item:hover::before {
-    background: var(--accent);
-    transition: background 0.3s;
-  }
-
-  .exp-meta {
-    padding-top: 4px;
-    padding-left: 16px;
-  }
-
-  .exp-year {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 0.08em;
-  }
-
-  .exp-org {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-
-  .exp-role {
-    font-family: var(--serif);
-    font-size: 20px;
-    color: var(--text);
-    margin-bottom: 10px;
-    line-height: 1.2;
-  }
-
-  .exp-desc {
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.7;
-  }
-
-  .exp-bullets {
-    margin-top: 10px;
-    list-style: none;
-  }
-
-  .exp-bullets li {
-    font-size: 13px;
-    color: var(--muted);
-    padding: 3px 0 3px 16px;
-    position: relative;
-  }
-
-  .exp-bullets li::before {
-    content: '—';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    font-size: 11px;
-  }
-
-  /* ── PUBLICATIONS ── */
-  #publications {
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    max-width: 100%;
-    padding: 100px 48px;
-  }
-
-  #publications > .inner {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .pub-filters {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 40px;
-    flex-wrap: wrap;
-  }
-
-  .filter-btn {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 6px 14px;
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.2s;
-    border-radius: 2px;
-  }
-
-  .filter-btn.active,
-  .filter-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: rgba(232,99,58,0.06);
-  }
-
-  .pub-list { display: flex; flex-direction: column; gap: 2px; }
-
-  .pub-item {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    padding: 22px 24px;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 20px;
-    align-items: start;
-    transition: border-color 0.25s, background 0.25s;
-    cursor: default;
-  }
-
-  .pub-item:hover {
-    border-color: var(--faint);
-    background: var(--surface2);
-  }
-
-  .pub-idx {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--accent);
-    width: 28px;
-    padding-top: 2px;
-  }
-
-  .pub-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    margin-bottom: 4px;
-    line-height: 1.4;
-  }
-
-  .pub-authors {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .pub-venue {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    font-style: italic;
-  }
-
-  .pub-badges {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    align-items: flex-end;
-  }
-
-  .badge {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 2px;
-    white-space: nowrap;
-  }
-
-  .badge-rank { background: rgba(232,99,58,0.12); color: var(--accent); border: 1px solid rgba(232,99,58,0.3); }
-  .badge-review { background: rgba(107,122,150,0.12); color: var(--muted); border: 1px solid var(--border); }
-  .badge-patent { background: rgba(240,154,92,0.12); color: var(--accent2); border: 1px solid rgba(240,154,92,0.3); }
-  .badge-submitted { background: rgba(107,122,150,0.08); color: var(--muted); border: 1px solid var(--border); }
-
-  /* ── EDUCATION ── */
-  .edu-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-  }
-
-  .edu-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 28px 24px;
-    position: relative;
-    transition: border-color 0.3s, transform 0.3s;
-  }
-
-  .edu-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-4px);
-  }
-
-  .edu-card::after {
-    content: attr(data-year);
-    position: absolute;
-    top: 20px; right: 20px;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-  }
-
-  .edu-degree {
-    font-family: var(--serif);
-    font-size: 17px;
-    color: var(--text);
-    margin-bottom: 8px;
-    line-height: 1.3;
-  }
-
-  .edu-inst {
-    font-size: 13px;
-    color: var(--accent);
-    margin-bottom: 6px;
-  }
-
-  .edu-field {
-    font-size: 12px;
-    color: var(--muted);
-  }
-
-  /* ── CONTACT ── */
-  #contact {
-    text-align: center;
-    padding: 100px 48px;
-  }
-
-  .contact-links {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin-top: 40px;
-    flex-wrap: wrap;
-  }
-
-  .contact-link {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border: 1px solid var(--border);
-    transition: all 0.2s;
-    border-radius: 2px;
-  }
-
-  .contact-link:hover {
-    color: var(--text);
-    border-color: var(--text);
-  }
-
-  /* ── FOOTER ── */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 28px 48px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  footer p {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .fade-in {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-
-  .fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* ── PROJECTS ── */
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 48px;
-  }
-
-  .project-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 28px 24px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.3s, transform 0.3s;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .project-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-4px);
-  }
-
-  .project-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--accent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s;
-  }
-
-  .project-card:hover::before { transform: scaleX(1); }
-
-  .project-name {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
-
-  .project-desc {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.7;
-    flex: 1;
-  }
-
-  .project-stack {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 4px;
-  }
-
-  .project-tag {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 0.07em;
-    padding: 3px 8px;
-    background: var(--surface2);
-    border: 1px solid var(--faint);
-    color: var(--muted);
-    border-radius: 2px;
-  }
-
-  .project-link {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin-top: 6px;
-  }
-
-  .project-link:hover { text-decoration: underline; }
-
-  .other-projects {
-    border-top: 1px solid var(--border);
-    padding-top: 40px;
-  }
-
-  .other-projects-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 20px;
-  }
-
-  .other-projects-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    list-style: none;
-  }
-
-  .other-projects-list li {
-    font-size: 13px;
-    color: var(--muted);
-    padding: 12px 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 2px solid var(--faint);
-    line-height: 1.6;
-    transition: border-color 0.2s;
-  }
-
-  .other-projects-list li:hover {
-    border-left-color: var(--accent);
-  }
-
-  /* ── MOBILE ── */
-  @media (max-width: 900px) {
-    nav { padding: 16px 24px; }
-    .nav-links { display: none; }
-    #hero { grid-template-columns: 1fr; padding: 100px 24px 60px; }
-    .hero-stats { display: none; }
-    section { padding: 60px 24px; }
-    #publications { padding: 60px 24px; }
-    #about .about-grid { grid-template-columns: 1fr; gap: 40px; }
-    .exp-item { grid-template-columns: 1fr; gap: 8px; }
-    .edu-grid { grid-template-columns: 1fr; }
-    .projects-grid { grid-template-columns: 1fr; }
-    .other-projects-list { grid-template-columns: 1fr; }
-    footer { flex-direction: column; gap: 12px; text-align: center; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 20px 0 8px; }
+  p { margin: 0 0 12px; }
+  a { color: var(--link); }
+  .muted { color: var(--muted); }
+  .links a { margin-right: 16px; white-space: nowrap; }
+  ul { padding-left: 20px; margin: 0 0 12px; }
+  li { margin-bottom: 8px; }
+  ul.works { list-style: none; padding-left: 0; }
+  ul.works > li { margin-bottom: 16px; }
+  .title { font-weight: 600; }
+  .summary { margin-top: 4px; }
+  .row { display: grid; grid-template-columns: 6.5em 1fr; column-gap: 12px; }
+  .date { color: var(--muted); }
+  @media (max-width: 480px) {
+    .row { display: block; }
   }
 </style>
 </head>
 <body>
+<main>
 
-<!-- NAV -->
-<nav>
-  <a href="#hero" class="nav-logo">K·I·O</a>
-  <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#experience">Experience</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#publications">Research</a></li>
-    <li><a href="#education">Education</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="Ouattara_CV_Publications.pdf" download class="nav-cv">↓ CV + Pubs</a></li>
-  </ul>
-  <button id="theme-toggle" aria-label="Toggle theme" title="Toggle light/dark mode">
-    <!-- Moon icon (shown in dark mode) -->
-    <svg id="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-    </svg>
-    <!-- Sun icon (shown in light mode) -->
-    <svg id="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
-      <circle cx="12" cy="12" r="5"/>
-      <line x1="12" y1="1" x2="12" y2="3"/>
-      <line x1="12" y1="21" x2="12" y2="23"/>
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-      <line x1="1" y1="12" x2="3" y2="12"/>
-      <line x1="21" y1="12" x2="23" y2="12"/>
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-    </svg>
-  </button>
-</nav>
+<h1>Koffi Ismael Ouattara</h1>
+<p>PhD candidate in AI security, Ulm University and Huawei (Paris / Munich).</p>
+<p class="links">
+  <a href="mailto:ouattaraismael1999@gmail.com">ouattaraismael1999@gmail.com</a>
+  <a href="Ouattara_CV_Publications.pdf">CV (PDF)</a>
+  <a href="https://github.com/Ouatt-Isma">GitHub</a>
+  <a href="https://www.linkedin.com/in/koffi-ismael-ouattara-96291817a/">LinkedIn</a>
+</p>
 
-<!-- HERO -->
-<div id="hero">
-  <div class="hero-bg-glow"></div>
-  <div class="hero-left">
-    <div class="hero-tag">AI Researcher</div>
-    <h1>Koffi Ismael<br><em>Ouattara</em></h1>
-    <p class="hero-sub">
-      PhD candidate at Ulm University &amp; Huawei (Paris/Munich). Building the theoretical and practical foundations for trustworthy, interpretable machine learning through Subjective Logic and neuro-symbolic methods.
-    </p>
-    <div class="hero-tags">
-      <span class="tag">Trustworthy AI</span>
-      <span class="tag">Uncertainty Quantification</span>
-      <span class="tag">Neuro-Symbolic AI</span>
-      <span class="tag">Adversarial ML</span>
-      <span class="tag">Privacy-Preserving AI</span>
+<p>
+  I work on trustworthy and secure machine learning: uncertainty quantification, trust assessment with Subjective Logic, and defences against data poisoning, model extraction and membership inference. My PhD (2023–2026) is a collaboration between Huawei and Ulm University, supervised by Frank Kargl and Theo Dimitrakos. Before it I worked at Mithril Security, Nokia Bell Labs and INRIA, and studied at École Polytechnique and Télécom Paris.
+</p>
+<p>
+  My PhD ends in 2026 and I am looking for a research or engineering position in ML security and trustworthy AI, in industry or academia.
+</p>
+
+<h2 id="research">Research</h2>
+
+<h3>New in 2026</h3>
+<ul class="works">
+  <li>
+    <div class="title">Provenance Is Enough: Removing Backdoors From the Parameters an Untrusted Source Shaped</div>
+    <div>K. I. Ouattara et al. Submitted to IEEE SaTML, 2026 (under review). <a href="papers/2026-provenance-is-enough-backdoor-removal.pdf">PDF</a></div>
+    <div class="summary muted">Attributes every parameter of a trained network to the training sources that shaped it, weighted by their share of its gradient, and removes the parameters an untrusted source formed. On MNIST this drives a patch backdoor's attack success from 99.08% to 0.10% for 0.15 points of clean accuracy, with no retraining, no clean reference set and no knowledge of the trigger. Whether the defence applies is decidable before training from the trusted data alone, and it still works at a 0.97% poisoning rate where activation clustering and spectral signatures fail.</div>
+  </li>
+  <li>
+    <div class="title">Position: Learned Aleatoric Uncertainty Should Never Be Reported Without a Measured Noise Floor</div>
+    <div>K. I. Ouattara. Preprint, September 2026. <a href="papers/2026-position-aleatoric-uncertainty-noise-floor.pdf">PDF</a></div>
+    <div class="summary muted">Argues that a learned aleatoric estimate is the true noise floor plus the model's own error, of unknown magnitude and (in classification) unknown sign, and should be reported against a separately measured floor with the signed gap. Gives an exact decomposition of that gap for regression and classification, measures it on CIFAR-10H against 511,000 human judgements, and reports a pre-registered survey of 50 recent papers, of which 5 compare their estimate to any real floor.</div>
+  </li>
+</ul>
+
+<h3>Under review and in progress</h3>
+<ul class="works">
+  <li>
+    <div class="title">PaTAS: A Framework for Parallel Trust Assessment in Neural Networks</div>
+    <div>K. I. Ouattara et al. Under review, IEEE Transactions on Dependable and Secure Computing. <a href="demos/patas_simulator.html">Demo</a></div>
+  </li>
+  <li>
+    <div class="title">Subjective Heads for Frozen Foundation Models: Decomposition and Adversarial-Robust Fusion</div>
+    <div>K. I. Ouattara. Submitted; work in progress.</div>
+  </li>
+</ul>
+
+<h3>Published</h3>
+<ul class="works">
+  <li>
+    <div class="title">Assessing AI Training Dataset Trustworthiness: A Use Case on Bias</div>
+    <div>K. I. Ouattara, I. Krontiris, T. Dimitrakos, F. Kargl. BIAS workshop at ECML PKDD 2025.</div>
+  </li>
+  <li>
+    <div class="title">Actions Speak Louder Than Words: Evidence-Based Trust Level Evaluation in Multi-Agent Systems</div>
+    <div>N. Fotos, K. I. Ouattara, D. S. Karas, I. Krontiris, W. Meng, T. Giannetsos. ICICS 2025.</div>
+  </li>
+  <li>
+    <div class="title">Quantifying Calibration Error in Neural Networks through Evidence-Based Theory</div>
+    <div>K. I. Ouattara, I. Krontiris, T. Dimitrakos, F. Kargl. FUSION 2025. <a href="demos/calibration_demo.html">Demo</a></div>
+  </li>
+  <li>
+    <div class="title">An Optimized Framework for DSPG Synthesis and Trust Network Analysis with Subjective Logic</div>
+    <div>K. I. Ouattara, A. Petrovska, I. Krontiris, T. Dimitrakos, F. Kargl. RuleML+RR 2025. <a href="demos/dspg_demo.html">Demo</a></div>
+  </li>
+  <li>
+    <div class="title">On Subjective Logic Trust Discount for Referral Paths</div>
+    <div>K. I. Ouattara, A. Petrovska, A. Hermann, N. Trkulja, T. Dimitrakos, F. Kargl. FUSION 2024. <a href="https://doi.org/10.23919/FUSION59988.2024.10706345">DOI</a></div>
+  </li>
+  <li>
+    <div class="title">Detecting Fake Base Stations Using Knowledge Graphs and ML-Based Techniques</div>
+    <div>S. Kriaa, A. Feki, S. Papillon, T. Chene, I. Ouattara. IEEE VCC 2023. <a href="https://doi.org/10.1109/VCC60689.2023.10474891">DOI</a></div>
+  </li>
+</ul>
+
+<h3>Patent</h3>
+<ul class="works">
+  <li>
+    <div class="title">Distributed Machine Learning Solution for Rogue Base Station Detection</div>
+    <div>K. I. Ouattara, S. Papillon, A. Feki, K. A. Pantelidou. US patent application US20240121678A1, 2024. <a href="https://patents.google.com/patent/US20240121678A1/en">Google Patents</a></div>
+  </li>
+</ul>
+
+<h2 id="demos">Demos</h2>
+<ul>
+  <li><a href="demos/patas_simulator.html">PaTAS simulator</a>: trust propagation through a neural network with Subjective Logic.</li>
+  <li><a href="demos/calibration_demo.html">Calibration assessment</a>: neural network calibration expressed as a Subjective Logic opinion.</li>
+  <li><a href="demos/dspg_demo.html">DSPG synthesis</a>: directed series-parallel graph synthesis and trust inference on trust networks.</li>
+  <li><a href="demos/food-platform-simulator.html">Dynamic pricing and recommendation simulator</a>: reinforcement learning against food waste on delivery platforms (École Polytechnique project, 2020).</li>
+</ul>
+
+<h2 id="experience">Experience</h2>
+<ul class="works">
+  <li class="row">
+    <span class="date">2023–2026</span>
+    <div>
+      <div class="title">Researcher and PhD student, AI security. Huawei Technologies and Ulm University, Paris / Munich.</div>
+      <div>Trust propagation in neural networks with Subjective Logic; PaTAS (Parallel Trust Assessment System); Subjective Neural Networks; neuro-symbolic policy enforcement for AI agents; trust architectures for the EU Horizon projects CONNECT, CASTOR and DUCA.</div>
     </div>
-    <div class="hero-ctas">
-      <a href="#publications" class="btn-primary">View Research</a>
-      <a href="Ouattara_CV_Publications.pdf" download class="btn-secondary">Download CV + Pubs</a>
+  </li>
+  <li class="row">
+    <span class="date">2022–2023</span>
+    <div>
+      <div class="title">Machine learning / security engineer. Mithril Security, Paris.</div>
+      <div>Defences against model extraction and membership inference attacks on deployed models; privacy-preserving inference.</div>
     </div>
-  </div>
-  <div class="hero-stats">
-    <div class="stat-card">
-      <div class="stat-num">8</div>
-      <div class="stat-label">Publications</div>
+  </li>
+  <li class="row">
+    <span class="date">2022</span>
+    <div>
+      <div class="title">Research intern. Nokia Bell Labs, Nozay.</div>
+      <div>ML-based anomaly and attack detection for 5G networks with graph neural networks; co-inventor of the rogue base-station detection patent above.</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-num">1</div>
-      <div class="stat-label">US Patent</div>
+  </li>
+  <li class="row">
+    <span class="date">2021</span>
+    <div>
+      <div class="title">Research intern. INRIA, Rennes.</div>
+      <div>Meta-model of cryptographic architectures for checking compliance with best practices.</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-num">3</div>
-      <div class="stat-label">EU Horizon<br>Projects</div>
+  </li>
+  <li class="row">
+    <span class="date">2021–2022</span>
+    <div>
+      <div class="title">Teaching.</div>
+      <div>Intrusion detection systems course and Snort labs at ISEP (2022); oral examiner in mathematics and computer science for preparatory classes at Lycée Janson de Sailly and EPF (2021–2022).</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-num">A/B</div>
-      <div class="stat-label">Venue Rankings</div>
-    </div>
-  </div>
-</div>
+  </li>
+</ul>
 
-<!-- ABOUT -->
-<section id="about">
-  <div class="section-label">About</div>
-  <h2>Building machines that<br><em style="font-family:var(--serif);font-style:italic;color:var(--accent)">know what they don't know</em></h2>
-  <div class="about-grid fade-in">
-    <div class="about-text">
-      <p>
-        I am a researcher in <strong>Trustworthy AI and Machine Learning Security</strong>, currently pursuing a PhD at Ulm University in collaboration with Huawei Research (Paris &amp; Munich). My work sits at the intersection of formal reasoning, probabilistic uncertainty, and real-world ML deployments.
-      </p>
-      <p>
-        My core research integrates <strong>Subjective Logic</strong> and <strong>Bayesian Deep Learning</strong> into neural networks — enabling models to reason explicitly about their own uncertainty, propagate trust through multi-agent systems, and remain interpretable under adversarial conditions.
-      </p>
-      <p>
-        Beyond academia, I have worked at <strong>Huawei, Nokia Bell Labs, Mithril Security</strong>, and <strong>INRIA</strong> — building production-grade ML systems and defenses against real-world attacks. I contribute to EU HORIZON projects CONNECT, CASTOR, and DUCA.
-      </p>
-    </div>
-    <div class="about-skills">
-      <div class="skills-group">
-        <div class="skills-group-label">Research Areas</div>
-        <div class="skill-chips">
-          <span class="chip">Trustworthy AI</span>
-          <span class="chip">Uncertainty Quantification</span>
-          <span class="chip">Bayesian Deep Learning</span>
-          <span class="chip">Neuro-Symbolic AI</span>
-          <span class="chip">Trust Propagation</span>
-          <span class="chip">Adversarial ML</span>
-          <span class="chip">Privacy-Preserving AI</span>
-          <span class="chip">Reinforcement Learning</span>
-        </div>
-      </div>
-      <div class="skills-group">
-        <div class="skills-group-label">Programming</div>
-        <div class="skill-chips">
-          <span class="chip">Python</span>
-          <span class="chip">C++</span>
-          <span class="chip">Rust</span>
-          <span class="chip">Go</span>
-          <span class="chip">Java</span>
-          <span class="chip">R</span>
-          <span class="chip">x86-64 Asm</span>
-        </div>
-      </div>
-      <div class="skills-group">
-        <div class="skills-group-label">ML / Tools</div>
-        <div class="skill-chips">
-          <span class="chip">PyTorch</span>
-          <span class="chip">TensorFlow</span>
-          <span class="chip">Transformers</span>
-          <span class="chip">Docker</span>
-          <span class="chip">LaTeX</span>
-        </div>
-      </div>
-      <div class="skills-group">
-        <div class="skills-group-label">Security</div>
-        <div class="skill-chips">
-          <span class="chip">IDS/IPS</span>
-          <span class="chip">TCP/IP</span>
-          <span class="chip">Adversarial Robustness</span>
-          <span class="chip">Membership Inference</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<h2 id="education">Education</h2>
+<ul class="works">
+  <li class="row"><span class="date">2023–2026</span><div>PhD in AI security, Ulm University, Germany.</div></li>
+  <li class="row"><span class="date">2021–2023</span><div>Engineer and Master's degree, Télécom Paris / Institut Polytechnique de Paris. Cybersecurity, machine learning, mobile networks.</div></li>
+  <li class="row"><span class="date">2018–2022</span><div>Engineer and Master's degree, École Polytechnique (X2018). Cybersecurity and machine learning.</div></li>
+</ul>
 
-<!-- EXPERIENCE -->
-<section id="experience">
-  <div>
-    <div class="section-label">Experience</div>
-    <h2>Where I've worked</h2>
+<h2 id="skills">Skills</h2>
+<p>Python, C, C++, Rust, Go, Java, R, x86-64 assembly. PyTorch, TensorFlow, Transformers, reinforcement learning. Docker, Git, LaTeX. Networking and intrusion detection (TCP/IP, Snort, YARA). Adversarial machine learning, membership inference, privacy-preserving ML.</p>
+<p>French (native), English (advanced), Chinese and Spanish (basic).</p>
 
-    <div class="exp-item fade-in">
-      <div class="exp-meta">
-        <div class="exp-year">2023 – 2026</div>
-        <div class="exp-org">Paris / Munich</div>
-      </div>
-      <div>
-        <div class="exp-role">Researcher &amp; PhD Student, AI Security</div>
-        <div class="exp-desc" style="color:var(--accent);font-size:13px;margin-bottom:10px;">Huawei Technologies &amp; Ulm University</div>
-        <ul class="exp-bullets">
-          <li>Developed a novel trust propagation framework for neural networks using Subjective Logic, enabling interpretable uncertainty and reliability assessment across full AI pipelines.</li>
-          <li>Designed PaTAS (Parallel Trust Assessment System) — a scalable framework integrating data quality, model behavior, and inference context for dynamic trust scoring.</li>
-          <li>Developed Subjective Neural Networks: a Bayesian neural architecture for joint modeling of prediction, uncertainty, and trust at the parameter level.</li>
-          <li>Proposed neuro-symbolic approaches for policy enforcement in AI agents, bridging logical constraints and neural learning.</li>
-          <li>Contributed to EU HORIZON projects CONNECT, CASTOR, and DUCA designing trust architectures for secure and privacy-preserving AI in edge and mobility systems.</li>
-        </ul>
-      </div>
-    </div>
+<h2 id="projects">Other projects</h2>
+<ul>
+  <li><a href="https://faos.fr">faos.fr</a>: platform for a business accelerator agency (WordPress, PHP, MySQL).</li>
+  <li>AMON.AI: retrieval-augmented question answering over construction project documentation (Python, LLM, vector database).</li>
+  <li><a href="https://playinvest-hd.com">playinvest-hd.com</a>: financial insights platform (Nuxt.js, FastAPI, PostgreSQL).</li>
+  <li>Earlier: a mini C compiler in Java, Snort and YARA rules for a small network, CTF challenges on Root Me (Xma99).</li>
+</ul>
 
-    <div class="exp-item fade-in">
-      <div class="exp-meta">
-        <div class="exp-year">2022 – 2023</div>
-        <div class="exp-org">Paris, France</div>
-      </div>
-      <div>
-        <div class="exp-role">ML / Security Engineer</div>
-        <div class="exp-desc" style="color:var(--accent);font-size:13px;margin-bottom:10px;">Mithril Security</div>
-        <ul class="exp-bullets">
-          <li>Developed defenses against model extraction and membership inference attacks in deployed ML systems.</li>
-          <li>Worked on privacy-preserving inference techniques for sensitive data processing.</li>
-        </ul>
-      </div>
-    </div>
+<h2 id="contact">Contact</h2>
+<p class="links">
+  <a href="mailto:ouattaraismael1999@gmail.com">ouattaraismael1999@gmail.com</a>
+  <a href="https://github.com/Ouatt-Isma">GitHub</a>
+  <a href="https://www.linkedin.com/in/koffi-ismael-ouattara-96291817a/">LinkedIn</a>
+</p>
+<p class="muted">Last updated September 2026.</p>
 
-    <div class="exp-item fade-in">
-      <div class="exp-meta">
-        <div class="exp-year">2022</div>
-        <div class="exp-org">Nozay, France</div>
-      </div>
-      <div>
-        <div class="exp-role">Research Intern</div>
-        <div class="exp-desc" style="color:var(--accent);font-size:13px;margin-bottom:10px;">Nokia Bell Labs (Alcatel-Lucent Int.)</div>
-        <ul class="exp-bullets">
-          <li>Designed ML-based anomaly detection for 5G networks using graph-based deep learning models.</li>
-          <li>Co-invented a patented system for rogue base-station detection — Patent US20240121678A1.</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="exp-item fade-in">
-      <div class="exp-meta">
-        <div class="exp-year">2021</div>
-        <div class="exp-org">Rennes, France</div>
-      </div>
-      <div>
-        <div class="exp-role">Research Intern</div>
-        <div class="exp-desc" style="color:var(--accent);font-size:13px;margin-bottom:10px;">INRIA</div>
-        <ul class="exp-bullets">
-          <li>Designed a meta-model of cryptographic architectures to verify compliance with best practices.</li>
-        </ul>
-      </div>
-    </div>
-    <div class="exp-item fade-in">
-      <div class="exp-meta">
-        <div class="exp-year">Apr 2022</div>
-        <div class="exp-org">Paris, France</div>
-      </div>
-      <div>
-        <div class="exp-role">Interim Teacher — IDS &amp; SNORT</div>
-        <div class="exp-desc" style="color:var(--accent);font-size:13px;margin-bottom:10px;">ISEP</div>
-        <ul class="exp-bullets">
-          <li>Taught Intrusion Detection Systems course and led hands-on SNORT lab sessions for engineering students.</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="exp-item fade-in">
-      <div class="exp-meta">
-        <div class="exp-year">2021 – 2022</div>
-        <div class="exp-org">Paris, France</div>
-      </div>
-      <div>
-        <div class="exp-role">Teaching Assistant &amp; Oral Examiner</div>
-        <div class="exp-desc" style="color:var(--accent);font-size:13px;margin-bottom:10px;">Lycée Janson de Sailly &amp; EPF Engineering School</div>
-        <ul class="exp-bullets">
-          <li>Oral examiner (colle) for Classes Préparatoires students — mathematics and computer science.</li>
-          <li>Homework support and course comprehension assistance for preparatory-class students.</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PROJECTS -->
-<section id="projects">
-  <div class="section-label">Projects</div>
-  <h2>Built &amp; shipped</h2>
-
-  <div class="projects-grid fade-in">
-
-    <div class="project-card">
-      <div class="project-name">FAOS.FR</div>
-      <div class="project-desc">
-        Business accelerator agency platform. Full-stack development of the FAOS platform including custom themes, plugins, and integrations tailored for SME growth.
-      </div>
-      <div class="project-stack">
-        <span class="project-tag">WordPress</span>
-        <span class="project-tag">PHP</span>
-        <span class="project-tag">MySQL</span>
-      </div>
-      <a href="https://faos.fr" target="_blank" rel="noopener" class="project-link">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        faos.fr
-      </a>
-    </div>
-
-    <div class="project-card">
-      <div class="project-name">AMON.AI</div>
-      <div class="project-desc">
-        RAG-powered information retrieval system for BTP (Building &amp; Construction) projects. Enables teams to instantly query large project documentation corpora using natural language.
-      </div>
-      <div class="project-stack">
-        <span class="project-tag">RAG</span>
-        <span class="project-tag">LLM</span>
-        <span class="project-tag">Vector DB</span>
-        <span class="project-tag">Python</span>
-      </div>
-      <!-- <a href="http://amon.ai" target="_blank" rel="noopener" class="project-link">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        amon.ai
-      </a> -->
-    </div>
-
-    <div class="project-card">
-      <div class="project-name">PLAYINVEST-HD.COM</div>
-      <div class="project-desc">
-        Financial intelligence platform delivering real-time investment insights. Full-stack application with server-side rendering, REST API backend, and relational data storage.
-      </div>
-      <div class="project-stack">
-        <span class="project-tag">Nuxt.js</span>
-        <span class="project-tag">FastAPI</span>
-        <span class="project-tag">PostgreSQL</span>
-        <span class="project-tag">Python</span>
-      </div>
-      <a href="https://playinvest-hd.com" target="_blank" rel="noopener" class="project-link">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        playinvest-hd.com
-      </a>
-    </div>
-
-  </div>
-
-  <div class="other-projects fade-in">
-    <div class="other-projects-label">Other work</div>
-    <ul class="other-projects-list">
-      <li>Dynamic pricing &amp; recommendation engine on sales platforms to reduce food waste.</li>
-      <li>Predicting Uber driver activation likelihood from signup data (binary classification).</li>
-      <li>Predicting tweet retweet counts from content and metadata features.</li>
-      <li>CTF challenges on Root Me platform — network, web, reverse, crypto (pseudo: <strong style="color:var(--text)">Xma99</strong>).</li>
-      <li>Implemented Snort rules to build a firewall securing a local network.</li>
-      <li>Wrote a YARA rule to detect a specific malware sample.</li>
-      <li>Built a mini C compiler from scratch using Java (lexer → parser → codegen).</li>
-    </ul>
-  </div>
-</section>
-
-<!-- DEMOS -->
-<section id="demos">
-  <div class="section-label">Demos</div>
-  <h2>Live experiments</h2>
-
-  <div class="demos-grid fade-in">
-
-    <div class="demo-card">
-      <div class="demo-name">PaTAS Simulator</div>
-      <div class="demo-desc">
-        Interactive simulator for the Parallel Trust Assessment System. Explore how PaTAS evaluates and propagates trust scores across neural network pipelines in real time.
-      </div>
-      <a href="demos/patas_simulator" class="demo-link">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Launch demo
-      </a>
-    </div>
-    <div class="demo-card">
-      <div class="demo-name">Dynamic Pricing & Recommendation Simulator</div>
-      <div class="demo-desc">
-        PSC at École Polytechnique, January 2020, supervised by Pascal Benchimol. Addresses food waste on delivery platforms by jointly optimising recommendations and dynamic pricing.
-      </div>
-      <a href="demos/food-platform-simulator" class="demo-link">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Launch demo
-      </a>
-    </div>
-    <div class="demo-card">
-      <div class="demo-name">Optimized Directed Series Parallel Graph Synthesis and Analysis</div>
-      <div class="demo-desc">
-        This demo presents a framework for synthesizing Directed Series-Parallel Graphs (DSPG) for trust networks while preserving information and improving trust inference time.
-      </div>
-      <a href="demos/dspg_demo" class="demo-link">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Launch demo
-      </a>
-    </div>
-    <div class="demo-card">
-      <div class="demo-name">Neural Network Calibration Assessment</div>
-      <div class="demo-desc">
-        This demo presents a framework for evaluating Neural Network Calibration as a Subjective Logic Trust Opinion.
-      </div>
-      <a href="demos/calibration_demo" class="demo-link">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Launch demo
-      </a>
-    </div>
-  </div>
-</section>
-<!-- PUBLICATIONS -->
-<div id="publications">
-  <div class="inner">
-    <div class="section-label">Research</div>
-    <h2 style="margin-bottom:32px">Publications &amp; Patents</h2>
-    <div class="pub-filters">
-      <button class="filter-btn active" onclick="filterPubs('all', this)">All</button>
-      <button class="filter-btn" onclick="filterPubs('conference', this)">Conference</button>
-      <button class="filter-btn" onclick="filterPubs('journal', this)">Journal</button>
-      <button class="filter-btn" onclick="filterPubs('patent', this)">Patent</button>
-      <button class="filter-btn" onclick="filterPubs('submitted', this)">Submitted</button>
-    </div>
-
-    <div class="pub-list" id="pubList">
-
-      <div class="pub-item" data-type="journal">
-        <div class="pub-idx">J1</div>
-        <div>
-          <div class="pub-title">Patas: A Framework for Parallel Trust Assessment in Neural Networks</div>
-          <div class="pub-authors">K. I. Ouattara et al.</div>
-          <div class="pub-venue">IEEE Transactions on Dependable and Secure Computing · 2026</div>
-        </div>
-        <div class="pub-badges">
-          <span class="badge badge-review">Under Review</span>
-        </div>
-      </div>
-
-      <div class="pub-item" data-type="conference">
-        <div class="pub-idx">C1</div>
-        <div>
-          <div class="pub-title">Assessing AI Training Dataset Trustworthiness — A Use Case on Bias</div>
-          <div class="pub-authors">K. I. Ouattara, I. Krontiris, T. Dimitrakos, F. Kargl</div>
-          <div class="pub-venue">BIAS 2025 Workshop @ ECML PKDD 2025</div>
-        </div>
-        <div class="pub-badges">
-          <span class="badge badge-rank">Rank A</span>
-        </div>
-      </div>
-
-      <div class="pub-item" data-type="conference">
-        <div class="pub-idx">C2</div>
-        <div>
-          <div class="pub-title">Actions Speak Louder Than Words: Evidence-Based Trust Level Evaluation in Multi-Agent Systems</div>
-          <div class="pub-authors">N. Fotos, K. I. Ouattara, D. S. Karas, I. Krontiris, W. Meng, T. Giannetsos</div>
-          <div class="pub-venue">ICICS 2025 · 27th Int. Conf. on Information and Communications Security</div>
-        </div>
-        <div class="pub-badges">
-          <span class="badge badge-rank">Rank B</span>
-          <span class="badge badge-review">Accept. 26%</span>
-        </div>
-      </div>
-
-      <div class="pub-item" data-type="conference">
-        <div class="pub-idx">C3</div>
-        <div>
-          <div class="pub-title">Quantifying Calibration Error in Neural Networks through Evidence-Based Theory</div>
-          <div class="pub-authors">K. I. Ouattara, I. Krontiris, T. Dimitrakos, F. Kargl</div>
-          <div class="pub-venue">FUSION 2025 · 28th Int. Conf. on Information Fusion</div>
-        </div>
-        <div class="pub-badges">
-          <span class="badge badge-rank">Rank B</span>
-        </div>
-      </div>
-
-      <div class="pub-item" data-type="conference">
-        <div class="pub-idx">C4</div>
-        <div>
-          <div class="pub-title">An Optimized Framework for DSPG Synthesis and Trust Network Analysis with Subjective Logic</div>
-          <div class="pub-authors">K. I. Ouattara, A. Petrovska, I. Krontiris, T. Dimitrakos, F. Kargl</div>
-          <div class="pub-venue">RuleML+RR 2025</div>
-        </div>
-        <div class="pub-badges">
-          <span class="badge badge-rank">Rank B</span>
-          <span class="badge badge-review">Accept. 35%</span>
-        </div>
-      </div>
-
-      <div class="pub-item" data-type="conference">
-        <div class="pub-idx">C5</div>
-        <div>
-          <div class="pub-title">On Subjective Logic Trust Discount for Referral Paths</div>
-          <div class="pub-authors">K. I. Ouattara, A. Petrovska, A. Hermann, N. Trkulja, T. Dimitrakos, F. Kargl</div>
-          <div class="pub-venue">FUSION 2024 · 27th Int. Conf. on Information Fusion · DOI: 10.23919/FUSION59988.2024.10706345</div>
-        </div>
-        <div class="pub-badges">
-          <span class="badge badge-rank">Rank B</span>
-        </div>
-      </div>
-
-      <div class="pub-item" data-type="conference">
-        <div class="pub-idx">C6</div>
-        <div>
-          <div class="pub-title">Detecting Fake Base Stations Using Knowledge Graphs and ML-Based Techniques</div>
-          <div class="pub-authors">S. Kriaa, A. Feki, S. Papillon, T. Chene, I. Ouattara</div>
-          <div class="pub-venue">IEEE Virtual Conference on Communications (VCC) · Nov. 2023 · DOI: 10.1109/VCC60689.2023.10474891</div>
-        </div>
-        <div class="pub-badges"></div>
-      </div>
-
-      <div class="pub-item" data-type="patent">
-        <div class="pub-idx">P1</div>
-        <div>
-          <div class="pub-title">Distributed Machine Learning Solution for Rogue Base Station Detection</div>
-          <div class="pub-authors">K. I. Ouattara, S. Papillon, A. Feki, K. A. Pantelidou</div>
-          <div class="pub-venue">US Patent US20240121678A1 · Filed 2024</div>
-        </div>
-        <div class="pub-badges">
-          <span class="badge badge-patent">Patent</span>
-        </div>
-      </div>
-
-      <div class="pub-item" data-type="submitted">
-        <div class="pub-idx">S1</div>
-        <div>
-          <div class="pub-title">Subjective Heads for Frozen Foundation Models: Decomposition and Adversarial-Robust Fusion</div>
-          <div class="pub-authors">K. I. Ouattara</div>
-          <div class="pub-venue">Work in Progress · integrating Subjective Logic for structured uncertainty modeling with SBNN and Dirichlet Process mappings.</div>
-        </div>
-        <div class="pub-badges">
-          <span class="badge badge-submitted">Submitted</span>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- EDUCATION -->
-<section id="education">
-  <div class="section-label">Education</div>
-  <h2>Academic background</h2>
-  <div class="edu-grid fade-in">
-    <div class="edu-card" data-year="2023–2026">
-      <div class="edu-degree">PhD in AI Security</div>
-      <div class="edu-inst">Ulm University</div>
-      <div class="edu-field">V2X Networks, Trust in Machine Learning · Germany</div>
-    </div>
-    <div class="edu-card" data-year="2021–2023">
-      <div class="edu-degree">Engineer &amp; Master's<br>Cybersecurity, ML</div>
-      <div class="edu-inst">Telecom Paris — Institut Polytechnique de Paris</div>
-      <div class="edu-field">Cybersecurity, Machine Learning, Mobile Networks · France</div>
-    </div>
-    <div class="edu-card" data-year="2018–2022">
-      <div class="edu-degree">Engineer / Master's<br>Cybersecurity &amp; ML</div>
-      <div class="edu-inst">École Polytechnique (X18)</div>
-      <div class="edu-field">Cybersecurity &amp; Machine Learning · France</div>
-    </div>
-  </div>
-</section>
-
-  
-<!-- CONTACT -->
-<section id="contact">
-  <div class="section-label" style="justify-content:center">Contact</div>
-  <h2>Get in touch</h2>
-  <p style="color:var(--muted);max-width:480px;margin:0 auto;font-size:15px;">
-    Open to collaborations, research discussions, and speaking engagements in trustworthy AI, uncertainty quantification, and ML security.
-  </p>
-  <div class="contact-links">
-    <a href="mailto:ouattaraismael1999@gmail.com" class="contact-link">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-      <span class="__cf_email__" data-cfemail="a6c9d3c7d2d2c7d4c7cfd5cbc7c3ca979f9f9fe6c1cbc7cfca88c5c9cb">ouattaraismael1999@gmail.com</span>
-    </a>
-    <a href="https://github.com/Ouatt-Isma" target="_blank" class="contact-link">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-      github.com/Ouatt-Isma
-    </a>
-    <a href="https://ouatt-isma.github.io" target="_blank" class="contact-link">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 1 0 20A14.5 14.5 0 0 1 12 2"/><path d="M2 12h20"/></svg>
-      ouatt-isma.github.io
-    </a>
-    <a href="https://www.linkedin.com/in/koffi-ismael-ouattara-96291817a/" target="_blank" class="contact-link">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 1 0 20A14.5 14.5 0 0 1 12 2"/><path d="M2 12h20"/></svg>
-      linkedin
-    </a>
-    <a href="Ouattara_CV_Publications.pdf" download class="contact-link" style="border-color:var(--accent);color:var(--accent);">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Download CV + Publications
-    </a>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <p>© 2026 Koffi Ismael Ouattara</p>
-  <p>Ulm University &amp; Huawei Research</p>
-</footer>
-
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  // Scroll fade-in
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        observer.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.1 });
-
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-  // Publication filter
-  function filterPubs(type, btn) {
-    document.querySelectorAll('.filter-btn').forEach(    b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.pub-item').forEach(item => {
-      item.style.display = (type === 'all' || item.dataset.type === type) ? 'grid' : 'none';
-    });
-  }
-
-  // Theme toggle
-  const toggle = document.getElementById('theme-toggle');
-  const moon = document.getElementById('icon-moon');
-  const sun = document.getElementById('icon-sun');
-  const html = document.documentElement;
-
-  // Persist preference
-  const saved = localStorage.getItem('theme');
-  if (saved === 'light') {
-    html.setAttribute('data-theme', 'light');
-    moon.style.display = 'none';
-    sun.style.display = 'block';
-  }
-
-  toggle.addEventListener('click', () => {
-    const isLight = html.getAttribute('data-theme') === 'light';
-    if (isLight) {
-      html.removeAttribute('data-theme');
-      moon.style.display = 'block';
-      sun.style.display = 'none';
-      localStorage.setItem('theme', 'dark');
-    } else {
-      html.setAttribute('data-theme', 'light');
-      moon.style.display = 'none';
-      sun.style.display = 'block';
-      localStorage.setItem('theme', 'light');
-    }
-  });
-</script>
+</main>
 </body>
 </html>
