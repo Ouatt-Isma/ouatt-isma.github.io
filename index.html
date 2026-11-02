@@ -231,9 +231,9 @@
       <p class="meta">Provenance Is Enough. Under review at TMLR.</p>
     </div>
     <div class="tile">
-      <div class="figure">No test data</div>
-      <div class="tile-title">Backdoor localised by reading the model</div>
-      <p>Parameter trust, built from gradient stability and revised every mini-batch, localises a backdoor at the level of the two poisoned classes while accuracy stays above 97% (class trust 0.756 against 0.994 for clean classes), and separates the label channel from the trigger channel. A research prototype runs in Huawei's internal research environment.</p>
+      <div class="figure">AUROC 0.975</div>
+      <div class="tile-title">Out-of-distribution detection</div>
+      <p>Trust opinions propagated in parallel with the network's own computation, without modifying it. MNIST to Fashion-MNIST, against 0.883 for softmax.</p>
       <p class="meta">Two Routes to Trust. Accepted at IEEE TPS 2026 · <a href="https://arxiv.org/abs/2511.20586">arXiv:2511.20586</a> · <a href="demos/patas_simulator.html">Demo</a></p>
     </div>
     <div class="tile">
