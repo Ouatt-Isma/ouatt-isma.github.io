@@ -227,10 +227,10 @@
       <p class="meta">Provenance Is Enough. Submitted to IEEE SaTML 2027.</p>
     </div>
     <div class="tile">
-      <div class="figure">AUROC 1.00</div>
+      <div class="figure">AUROC 0.97</div>
       <div class="tile-title">PaTAS runtime failure monitor</div>
-      <p>Detects backdoored inputs with no trigger knowledge, matches softmax on clean data, under 0.1 ms per batch. Deployed.</p>
-      <p class="meta"><a href="https://arxiv.org/abs/2511.20586">arXiv:2511.20586</a> · <a href="demos/patas_simulator.html">Demo</a></p>
+      <p>Flags out-of-distribution and corrupted inputs (0.99 vs 0.66 for softmax on a CNN) and backdoored inputs with no trigger knowledge. Matches softmax on clean data, 0.43 ms per batch. Deployed.</p>
+      <p class="meta">Accepted at IEEE TPS 2026. <a href="https://arxiv.org/abs/2511.20586">arXiv:2511.20586</a> · <a href="demos/patas_simulator.html">Demo</a></p>
     </div>
     <div class="tile">
       <div class="figure">511,000 judgements</div>
@@ -306,10 +306,6 @@
       <div class="pub-meta">K. I. Ouattara et al. Submitted to ICLR 2027.</div>
     </li>
     <li>
-      <div class="pub-title">PaTAS: A Framework for Trust Propagation in Neural Networks Using Subjective Logic</div>
-      <div class="pub-meta">K. I. Ouattara et al. arXiv preprint, 2025. <a href="https://arxiv.org/abs/2511.20586">arXiv:2511.20586</a> · <a href="demos/patas_simulator.html">Demo</a></div>
-    </li>
-    <li>
       <div class="pub-title">Subjective Heads for Frozen Foundation Models</div>
       <div class="pub-meta">K. I. Ouattara et al. In progress. Post-hoc uncertainty heads, abstention frontiers, adversarially robust fusion.</div>
     </li>
@@ -317,6 +313,10 @@
 
   <h3>Published</h3>
   <ul class="pubs">
+    <li>
+      <div class="pub-title">PaTAS: A Framework for Trust Propagation in Neural Networks Using Subjective Logic</div>
+      <div class="pub-meta">K. I. Ouattara et al. IEEE TPS 2026, accepted. <a href="https://arxiv.org/abs/2511.20586">arXiv:2511.20586</a> · <a href="demos/patas_simulator.html">Demo</a></div>
+    </li>
     <li>
       <div class="pub-title">Quantifying Calibration Error in Neural Networks Through Evidence-Based Theory</div>
       <div class="pub-meta">K. I. Ouattara, I. Krontiris, T. Dimitrakos, F. Kargl. FUSION 2025. <a href="demos/calibration_demo.html">Demo</a></div>
@@ -365,7 +365,7 @@
         <div class="role">PhD Researcher, AI Failure Modes, Evaluation and Agent Safety</div>
         <div class="org">Huawei Technologies and Ulm University, Paris / Munich</div>
         <ul>
-          <li>Built and deployed PaTAS, a runtime monitor for anomalous model behaviour, adversarial inputs and drift: detects backdoored inputs at AUROC 1.00 with no trigger knowledge, matches softmax on clean data, under 0.1 ms per batch.</li>
+          <li>Built and deployed PaTAS, a runtime monitor for anomalous model behaviour, adversarial inputs and drift: flags out-of-distribution and corrupted inputs at AUROC 0.97 on MNIST (0.99 vs 0.66 for softmax on a CNN), flags backdoored inputs with no trigger knowledge, matches softmax on clean data, 0.43 ms per batch (IEEE TPS 2026).</li>
           <li>Extended the same parameter-level attribution into a backdoor defence that needs no retraining, no clean reference set and no trigger knowledge: attack success 99.08% to 0.10% for 0.15 points of clean accuracy (submitted to SaTML).</li>
           <li>Sole-authored a benchmark-grade audit of uncertainty reporting: exact theory of when learned estimates can be trusted, measured against 511,000 human judgements (CIFAR-10H) with pre-registered predictions and bootstrap confidence intervals.</li>
           <li>Showed in that audit that a standard estimator choice fabricates a trend of exactly the claimed shape, and surveyed 50 recent papers with an audited protocol: 22 of 38 compare their estimate to nothing.</li>
