@@ -231,10 +231,10 @@
       <p class="meta">Provenance Is Enough. Under review at TMLR.</p>
     </div>
     <div class="tile">
-      <div class="figure">AUROC 0.97</div>
-      <div class="tile-title">PaTAS runtime failure monitor</div>
-      <p>Flags out-of-distribution and corrupted inputs (0.99 vs 0.66 for softmax on a CNN) and backdoored inputs with no trigger knowledge. Matches softmax on clean data, 0.43 ms per batch. Deployed.</p>
-      <p class="meta">Accepted at IEEE TPS 2026. <a href="https://arxiv.org/abs/2511.20586">arXiv:2511.20586</a> · <a href="demos/patas_simulator.html">Demo</a></p>
+      <div class="figure">AUROC 0.975</div>
+      <div class="tile-title">Out-of-distribution detection</div>
+      <p>Trust opinions propagated in parallel with the network's own computation, without modifying it. MNIST to Fashion-MNIST, against 0.883 for softmax.</p>
+      <p class="meta">Two Routes to Trust. Accepted at IEEE TPS 2026 · <a href="https://arxiv.org/abs/2511.20586">arXiv:2511.20586</a> · <a href="demos/patas_simulator.html">Demo</a></p>
     </div>
     <div class="tile">
       <div class="figure">511,000 judgements</div>
@@ -304,24 +304,26 @@
     </li>
     <li>
       <div class="pub-title">Provenance Is Enough: Removing Backdoors From the Parameters an Untrusted Source Shaped</div>
-      <div class="pub-meta">K. I. Ouattara et al. Submitted to IEEE SaTML 2027.</div>
-      <div class="pub-summary">Attributes every parameter of a trained network to the training sources that shaped it, weighted by their share of its gradient, and removes the parameters an untrusted source formed. Drives a patch backdoor's attack success from 99.08% to 0.10% for 0.15 points of clean accuracy, with no retraining, no clean reference set and no knowledge of the trigger.</div>
+      <div class="pub-meta">K. I. Ouattara et al. Under review at TMLR.</div>
+      <div class="pub-summary">Attributes every parameter of a trained network to the training sources that shaped it, weighted by their share of its gradient, then removes the parameters an untrusted source formed. Drives a patch backdoor's attack success from 99.08% to 0.10% on MNIST for 0.15 points of clean accuracy, with no retraining, no clean reference set and no knowledge of the trigger, and still works at 0.97% poisoning where activation clustering removes nothing. Input-position attribution extends it to ResNet-18 on four datasets including GTSRB.</div>
     </li>
+  </ul>
+
+  <h3>In preparation</h3>
+  <ul class="pubs">
     <li>
-      <div class="pub-title">Where Uncertainty Lives: Exact Per-Layer Attribution of Aleatoric and Epistemic Variance, and the Trade-off It Reveals</div>
-      <div class="pub-meta">K. I. Ouattara et al. Submitted to ICLR 2027.</div>
-    </li>
-    <li>
-      <div class="pub-title">Subjective Heads for Frozen Foundation Models</div>
-      <div class="pub-meta">K. I. Ouattara et al. In progress. Post-hoc uncertainty heads, abstention frontiers, adversarially robust fusion.</div>
+      <div class="pub-title">Knowing Whom to Believe: Evidence-Aware Source Trust for Multi-Source RAG</div>
+      <div class="pub-meta">In preparation.</div>
+      <div class="pub-summary">Each source carries a reliability opinion updated online from the consensus of the answers, so the system can answer with its reliability, abstain when evidence is thin, or abstain when sources conflict. Tracks sources that build a record and then betray it.</div>
     </li>
   </ul>
 
   <h3>Published</h3>
   <ul class="pubs">
     <li>
-      <div class="pub-title">PaTAS: A Framework for Trust Propagation in Neural Networks Using Subjective Logic</div>
-      <div class="pub-meta">K. I. Ouattara et al. IEEE TPS 2026, accepted. <a href="https://arxiv.org/abs/2511.20586">arXiv:2511.20586</a> · <a href="demos/patas_simulator.html">Demo</a></div>
+      <div class="pub-title">Two Routes to Trust: Propagating Data and Parameter Trustworthiness Through Neural Networks with Subjective Logic</div>
+      <div class="pub-meta">K. I. Ouattara, I. Krontiris, T. Dimitrakos, D. Eisermann, H. Labiod, F. Kargl. IEEE TPS 2026, accepted. Earlier version on arXiv as <em>PaTAS: A Framework for Trust Propagation in Neural Networks Using Subjective Logic</em>, <a href="https://arxiv.org/abs/2511.20586">arXiv:2511.20586</a> · <a href="demos/patas_simulator.html">Demo</a></div>
+      <div class="pub-summary">Propagates Subjective Logic trust opinions through a network in parallel with its computation, without modifying it. An input route builds a per-feature conformity source from training statistics, with an a-priori diagnostic computed before training that predicts the datasets on which it cannot work. A model route derives parameter trust from gradient stability and reads a trained model without test data. Extends to residual CNNs by weighting the inference path.</div>
     </li>
     <li>
       <div class="pub-title">Quantifying Calibration Error in Neural Networks Through Evidence-Based Theory</div>
@@ -371,8 +373,8 @@
         <div class="role">PhD Researcher, AI Security and Evaluation</div>
         <div class="org">Huawei Technologies and Ulm University, Paris / Munich</div>
         <ul>
-          <li>Built and deployed PaTAS, a runtime monitor for anomalous model behaviour, adversarial inputs and drift: flags out-of-distribution and corrupted inputs at AUROC 0.97 on MNIST (0.99 vs 0.66 for softmax on a CNN), flags backdoored inputs with no trigger knowledge, matches softmax on clean data, 0.43 ms per batch (IEEE TPS 2026).</li>
-          <li>Extended the same parameter-level attribution into a backdoor defence that needs no retraining, no clean reference set and no trigger knowledge: attack success 99.08% to 0.10% for 0.15 points of clean accuracy (submitted to SaTML).</li>
+          <li>Built PaTAS, a framework that propagates Subjective Logic trust opinions through a neural network in parallel with its computation, without modifying it: parameter trust read from a trained model without test data localises a backdoor at the level of the poisoned classes while accuracy stays above 97%, and flags label corruption at every non-zero flip rate. Accepted at IEEE TPS 2026; a research prototype runs in Huawei's internal research environment.</li>
+          <li>Extended the same parameter-level attribution into a backdoor defence that needs no retraining, no clean reference set and no trigger knowledge: attack success 99.08% to 0.10% on MNIST for 0.15 points of clean accuracy, with input-position attribution extending it to ResNet-18 on four datasets (under review at TMLR).</li>
           <li>Sole-authored a benchmark-grade audit of uncertainty reporting: exact theory of when learned estimates can be trusted, measured against 511,000 human judgements (CIFAR-10H) with pre-registered predictions and bootstrap confidence intervals.</li>
           <li>Showed in that audit that a standard estimator choice fabricates a trend of exactly the claimed shape, and surveyed 50 recent papers with an audited protocol: 22 of 38 compare their estimate to nothing.</li>
           <li>Developed inference-time policy enforcement for AI agents: logical rules combined with neural learning to detect and block unsafe behaviour, implemented in LangChain and LangGraph as a loop that checks a model output against a policy and iterates until it complies. Second author on an evidence-based trust evaluation that identifies deceptive agents in multi-agent systems.</li>
@@ -529,7 +531,6 @@
     <li><span>LinkedIn</span> <a href="https://www.linkedin.com/in/koffi-ismael-ouattara-96291817a/">koffi-ismael-ouattara</a></li>
     <li><span>Scholar</span> <a href="https://scholar.google.com/citations?user=ZZfjgq8AAAAJ">Google Scholar</a></li>
   </ul>
-  <p>Based between Munich and Paris. Available from 1 November 2026, or 1 January 2027 for roles that require the completed doctorate.</p>
   <p>Other projects: <a href="https://faos.fr">faos.fr</a>, platform for a business accelerator agency. Security practice: <a href="https://www.root-me.org/Xma99">45 Root-Me challenges</a>, mainly cryptanalysis and reverse engineering.</p>
   <footer>© 2026 Koffi Ismael Ouattara · Last updated November 2026</footer>
 </section>
