@@ -47,7 +47,13 @@ button:hover{background:#f0f0f0}
 .legi{display:flex;align-items:center;gap:5px;font-size:12px;color:#666}
 .legd{width:22px;height:3px;border-radius:2px;flex-shrink:0}
 hr.sep{margin:14px 0;border:none;border-top:1px solid #e8e7e4}
-</style></head><body>
+</style><style>
+body{padding-bottom:52px}
+.cc-badge{position:fixed;right:12px;bottom:12px;z-index:9999;padding:6px 10px;text-decoration:none;border-radius:6px;font:11px/1 system-ui,sans-serif;color:#8a8a82;
+  background:#fffefb;border:1px solid #e0ded7}
+.cc-badge:hover{color:#1a1a18;border-color:#bbb8b0}
+</style>
+</head><body>
 <div class="tabs">
   <button class="tb" id="tab-btn-fw" onclick="switchTab('fw')">Framework</button>
   <button class="tb" id="tab-btn-sl" onclick="switchTab('sl')">SL Operators</button>
@@ -927,4 +933,5 @@ function runBenchmark(){
 /* ======== INIT ======== */
 updateSL();updateTE();updateFuse();
 </script>
+<a class="cc-badge" href="https://claude.com/claude-code" target="_blank" rel="noopener">Powered by Claude Code</a>
 </body></html>
